@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+        .el-dialog__wrapper {
+            left: 0 !important;
+        }
+
+        .demo-ruleForm {
+            width: 100%;
+        }
+
+        .demo-ruleForm .el-form-item {
+            width: 33%;
+            float: left;
+        }
+
+        .clears:after {
+            display: block;
+            clear: both;
+            content: "";
+            visibility: hidden;
+            height: 0
+        }
+
+        .grid-content:after {
+            display: block;
+            clear: both;
+            content: "";
+            visibility: hidden;
+            height: 0
+        }
+
+        .grid-content span {
+            float: left;
+        }
+
+        .grid-content span:last-child {
+            max-width: 75%;
+        }
+
+        .el-message-box__wrapper {
+            position: fixed;
+            top: -20px;
+            bottom: 0;
+            left: 0px !important;
+            right: 0;
+            text-align: center;
+        }
+
+        i {
+            font-style: normal
+        }
+
+        .fl {
+            float: left;
+        }
+
+        .label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .grid-content {
+            background: #fff;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .el-table__empty-block {
+            background: #fff;
+        }
+    </style>
+</head>
+
+<body style="background: #e5e9f2;">
+    <div id="app">
+        <el-row :gutter="20" style="margin:0;">
+            <el-col :span="24" id="leftdiv">
+                <div class="grid-content bg-purple">
+                    <p class="title">账单信息</p>
+                    <div class="grid-content bg-purple">
+                        <span class="label">创建时间:</span><span>{{ruleForm.createAt}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">账单名称:</span><span>{{ruleForm.type}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">账单类型:</span><span>{{ruleForm.billType}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">账单金额:</span>
+                        <el-input style="width:120px; float: left;margin-right:10px" v-model="ruleForm.badMoney"
+                                  onkeyup="this.value=this.value.replace(/[^\d.]/g,'').replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3')"
+                                  :disabled="dis"></el-input><span class="fl">{{ruleForm.current}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">账单状态:</span><span>{{ruleForm.statused}}</span>
+                    </div>
+                    <el-button type="primary" @click="update" :disabled="dis">修改</el-button>
+                </div>
+            </el-col>
+        </el-row>
+        <div style="background:#fff;padding:10px;margin:8px 10px;">
+            <p class="title">订单其他账单</p>
+            <el-table
+                      style="background: #e5e9f2;"
+                      :data="billdata"
+                      border
+                      style="width: 100%;margin-top:5px;"
+                      @selection-change="">
+                <el-table-column
+                                 label="创建时间"
+                                 :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.createAt }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                                 label="账单名称"
+                                 :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span v-if='scope.row.type ===1'>课程预付</span>
+                        <span v-if='scope.row.type ===2'>欠费账单</span>
+                        <span v-if='scope.row.type ===4'>课程尾款</span>
+                        <span v-if='scope.row.type ===8'>课程追付</span>
+                        <span v-if='scope.row.type ===16'>补款账单</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                                 label="账单类型"
+                                 width="160">
+                    <template slot-scope="scope">
+                        <span v-if='scope.row.billType ===1'>系统生成</span>
+                        <span v-if='scope.row.billType ===2'>销售创建</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                                 label="账单金额"
+                                 width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.endTime  }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                                 label="账单状态"
+                                 width="160">
+                    <template slot-scope="scope">
+                        <span v-if='scope.row.statused ===1'>待处理</span>
+                        <span v-if='scope.row.statused ===2'>学生已处理</span>
+                        <span v-if='scope.row.statused ===4'>销售已处理</span>
+                        <span v-if='scope.row.statused ===8'>已结束</span>
+                    </template>
+                </el-table-column>
+                <!-- <el-table-column label="操作">  
+            <template slot-scope="scope">  
+                <el-button size="mini" @click="revise(scope.row,scope.$index)">课堂记录</el-button>   
+            </template>  
+        </el-table-column>  -->
+            </el-table>
+        </div>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function(){
+        loadJsOrCss('pagejs/bill.js')
+    }
+</script>
+
+</html>

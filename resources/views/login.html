@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title id="title"></title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/AdminLTE.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="modules/vue/css/index.css">
+    <link rel="icon" id="icon" href="" type="image/x-icon" />
+</head>
+
+<body class="hold-transition login-page">
+    <div class="login-box" id="rrapp" v-cloak>
+        <div class="login-logo">
+            <b>后台管理</b>
+        </div>
+        <div class="login-box-body" v-show="div">
+            <p class="login-box-msg">管理员登录</p>
+            <div v-if="error" class="alert alert-danger alert-dismissible">
+                <h4 style="margin-bottom: 0px;">
+                    <i class="fa fa-exclamation-triangle"></i> {{errorMsg}}</h4>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="text" class="form-control" v-model="username" placeholder="账号" @keyup.enter="login">
+                <span class="glyphicon glyphicon-user form-control-feedback"></span>
+            </div>
+            <div class="form-group has-feedback">
+                <input type="password" class="form-control" v-model="password" placeholder="密码" @keyup.enter="login">
+                <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+            </div>
+            <div class="row">
+                <div style="text-align:center">
+                    <el-button type="primary" v-bind:loading="btnstatus" @click="login" id="login" style="width:320px;">
+                        {{btnval}}</el-button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="libs/jquery.min.js"></script>
+    <script type="text/javascript">
+        document.write('<script src="js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+    </script>
+    <script src="plugins/jqgrid/jquery.jqGrid.min.js"></script>
+    <script src="modules/vue/js/vue.js"></script>
+    <script src="js/common.js"></script>
+    <script src="modules/vue/js/index.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            loadJsOrCss('js/login.js');
+        }
+    </script>
+</body>
+
+</html>

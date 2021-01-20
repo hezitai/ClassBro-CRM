@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    body {}
+</style>
+
+<body>
+    <div id="app">
+        <!-- 列表 -->
+        <!-- @selection-change="handleSelectionChange" -->
+        <el-table :data="tableDataEnd" :rules="tableDataEndRules" ref="multipleTable" border
+                  style="width: 100%;margin-top:5px;">
+            <!-- <el-table-column type="selection" width="50">
+            </el-table-column> -->
+            <el-table-column type="index" width="50" align="center">
+            </el-table-column>
+            <el-table-column label="订单号">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.typeed == 4'>
+                        <img style="width:15px" src="images/wyard.png">
+                    </span>
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="销售名称" align="center">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.sellerName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="讲师姓名" align="center">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.teacName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="退款申请时间" align="center">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="退款金额" align="center">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.refundAmount }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="申请理由" align="center">
+                <template slot-scope="scope">
+                    <span>{{scope.row.reasonShow}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="处理结果" align="center">
+                <template slot-scope="scope">
+                    <span v-show='scope.row.statused == 1'>待处理</span>
+                    <span v-show='scope.row.statused == 2'>同意退款</span>
+                    <span v-show='scope.row.statused == 4'>拒绝退款</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="理由" align="center">
+                <template slot-scope="scope">
+                    <span>{{scope.row.operReason}}</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column label="操作" width="100px" align="center">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="checkEvent(scope.row,scope.$index)">审核</el-button>
+                </template>
+            </el-table-column> -->
+        </el-table>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+
+
+        <!-- 弹窗 -->
+        <!-- <el-dialog :visible.sync="checkDialog" width="40%" top='2vh'
+                   :before-close="checkDialogCloseEvent">
+            <div>
+                <el-form ref="itemInfo" :model="itemInfo" label-width="160px">
+                    <el-form-item label="课程总价：">
+                        <span>{{itemInfo.totalPrice}} {{itemInfo.currency}}</span>
+                    </el-form-item>
+                    <el-form-item label="已消耗金额：">
+                        <span>{{itemInfo.spoReaMonetary}} {{itemInfo.currency}}</span>
+                    </el-form-item>
+                    <el-form-item label="销售申请退款金额：">
+                        <span>{{itemInfo.refundAmount}} {{itemInfo.currency}}</span>
+                    </el-form-item>
+                    <el-form-item label="理由：">
+                        <span>{{itemInfo.reasonShow.reason}}</span>
+                    </el-form-item>
+                    <el-form-item label="文件：">
+                        <a title="点击查看" style="font-weight: 600;color:#409EFF;cursor: pointer;"
+                           @click='downFile(itemInfo.reasonShow.file.fileUrl)'>{{itemInfo.reasonShow.file.fileName}}</a>
+                    </el-form-item>
+                    <el-form-item label="请选择处理结果：">
+                        <el-radio-group v-model="itemInfo.result" @change='changeResult'>
+                            <el-radio :label="1" :value='1'>同意</el-radio>
+                            <el-radio :label="0" :value='0'>不同意</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <div v-show='showResultContent == true'>
+                        <el-form-item label="责任人：" style="position:relative;">
+                            <span
+                                  style="position:absolute;top:0px;left:-75px;color:red;display:inline-block;width: 10px; height: 10px; z-index: 999;">*</span>
+                            <el-select v-model="dutyPerson" placeholder="请选择责任人" @change='dutyPersonEvent'>
+                                <el-option v-for="item in dutyPersonArray"
+                                           :key="item.value"
+                                           :label="item.label"
+                                           :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="选择退款渠道：" style="position:relative;">
+                            <span
+                                  style="position:absolute;top:0px;left:-120px;color:red;display:inline-block;width: 10px; height: 10px; z-index: 999;">*</span>
+                            <el-select v-model="refund" placeholder="请选择退款渠道" @change='refundEvent'>
+                                <el-option v-for="item in refundArray"
+                                           :key="item.value"
+                                           :label="item.label"
+                                           :value="item.value">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <p style="border-top: 1px solid #888; margin-top: 0; padding-top: 20px;">销售：</p>
+                        <div style="padding-bottom:20px;    padding-left: 25px;">
+                            <div style="display:inline-block;width: 100px;margin-left: 20px;">
+                                <el-checkbox v-model='isDeductSeller' @change='isDeductSellerEvent'>扣消耗业绩</el-checkbox>
+                            </div>
+                            <div style="display:inline-block;width: 300px;">
+                                <span>
+                                    <el-input type='number' :disabled='isSellerDisabled' style="width:150px;"
+                                              v-model="deductSellerNum"></el-input>
+                                </span><span> {{itemInfo.currency}}</span>
+                            </div>
+                        </div>
+                        <p style="border-top: 1px solid #888; margin-top: 0; padding-top: 20px;">师资：</p>
+                        <div style="padding-bottom:20px;    padding-left: 25px;">
+                            <div style="display:inline-block;width: 100px;margin-left: 20px;">
+                                <el-checkbox v-model='isDeductTeac' @change='isDeductTeacEvent'>扣师资业绩</el-checkbox>
+                            </div>
+                            <div style="display:inline-block;width: 300px;">
+                                <span>
+                                    <el-input type='number' :disabled='isTeacDisabled' style="width:150px;"
+                                              v-model="deductTeacNum"></el-input>
+                                </span><span> {{itemInfo.currency}}</span>
+                            </div>
+                        </div>
+                        <p style="border-top: 1px solid #888; margin-top: 0; padding-top: 20px;">讲师：</p>
+                        <div style="padding-bottom:20px;    padding-left: 25px;">
+                            <div style="display:inline-block;width: 100px;margin-left: 20px;">
+                                <el-checkbox v-model='isDeductLect' @change='isDeductLectEvent'>扣讲师提成</el-checkbox>
+                            </div>
+                        </div>
+                        <el-form-item label="讲师已获G币：">
+                            <span>{{itemInfo.totalTeacG}} 个</span>
+                        </el-form-item>
+                        <el-form-item label="讲师已获OTG币：">
+                            <span>{{itemInfo.totalTeacOTG}} 个</span>
+                        </el-form-item>
+                        <el-form-item label="扣除讲师已获G币：">
+                            <span>
+                                <el-input type='number' style="width:150px;" :disabled='isLectDisabled'
+                                          v-model="deTeacG">
+                                </el-input>
+                            </span><span> 个</span>
+                        </el-form-item>
+                        <el-form-item label="扣除讲师已获OTG币：">
+                            <span>
+                                <el-input type='number' style="width:150px;" :disabled='isLectDisabled'
+                                          v-model="deTeacOTG">
+                                </el-input>
+                            </span><span> 个</span>
+                        </el-form-item>
+                        <p style="border-top:1px solid #888"></p>
+                        <el-form-item label="备注：" style="position:relative;">
+                            <span
+                                  style="position:absolute;top:0px;left:-65px;color:red;display:inline-block;width: 10px; height: 10px; z-index: 999;">*</span>
+                            <el-input type='textarea' v-model="reasonDesc"></el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-show='showResultContent == false'>
+                        <el-form-item label="理由：" style="position:relative;">
+                            <span
+                                  style="position:absolute;top:0px;left:-65px;color:red;display:inline-block;width: 10px; height: 10px; z-index: 999;">*</span>
+                            <el-input type='textarea' v-model="reasonDesc"></el-input>
+                        </el-form-item>
+                    </div>
+                </el-form>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="checkDialogCloseEvent">取 消</el-button>
+                <el-button type="primary" @click="submitCheckDialog">确 定</el-button>
+            </span>
+        </el-dialog> -->
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/exitMoneyOrderFinish.js');
+    }
+
+</script>
+
+</html>

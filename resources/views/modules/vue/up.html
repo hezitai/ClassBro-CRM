@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input placeholder="请输入姓名" style="width:240px" v-on:input="change"></el-input>
+        <el-upload
+                   class="upload-demo"
+                   ref="upload"
+                   :multiple="true"
+                   :action="url"
+                   accept="image/png, image/jpeg"
+                   :file-list="fileList"
+                   list-type="picture"
+                   :before-upload="beforeAvatarUpload"
+                   :on-success="success"
+                   :on-remove="remove"
+                   :http-request="uploadFile"
+                   :on-change="change"
+                   :on-exceed="handleExceed"
+                   :auto-upload="false">
+            <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+            <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+        </el-upload>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/axios.min.js"></script>
+<script type="text/javascript">
+    var token = "4bbf2869cd4bab8b679b70aa5698d4b9"
+    var vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                dialogImageUrl: '',
+                dialogVisible: false,
+                fileList: [],
+                myHeaders: {
+                    token: "6a938758166301d476b1194c5b991178"
+                },
+                url: "" + baseURL + "sys/seller/order/evidenceThumbSave",
+                data: {
+                    studId: "13",
+                    amount: "2",
+                    formDate: "",
+                    remark: '',
+                    current: "CNY"
+                },
+                formDate: '',
+            };
+        },
+        methods: {
+            change(val) {
+                console.log(val)
+            },
+
+            uploadFile(file, fileList) {
+                console.log(file.file)
+                this.formDate = new FormData();
+                // file.map(item=>{
+                //         var loghtml = "<li class='clears'><i style='margin-right:10px;'>"+item.createAt+"</i><i>"+item.description+"</i></li>";
+                //         $("#logs").append(loghtml)
+                //       }) 
+                for (i = 0; i < 2; i++) {
+                    this.formDate.append('file' + i, file.file);
+                }
+            },
+            submitUpload() {
+                this.$refs.upload.submit();
+                this.formDate = new FormData();
+                this.$refs.upload.submit();
+                this.formDate.append('current', "CAD");
+                this.formDate.append('studId', "260");
+                this.formDate.append('amount', "27");
+                this.formDate.append('remark', "112");
+                let config = {
+                    headers: {
+                        processData: false,
+                        contentType: false,
+                        mimeType: "multipart/form-data",
+                        token: "6a938758166301d476b1194c5b991178",
+                    }
+                }
+                axios.post(vm.url, this.formDate, config).then(res => {
+                    console.log(res)
+                }).catch(res => {
+                    console.log(res)
+                })
+            },
+            success() {},
+            beforeAvatarUpload(file) {
+                const isLt2M = file.size;
+            },
+            handleExceed(file) {
+                console.log(file)
+            },
+            change(file) {
+                console.log(file)
+            },
+            remove(file) {
+                console.log(file)
+            },
+            handlePictureCardPreview(file) {
+                console.log(file)
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+        }
+    })
+    class TbFedMembers {
+        static get HuaChen() {
+            return 'jelly';
+        }
+    }
+    Promise.reject(123).then(v => {
+        console.log(v);
+    }).catch(v => {
+        console.log(v);
+    });
+    var obj = new Object();
+    obj.d = 2;
+    a();
+
+    function a() {
+        obj.d = 22;
+    };
+    console.log(obj.d);
+    //d为全局变量。
+</script>
+</body>
+
+</html>
+
+</html>

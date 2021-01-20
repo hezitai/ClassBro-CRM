@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+  <img src="" id="img"> 
+</body>
+  <script src="js/jquery.js"></script>
+  <script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+  <script type="text/javascript">  
+      getUrlStr =  function(name) {
+　　var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+　　var r = window.location.search.substr(1).match(reg);
+　　if(r != null) return unescape(r[2]);
+　　return null;
+};
+  var id = getUrlStr ("id");
+    $("#img").attr("src",baseURL+id)
+  </script>  
+</body>  
+</html>  
+</html>

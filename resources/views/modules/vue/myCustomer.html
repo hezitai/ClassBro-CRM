@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .totalPrice .el-input-number__decrease,
+    .totalPrice .el-input-number__increase {
+        display: none
+    }
+
+    .totalPrice .el-input__inner {
+        padding-left: 15px;
+        padding-right: 0;
+        text-align: left
+    }
+
+    .customerCardDialog .el-dialog {
+        margin-top: 3vh !important;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入姓名" style="width:240px">
+        </el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-button type="primary" @click="createStudAccount">创建账号</el-button>
+        <el-button type="primary" @click="myCustomer">充值记录</el-button>
+        <!-- <el-button type="primary" @click="">学生充值</el-button> -->
+        <!-- <el-button type="primary" @click="search">创建体验课堂账单</el-button> -->
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column label="姓名" :show-overflow-tooltip="true" width="100">
+                <template slot-scope="scope">
+                    <span @click="updateStudinfo(scope.row,scope.$index)"
+                          style="color:#409EFF;cursor: pointer;">{{ scope.row.nickName }}</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column 
+           label="客户等级"
+           :show-overflow-tooltip="true">
+           <template slot-scope="scope">
+             <span>{{ scope.row.wxAccount }}</span>
+           </template>
+           </el-table-column> -->
+            <el-table-column label="学校名称" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.universityName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="专业名称" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.professionalName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="下单记录" :show-overflow-tooltip="true" width="80" align='center'>
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;" @click="view_detail(scope.row,scope.$index)">查看</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="学期卡" :show-overflow-tooltip="true" width="80" align='center'>
+                <template slot-scope="scope">
+                    <span v-if='scope.row.studCardBag != null' style="color:#409EFF;cursor: pointer;"
+                          @click="view_card(scope.row,scope.$index)">查看</span>
+                    <span v-if='scope.row.studCardBag == null' style="color:#ccc;">无学期卡</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="账户余额" :show-overflow-tooltip="true" width="400" align='center'>
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="view_current(scope.row.studAccounts,scope.$index)">
+                        <span v-for='(item, index) in scope.row.studAccounts'><span v-if='index != 0'
+                                  style='color:#606266'> | </span>{{item.money}} {{item.current}}</span>
+                    </span>
+                </template>
+            </el-table-column>
+
+            <!-- <el-table-column label="充值" :show-overflow-tooltip="true" width="80">
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;" @click="view_card(scope.row,scope.$index)">查看</span>
+                </template>
+            </el-table-column> -->
+
+            <el-table-column label="课程预付款总额" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.consumeValue }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="课程消耗总额" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.useValue }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="客户来源" :show-overflow-tooltip="true" align='center'>
+                <template slot-scope="scope">
+                    <span v-show='scope.row.userType == 0'>销售创建</span>
+                    <span v-show='scope.row.userType == 1'>销售创建</span>
+                    <span v-show='scope.row.userType == 2'>销售创建</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="200px">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="creatOrder(scope.row,scope.$index)">创建订单</el-button>
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                            下拉操作
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click.native="creatTestclassroom(scope.row,scope.$index)">创建测试课堂
+                            </el-dropdown-item>
+                            <el-dropdown-item @click.native="setStudScreen(scope.row,scope.$index)">屏蔽录屏监测
+                            </el-dropdown-item>
+                            <el-dropdown-item :disabled='scope.row.studCardBag != null'
+                                              @click.native="addCard(scope.row,scope.$index)">添加学期卡</el-dropdown-item>
+                            <el-dropdown-item @click.native="studCZEvent(scope.row,scope.$index)">学生充值
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage" :page-sizes="[15,20]" :page-size="limit"
+                       layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
+        <el-dialog :visible.sync="modal" :close-on-click-modal="false" width="50%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <!-- <el-form-item label="测试课程名称" prop="specializedName">
+                    <el-input v-model="ruleForm.specializedName"></el-input>
+                  </el-form-item> -->
+                <el-form-item label="测试课堂名称" prop="name">
+                    <el-input v-model="ruleForm.name"></el-input>
+                </el-form-item>
+                <template>
+                    <div class="app-container">
+                        <el-form-item label="开始时间" prop="viewStartTime">
+                            <el-date-picker v-model="ruleForm.viewStartTime" type="date" value-format="yyyy-MM-dd"
+                                            :picker-options="pciker1" placeholder="开始日期" @change="changeTime">
+                            </el-date-picker>
+                            <el-time-select placeholder="起始时间" v-model="startTime" :picker-options="{
+                              start: '00:00',
+                              step: '00:10',
+                              end: '24:00'
+                            }">
+                            </el-time-select>
+                        </el-form-item>
+                        <el-form-item label="结束时间" prop="viewEndTime">
+                            <el-date-picker v-model="ruleForm.viewEndTime" type="date" value-format="yyyy-MM-dd"
+                                            :picker-options="pciker2" placeholder="结束日期">
+                            </el-date-picker>
+                            <el-time-select placeholder="结束时间" v-model="endTime" :picker-options="{
+                            start: '00:00',
+                            step: '00:10',
+                            end: '24:00',
+                            minTime: startTime
+                          }">
+                            </el-time-select>
+                        </el-form-item>
+                    </div>
+                </template>
+                <el-form-item label="课堂详情" prop="description">
+                    <el-input type="textarea" :rows="4" placeholder="请输入内容" v-model="ruleForm.description">
+                    </el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm('ruleForm')" v-bind:loading="btnstatus">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="detilmodal" :before-close="handleClose" :close-on-click-modal="false" width="50%">
+            <el-table :data="tableDataEnd1" ref="multipleTable" border style="width: 100%;margin-top:5px;">
+                <el-table-column label="订单号" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span style="color:#409EFF;cursor: pointer;"
+                              @click='openNew(scope.row, scope.$index)'>{{ scope.row.orderNo }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="订单状态" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span v-if='scope.row.statused===1'>未处理(无任何销售接单)</span>
+                        <span v-if='scope.row.statused===2'>待审核</span>
+                        <span v-if='scope.row.statused===4'>待确定</span>
+                        <span v-if='scope.row.statused===8'>待规划(等待教师/运营接单)</span>
+                        <span v-if='scope.row.statused===16'>规划中(订单第一次超时等待运营接单)</span>
+                        <span v-if='scope.row.statused===32'>规划中(订单第二次超时等待运营主管强制指派)</span>
+                        <span v-if='scope.row.statused===64'>规划中(运营接单待指派，正在处理)</span>
+                        <span v-if='scope.row.statused===128'>待排课</span>
+                        <span v-if='scope.row.statused===256'>已排课</span>
+                        <span v-if='scope.row.statused===512'>待结课</span>
+                        <span v-if='scope.row.statused===1024'>已结课</span>
+                        <span v-if='scope.row.statused===2048'>已强制结课</span>
+                        <span v-if='scope.row.statused===4096'>已取消</span>
+                        <span v-if='scope.row.statused===8192'>坏单申请中</span>
+                        <span v-if='scope.row.statused===16384'>坏单已确认结束</span>
+                        <span v-if='scope.row.statused===32768'>销售被更换</span>
+                        <span v-if='scope.row.statused===65536'>事故单申请中</span>
+                        <span v-if='scope.row.statused===131072'>事故单已处理</span>
+                        <span v-if='scope.row.statused===262144'>事故单更换教师</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="150px">
+                    <template slot-scope="scope">
+                        <el-button size="mini" @click="updatephone(scope.row,scope.$index)">更新回放手机设备</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination style="margin-top:15px" @size-change="handleSizeChange1"
+                           @current-change="handleCurrentChange1" :current-page="currentPage1" :page-sizes="[8]"
+                           :page-size="limit1" layout="total, sizes, prev, pager, next, jumper" :total="total1">
+            </el-pagination>
+            <!-- <span slot="footer" class="dialog-footer">
+              <el-button type="primary" @click="submitForm('ruleForm')" v-bind:loading="btnstatus">{{btnval}}</el-button>           
+          </span> -->
+        </el-dialog>
+        <!-- :rules="rules" -->
+        <el-dialog :visible.sync="cardmodal" :before-close="CloseaddCard" :close-on-click-modal="false" width="40%">
+            <el-form :model="cardruleForm" ref="cardruleForm" label-width="100px" class="demo-ruleForm">
+                <!--  prop="currencyType" class="currencyType" -->
+                <el-form-item label="选择币种">
+                    <el-select v-model="nomarlCurrency" placeholder="选择币种" @change='changeCurrency'>
+                        <el-option v-for="item in currencyList" :key="item.id" :label="item.tagerCurrency"
+                                   :value="item.id" :disabled='item.deleteFlag == true'>
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <!--  prop="totalPrice" class="totalPrice" -->
+                <el-form-item label="学期卡金额">
+                    <el-input-number v-model="cardruleForm.totalPrice" :min="0" :precision="1" :step="0.1">
+                    </el-input-number>
+                    <span v-text="cardruleForm.currency"></span>
+                </el-form-item>
+                <!-- prop="time" -->
+                <el-form-item label="普通课时">
+                    <el-input-number v-model="cardruleForm.time" :min="0" :precision="2" :step="0.1"></el-input-number>
+                    <span>小时</span>
+                </el-form-item>
+                <!--  prop="sendTime" -->
+                <el-form-item label="赠送课时">
+                    <el-input-number v-model="cardruleForm.sendTime" :min="0" :precision="2" :step="0.1">
+                    </el-input-number>
+                    <span>小时</span>
+                </el-form-item>
+                <!--  prop="paytype" -->
+                <el-form-item label="支付方式:">
+                    <el-select v-model="cardruleForm.paytype" placeholder="请选择支付方式">
+                        <el-option label="余额支付" value="1"></el-option>
+                        <el-option label="转账支付" value="2"></el-option>
+                    </el-select>
+                </el-form-item>
+
+                <!-- 学期卡币种选择 -->
+
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="typebtn('cardruleForm')" v-bind:loading="btnstatus">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="mm" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-upload class="upload-demo" ref="upload" :multiple="true" accept="image/png, image/jpeg"
+                           :action="url" :on-preview="handlePreview" :on-remove="handleRemove"
+                           :http-request="uploadFile"
+                           :file-list="fileList" list-type="picture" :on-change="change" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload">上传到服务器</el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save('ruleForm')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+
+        <!-- 学生充值 -->
+        <el-dialog :visible.sync="studCZ" width="40%">
+            <el-form :model="studCZData" :rules="studCZData" ref="studCZData" label-width="80px"
+                     class="demo-studCZData">
+                <el-form-item label='手机号'>
+                    <el-input v-model='studCZData.mobile' :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label='姓名'>
+                    <el-input v-model='studCZData.nickName' :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label='金额'>
+                    <el-input type='number' v-model='studCZUpdata.amount'></el-input>
+                </el-form-item>
+                <el-form-item label="货币类型" prop="current">
+                    <el-form-item>
+                        <el-select v-model="studCZData.current" style="width: 200px;">
+                            <el-option v-for="item in countrys" :key="item.value" :label="item.currency"
+                                       :value="item.currency">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form-item>
+                <!-- :headers="myHeaders" :data="data"  -->
+                <el-upload class="upload-demo" ref="upload" :multiple="true"
+                           accept="image/png, image/jpeg" :action="url" :on-preview="handlePreviewCZ"
+                           :on-remove="handleRemoveCZ"
+                           :on-success="successCZ" :http-request="uploadFileCZ" :on-error="onerrorCZ"
+                           :file-list="fileListCZ"
+                           list-type="picture" :on-change="changeCZ" :auto-upload="false" style="margin-bottom:10px;">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpDataCZ">上传到服务器
+                    </el-button>
+                </el-upload>
+                <el-form-item label='转账备注'>
+                    <el-input type="textarea" :rows="4" v-model="studCZUpdata.remark"></el-input>
+                </el-form-item>
+                <!-- <el-form-item label="手机号">
+                    <el-input v-model="studCZData.mobile" style="width:120px"></el-input>
+                </el-form-item> -->
+                <!-- <el-form-item label="姓名" prop="studname">
+                    <el-input v-model="studCZData.studname" :disabled="true"></el-input>
+                </el-form-item> -->
+                <!-- <el-form-item label="金额" prop="amount">
+                    <el-input v-model="studCZData.amount" type="number"></el-input>
+                </el-form-item> -->
+                <!-- <el-form-item label="转账备注">
+                    <el-input type="textarea" :rows="4" v-model="ruleForm.remark"></el-input>
+                </el-form-item> -->
+                <!-- <el-upload class="upload-demo" ref="upload" :headers="myHeaders" :data="data" :multiple="true"
+                    accept="image/png, image/jpeg" :action="url" :on-preview="handlePreview" :on-remove="handleRemove"
+                    :on-success="success" :http-request="uploadFile" :on-error="onerror" :file-list="fileList"
+                    list-type="picture" :on-change="change" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload">上传到服务器</el-button>
+                </el-upload> -->
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="updataCZ()" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+
+
+        <el-dialog title='账户余额' :visible.sync='currentDialog' width='60%'>
+            <div>
+                <el-table :data="currentList.list" border style="width: 100%;">
+                    <el-table-column label="日期" align='center'>
+                        <template slot-scope="scope">
+                            <!-- <span style="color:#409EFF;cursor: pointer;">{{ scope.row.current }}</span> -->
+                            <span>{{ scope.row.createAt }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="订单号" align='center'>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.orderNo }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="类型" align='center'>
+                        <template slot-scope="scope">
+                            <span v-if='scope.row.type == 1'>提现</span>
+                            <span v-if='scope.row.type == 2'>充值</span>
+                            <span v-if='scope.row.type == 4'>课程退款</span>
+                            <span v-if='scope.row.type == 16'>课程消费</span>
+                            <span v-if='scope.row.type == 64'>抵扣欠款</span>
+                        </template>
+                        <!-- 1-提现   
+                            2-充值 
+                            4-课程退款
+                            16-课程消费
+                            64-抵扣欠款 -->
+                    </el-table-column>
+                    <el-table-column label="状态" :show-overflow-tooltip="true" align='center'>
+                        <template slot-scope="scope">
+                            <el-tag v-if='scope.row.statused===0'>待审核</el-tag>
+                            <el-tag type="success" v-if='scope.row.statused===1'>已通过</el-tag>
+                            <el-tag type="warning" v-if='scope.row.statused===2'>已拒绝</el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="金额" align='center'>
+                        <template slot-scope="scope">
+                            <span v-if='scope.row.type == 1'> - </span>
+                            <span v-if='scope.row.type == 16'> - </span>
+                            <span v-if='scope.row.type == 64'> - </span>
+                            <span v-if='scope.row.type == 2'> + </span>
+                            <span v-if='scope.row.type == 4'> + </span>
+                            <span>{{ scope.row.money }} {{ scope.row.current}}</span>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <el-pagination
+                               :page-size="limit3"
+                               layout="prev, pager, next"
+                               :total="currentList.totalCount"
+                               @current-change="handleCurrentChange3"
+                               @size-change="handleSizeChange3">
+                </el-pagination>
+                <!-- @size-change="handleSizeChange1"
+                    @current-change="handleCurrentChange1" 
+                    :current-page="currentPage1" 
+                    :page-sizes="[8]"
+                    :page-size="limit1" 
+                    layout="total, sizes, prev, pager, next, jumper" 
+                    :total="total1" 
+                -->
+            </div>
+        </el-dialog>
+
+
+        <el-dialog title='学期卡' class="customerCardDialog" :visible.sync='customerCardDialog' width='80%'
+                   style="margin-left:200px!important">
+            <iframe :src="customerCardSrc" style="width:100%;height:600px;border:none;"></iframe>
+        </el-dialog>
+        <!-- <el-dialog :visible.sync="mm" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="手机号" prop="name">
+                    <el-input v-model="ruleForm.name" style="width:120px"></el-input>
+                    <el-button type="primary" @click="searchname">查询</el-button>
+                    <i v-show="error" style="color:red">{{error}}</i>
+                </el-form-item>
+                <el-form-item label="姓名" prop="studname">
+                    <el-input v-model="ruleForm.studname" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="金额" prop="amount" v-show="person">
+                    <el-input v-model="ruleForm.amount" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="转账备注">
+                    <el-input type="textarea" :rows="4" v-model="ruleForm.remark"></el-input>
+                </el-form-item>
+                <el-form-item label="货币类型" prop="current" v-show="person">
+                    <el-form-item>
+                        <el-select v-model="ruleForm.current" style="width: 200px;">
+                            <el-option v-for="item in countrys" :key="item.value" :label="item.currency"
+                                :value="item.currency">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form-item>
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders" :data="data" :multiple="true"
+                    accept="image/png, image/jpeg" :action="url" :on-preview="handlePreview" :on-remove="handleRemove"
+                    :on-success="success" :http-request="uploadFile" :on-error="onerror" :file-list="fileList"
+                    list-type="picture" :on-change="change" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload">上传到服务器</el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save('ruleForm')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="updatamodel" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="手机号" prop="name">
+                    <el-input v-model="ruleForm.name" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名" prop="studname">
+                    <el-input v-model="ruleForm.studname" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="转账备注">
+                    <el-input type="textarea" :rows="4" v-model="ruleForm.remark"></el-input>
+                </el-form-item>
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders1" :data="datas1" :multiple="true"
+                    accept="image/png, image/jpeg" :action="url" :on-preview="handlePreview1" :on-remove="handleRemove1"
+                    :on-success="success1" :http-request="uploadFile1" :on-error="onerror1" :file-list="fileList1"
+                    list-type="picture" :on-change="change1" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload1">上传到服务器
+                    </el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save1('ruleForm')" v-bind:loading="b11">{{b21}}</el-button>
+            </span>
+        </el-dialog> -->
+
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="js/axios.min.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/myCustomer.js');
+    }
+</script>
+
+</html>

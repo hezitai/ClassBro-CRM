@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入姓名" style="width:240px">
+        </el-input>
+        <el-select v-model="ruleForm.tudStatused" placeholder="请选择" @change="change_spoTypeArr">
+            <el-option v-for="item in tudStatuseds" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+        </el-select>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-button type="primary" @click="secondCalendar"
+                   v-if="hasPermission('sys:shiziqudao:fushiliebiao:fushilichengbiao')">复试历程表</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column label="手机号" :show-overflow-tooltip="true" width="120" align='center'>
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="view_detail(scope.row,scope.$index)">{{ scope.row.mobile }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="教师姓名" width="100" :show-overflow-tooltip="true" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.username }}</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column 
+      label="性别"
+      width="60">
+      <template slot-scope="scope">
+        <span v-if="scope.row.sex==='FEMALE'">女</span>
+        <span v-if="scope.row.sex==='MALE'">男</span>
+      </template>
+      </el-table-column> -->
+            <el-table-column label="学历" width="80" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.eduName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="专业" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.professionalCoursesName }}</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column
+        :show-overflow-tooltip="true"
+          label="国家">
+        <template slot-scope="scope">
+            <span>{{ scope.row.countryName }}</span>
+        </template>
+        </el-table-column> -->
+            <el-table-column :show-overflow-tooltip="true" label="学校" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.universityName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="初试人" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.interviewUser.username }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="复试人" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.reexamineInterviewUser.username }}</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column label="渠道方">
+        <template slot-scope="scope">
+          <span>{{ scope.row.channelName }}</span>
+        </template>
+      </el-table-column> -->
+            <el-table-column label="状态" width="100" align='center'>
+                <template slot-scope="scope">
+                    <span v-if="scope.row.tudStatused===0">待推荐</span>
+                    <span v-if="scope.row.tudStatused===1">待初试</span>
+                    <span v-if="scope.row.tudStatused===2">待复试</span>
+                    <span v-if="scope.row.tudStatused===3">初试被拒</span>
+                    <span v-if="scope.row.tudStatused===4">待培训1</span>
+                    <span v-if="scope.row.tudStatused===5">复试被拒</span>
+                    <span v-if="scope.row.tudStatused===6">培训1合格</span>
+                    <span v-if="scope.row.tudStatused===7">培训1被拒</span>
+                    <span v-if="scope.row.tudStatused===8">培训2合格</span>
+                    <span v-if="scope.row.tudStatused===9">培训2被拒</span>
+                    <span v-if="scope.row.tudStatused===10">工作中</span>
+                    <span v-if="scope.row.tudStatused===null">未知</span>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="复试时间" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.reexamineTime }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="创建时间" :show-overflow-tooltip="true" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="简历/成绩单" align='center'>
+                <template slot-scope="scope">
+                    <span>
+                        <el-button type="primary" size="mini" v-if="scope.row.report != ''" class="el-icon-download"
+                                   @click="downfile1(scope.row,scope.$index)">下载简历</el-button>
+                    </span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="120" align='center'>
+                <template slot-scope="scope">
+                    <!-- <el-button>安排复试</el-button>
+                    <el-button>安排复试</el-button>
+                    <el-button>更新时间</el-button>
+                    <el-button>更新时间</el-button>
+                    <el-button>复试结果</el-button>
+                    <el-button>复试结果</el-button> -->
+
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                            下拉操作
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item size="mini"
+                                              v-if="scope.row.reexamineTime ===null&&hasPermission('sys:shiziqudao:fushiliebiao:anpaimianshi')"
+                                              @click.native="recommendTeacher(scope.row,scope.$index)">安排复试</el-dropdown-item>
+                            <el-dropdown-item size="mini"
+                                              v-if="scope.row.reexamineTime !==null&&hasPermission('sys:shiziqudao:fushiliebiao:anpaimianshi')"
+                                              disabled>安排复试</el-dropdown-item>
+                            <el-dropdown-item size="mini"
+                                              v-if="scope.row.reexamineTime !==null&&hasPermission('sys:shiziqudao:fushiliebiao:gengxinshijian')"
+                                              @click.native="updateTeacher(scope.row,scope.$index)">
+                                更新时间</el-dropdown-item>
+                            <el-dropdown-item size="mini"
+                                              v-if="scope.row.reexamineTime ===null&&hasPermission('sys:shiziqudao:fushiliebiao:gengxinshijian')"
+                                              disabled>
+                                更新时间</el-dropdown-item>
+                            <el-dropdown-item size="mini"
+                                              v-if="scope.row.reexamineTime !==null&&hasPermission('sys:shiziqudao:fushiliebiao:fushijieguo')"
+                                              @click.native="recommendResult(scope.row,scope.$index)">
+                                复试结果</el-dropdown-item>
+                            <el-dropdown-item size="mini"
+                                              v-if="scope.row.reexamineTime ===null&&hasPermission('sys:shiziqudao:fushiliebiao:fushijieguo')"
+                                              disabled>复试结果</el-dropdown-item>
+                            
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+        <!-- 弹框 -->
+        <el-dialog :visible.sync="modal" width="50%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="选择师资" prop="toOperId">
+                    <el-select v-model="ruleForm.toOperId" @change="changeTeac">
+                        <el-option v-for="item in toOperIds" :key="item.id" :label="item.username" :value="item.userId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="房间ID" prop="roomId">
+                    <el-input type="number" placeholder="请输入内容" v-model="ruleForm.roomId">
+                    </el-input>
+                </el-form-item>
+                <el-form-item label="房间URL" prop="roomUrl">
+                    <el-input type="textarea" :rows="3" placeholder="请输入内容" v-model="ruleForm.roomUrl">
+                    </el-input>
+                </el-form-item>
+                <template>
+                    <div class="app-container">
+                        <el-form-item label="开始时间" prop="viewStartTime">
+                            <el-date-picker v-model="ruleForm.viewStartTime" type="date" value-format="yyyy-MM-dd"
+                                            :picker-options="pciker1" placeholder="开始日期"
+                                            @change="changeTime">
+                            </el-date-picker>
+                            <el-time-select placeholder="起始时间" v-model="startTime" :picker-options="{
+                          start: '00:00',
+                          step: '00:10',
+                          end: '24:00'
+                        }">
+                            </el-time-select>
+                        </el-form-item>
+                        <el-form-item label="结束时间" prop="viewEndTime">
+                            <el-date-picker v-model="ruleForm.viewEndTime" type="date" value-format="yyyy-MM-dd"
+                                            :picker-options="pciker2" placeholder="结束日期">
+                            </el-date-picker>
+                            <el-time-select placeholder="结束时间" v-model="endTime" :picker-options="{
+                          start: '00:00',
+                          step: '00:10',
+                          end: '24:00',
+                          minTime: startTime
+                        }">
+                            </el-time-select>
+                        </el-form-item>
+                    </div>
+                </template>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-show="save" @click="submitForm('ruleForm')" v-bind:loading="btnstatus">
+                    {{btnval}}</el-button>
+                <el-button type="primary" v-show="update" @click="updateForm('ruleForm')" v-bind:loading="btnstatus">
+                    {{btnval}}</el-button>
+            </span>
+        </el-dialog>
+        <!-- 弹框 -->
+        <el-dialog :visible.sync="resultmodal" width="50%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="是否通过" prop="isCross">
+                    <template>
+                        <el-radio-group v-model="ruleForm.isCross" @change="change">
+                            <el-radio :label="true">通过</el-radio>
+                            <el-radio :label="false">不通过</el-radio>
+                        </el-radio-group>
+                    </template>
+                    <!-- <el-switch
+                  v-model="ruleForm.isCross">
+                </el-switch> -->
+                </el-form-item>
+                <el-form-item label="复试评价" prop="description">
+                    <el-input type="textarea" :rows="4" placeholder="请输入内容" v-model="ruleForm.description">
+                    </el-input>
+                </el-form-item>
+            </el-form>
+
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm1('ruleForm')" v-bind:loading="btnstatus">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/secondInterview.js');
+    }
+</script>
+
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .totalPrice .el-input-number__decrease,
+    .totalPrice .el-input-number__increase {
+        display: none
+    }
+
+    .totalPrice .el-input__inner {
+        padding-left: 15px;
+        padding-right: 0;
+        text-align: left
+    }
+
+    .el-row {
+        margin-bottom: 6px;
+    }
+
+    .el-col {
+        border-radius: 4px;
+        height: 36px;
+        line-height: 36px;
+        text-indent: 8px
+    }
+
+    .grid-content {
+        border-radius: 4px;
+        min-height: 36px;
+    }
+
+    .cards {
+        height: 200px;
+        line-height: 200px;
+        text-align: center
+    }
+
+    .box-card .el-card__header {
+        border: none;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <!-- <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入姓名" style="width:240px"></el-input> -->
+        <!-- <el-button type="primary" @click="search">搜索</el-button> -->
+        <el-dialog :visible.sync="tablemodal" :before-close="CloseaddCard" :close-on-click-modal="false" width="80%"
+                   style="margin-left:200px!important">
+            <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                      @selection-change="handleSelectionChange">
+                <el-table-column label="订单号" :show-overflow-tooltip="true" align='center'>
+                    <template slot-scope="scope">
+                        <span class="link" style="color:#409EFF;cursor: pointer;"
+                              @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="详情" width="100" align='center'>
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.description }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="课堂名称" width="80" align='center'>
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.classroomName }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="课时" width="100" align='center'>
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.classHour }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="赠送课时" width="100" align='center'>
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.presenterTime }}</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                           :current-page="currentPage"
+                           :page-sizes="[15,20]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper"
+                           :total="total">
+            </el-pagination>
+        </el-dialog>
+        <el-card class="box-card" v-show="!cards">
+            <div slot="header" class="clearfix">
+                <!-- <span>学期卡</span> -->
+                <el-button @click="withdrawCard" style="float: right; padding: 3px 0" type="text">申请退卡</el-button>
+                <el-button @click="addCard" style="float: right; margin-right:4px; padding: 3px 0" type="text">充值
+                </el-button>
+                <!-- <el-button @click="viewCard" style="float: right; margin-right:4px; padding: 3px 0" type="text">查看使用记录</el-button> -->
+            </div>
+            <div class="text item">
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple">卡号:</div>
+                    </el-col>
+                    <el-col :span="12">
+                        <div class="grid-content bg-purple" v-text="cardNo"></div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple">学期卡单价:</div>
+                    </el-col>
+                    <el-col :span="12">
+                        <div class="grid-content bg-purple">{{unitWorth}} {{currency}}/课时</div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple">学期卡状态:</div>
+                    </el-col>
+                    <el-col :span="12">
+                        <div class="grid-content bg-purple" v-if="statused === 0">未知状态</div>
+                        <div class="grid-content bg-purple" v-if="statused === 1">未使用</div>
+                        <div class="grid-content bg-purple" v-if="statused === 2">使用中</div>
+                        <div class="grid-content bg-purple" v-if="statused === 4">代充值</div>
+                        <div class="grid-content bg-purple" v-if="statused === 8">退卡申请中</div>
+                        <div class="grid-content bg-purple" v-if="statused === 16">已注销</div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple">总课时: </div>
+                    </el-col>
+                    <el-col :span="12">
+                        <div class="grid-content bg-purple">{{cardruleForm.allTime}} 小时</div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple">普通课时:</div>
+                    </el-col>
+                    <el-col :span="12">
+                        <div class="grid-content bg-purple">{{cardruleForm.buyTime}} 小时</div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple">赠送课时:</div>
+                    </el-col>
+                    <el-col :span="12">
+                        <div class="grid-content bg-purple">{{cardruleForm.sendTime}} 小时</div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple">剩余课时:</div>
+                    </el-col>
+                    <el-col :span="12">
+                        <div class="grid-content bg-purple">{{cardruleForm.lastTime}} 小时</div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple">添加时间:</div>
+                    </el-col>
+                    <el-col :span="12">
+                        <div class="grid-content bg-purple" v-text="createAt"></div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple">使用记录:</div>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button @click="viewCard" type="text">查看</el-button>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <div class="grid-content bg-purple">充值记录:</div>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-button @click="applydetil" type="text">查看</el-button>
+                    </el-col>
+                </el-row>
+            </div>
+        </el-card>
+        <p class="cards" v-show="!card">暂无学习卡</p>
+        <el-dialog :visible.sync="cardmodal" :before-close="CloseaddCard" :close-on-click-modal="false" width="80%"
+                   style="margin-left:200px!important">
+            <el-form :model="cardruleForm" :rules="rules" ref="cardruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="学期卡金额" prop="totalPrice" class="totalPrice">
+                    <el-input-number v-model="cardruleForm.totalPrice" :min="0" :precision="1" :step="0.1"
+                                     v-on:input="inputFunc">
+                    </el-input-number>
+                    <span v-text="currency"></span>
+                </el-form-item>
+                <el-form-item label="课时单价" prop="time">
+                    <el-input-number v-model="cardruleForm.unitWorth" :min="0" v-on:input="inputFunc" :precision="2"
+                                     :step="0.1"
+                                     v-bind:disabled="disabled"></el-input-number>
+                    <span>{{currency}} / H</span>
+                </el-form-item>
+                <el-form-item label="普通课时" prop="buyTime">
+                    <el-input-number v-model="buyTime" :min="0" :precision="2" :step="0.1" :disabled="true">
+                    </el-input-number>
+                    <span>小时</span>
+                </el-form-item>
+                <el-form-item label="赠送课时" prop="sendTime">
+                    <el-input-number v-model="cardruleForm.sendTime" :min="0" :precision="2" :step="0.1">
+                    </el-input-number>
+                    <span>小时</span>
+                </el-form-item>
+                <el-form-item label="支付方式:" prop="paytype">
+                    <el-select v-model="cardruleForm.paytype" placeholder="请选择支付方式">
+                        <el-option label="余额支付" value="1"></el-option>
+                        <el-option label="转账支付" value="2"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="typebtn('cardruleForm')" v-bind:loading="btnstatus">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="withdrawCardmodel" :before-close="CloseaddCard" :close-on-click-modal="false"
+                   width="80%"
+                   style="margin-left:200px!important">
+            <el-form :model="cardruleForm" :rules="rules" ref="cardruleForm" label-width="50px" class="demo-ruleForm">
+                <el-form-item label="理由" prop="description">
+                    <el-input v-model="cardruleForm.description" type="textarea"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="applyCard('cardruleForm')" v-bind:loading="btnstatus">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="mm" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-upload class="upload-demo" ref="upload" :multiple="true" accept="image/png, image/jpeg"
+                           :action="url"
+                           :on-preview="handlePreview"
+                           :on-remove="handleRemove" :http-request="uploadFile" :file-list="fileList"
+                           list-type="picture"
+                           :on-change="change"
+                           :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload">上传到服务器</el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save('ruleForm')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="applymodel" width="80%" style="margin-left:200px!important">
+            <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;">
+                <el-table-column label="时间" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.createAt }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="充值金额" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.money }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="普通课时" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.classHour }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="赠送课时" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.presenterTime }}</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                           :current-page="currentPage"
+                           :page-sizes="[15,20]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper"
+                           :total="total">
+            </el-pagination>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="js/axios.min.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/customerCard.js');
+    }
+</script>
+</html>

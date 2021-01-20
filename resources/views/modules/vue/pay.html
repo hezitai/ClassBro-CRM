@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .el-icon-close {
+        display: none;
+    }
+
+    .red {
+        color: red;
+        font-weight: 600;
+    }
+
+    .blue {
+        cursor: pointer;
+        color: rgb(64, 158, 255);
+    }
+
+    img {
+        border: 1px solid #ddd;
+    }
+</style>
+
+<body style="background: #fff;">
+    <div id="app">
+        <el-dialog :visible.sync="ordermodel" :close-on-click-modal="false" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="学生姓名:" prop="studname">
+                    <div>{{ruleForm.studname}}</div>
+                </el-form-item>
+                <el-form-item label="支付金额:" prop="badMoney">
+                    <div>{{ruleForm.badMoney}} {{ruleForm.current}}</div>
+                </el-form-item>
+                <el-form-item label="支付方式:" prop="paytype">
+                    <el-select v-model="ruleForm.paytype" placeholder="请选择支付方式" :disabled="true">
+                        <el-option label="订单支付" value="0"></el-option>
+                        <el-option label="余额支付" value="1"></el-option>
+                        <el-option label="转账支付" value="2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="选择订单:" prop="aboutorder">
+                    <el-select v-model="ruleForm.aboutorder" placeholder="请选择订单" @change="changeOrder"
+                               style="width:320px">
+                        <el-option v-for="item in deliverys" :key="item.id"
+                                   :label="item.orderNo+'  ('+item.studPurchaseOrder.leftMoney+item.studPurchaseOrder.currency+')' +'  '+item.deleteFlag+''"
+                                   :value="item.id">
+                        </el-option>
+                    </el-select>
+                    <span>{{ruleForm.orderMoney}}</span>
+                    <span v-show="current"> {{ruleForm.current}}</span>
+                    <p style="color:red">{{ruleForm.deleteFlag}}</p>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="back">返回</el-button>
+                <el-button type="primary" @click="save('ruleForm')" v-bind:loading="btnstatus">{{btnval}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="model1" :close-on-click-modal="false" width="40%">
+            <div>该账单金额
+                <span class="red"> {{ruleForm.badMoney}} {{ruleForm.current}} ,</span>将要从该订单
+                <span class="blue">{{orderNo}}</span>中扣款,是否确认支付？</div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="no1()">取消</el-button>
+                <el-button type="primary" @click="yes1()">确定</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="balancemodel" :close-on-click-modal="false" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="学生姓名:" prop="studname">
+                    <div>{{ruleForm.studname}}</div>
+                </el-form-item>
+                <el-form-item label="支付金额:" prop="badMoney">
+                    <div>{{ruleForm.badMoney}} {{ruleForm.current}}</div>
+                </el-form-item>
+                <el-form-item label="余额:" prop="banalce">
+                    <div>{{ruleForm.banalce}} {{ruleForm.current}}</div>
+                </el-form-item>
+                <el-form-item label="支付方式:" prop="paytype">
+                    <el-select v-model="ruleForm.paytype" placeholder="请选择支付方式" :disabled="true">
+                        <el-option label="订单支付" value="0"></el-option>
+                        <el-option label="余额支付" value="1"></el-option>
+                        <el-option label="转账支付" value="2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="余额抵扣:" prop="badMoney">
+                    <div>{{ruleForm.badMoney}} {{ruleForm.current}}</div>
+                </el-form-item>
+                <el-form-item label="还需充值:" prop="minMoney">
+                    <div>{{ruleForm.minMoney}} {{ruleForm.current}}</div>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="back">返回</el-button>
+                <el-button type="primary" @click="save2('ruleForm')" v-bind:loading="btnstatus">{{btnval}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="balancemodel2" :close-on-click-modal="false" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="学生姓名:" prop="studname">
+                    <div>{{ruleForm.studname}}</div>
+                </el-form-item>
+                <el-form-item label="支付金额:" prop="badMoney">
+                    <div>
+                        <span class="red">{{ruleForm.badMoney}} {{ruleForm.current}} 余额不足</span>
+                    </div>
+                </el-form-item>
+                <el-form-item label="账户余额:" prop="banalce">
+                    <div>{{ruleForm.banalce}} {{ruleForm.current}}</div>
+                </el-form-item>
+                <el-form-item label="还需充值:" prop="minMoney">
+                    <div>{{ruleForm.needMoney}} {{ruleForm.current}}</div>
+                </el-form-item>
+                <el-form-item label="支付方式:" prop="paytype">
+                    <el-select v-model="ruleForm.paytype" placeholder="请选择支付方式" :disabled="true">
+                        <el-option label="订单支付" value="0"></el-option>
+                        <el-option label="余额支付" value="1"></el-option>
+                        <el-option label="转账支付" value="2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders" :data="data" :multiple="true"
+                           accept="image/png, image/jpeg" :action="url" :on-preview="handlePreview"
+                           :on-remove="handleRemove"
+                           :on-success="success" :http-request="uploadFile" :on-error="onerror" :file-list="fileList"
+                           list-type="picture" :on-change="change" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload1">上传到服务器
+                    </el-button>
+                </el-upload>
+                <el-form-item label="备注:" prop="remark" style="margin-top:20px;">
+                    <el-input v-model="ruleForm.remark" v-model="textarea" :rows="3"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="back">返回</el-button>
+                <el-button type="primary" @click="save1('ruleForm')" v-bind:loading="btnstatus">{{btnval}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="model2" :close-on-click-modal="false" width="50%">
+            <div style="font-size:16px;">请确认充值金额与转账截图金额一致！</div>
+            <div style="font-size:16px;">充值金额:
+                <span class="red">{{ruleForm.badMoney}} {{ruleForm.current}}</span>
+            </div>
+            <div style="font-size:16px;">转账截图:</div>
+            <el-row style="margin-top:10px;">
+                <el-col v-for="imgs in imgs" :span="span">
+                    <img style="width:100%" :src="imgs.url">
+                </el-col>
+            </el-row>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="no2()">取消</el-button>
+                <el-button type="primary" @click="yes2()" v-bind:loading="btnstatus">{{btnval}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="transfermodel" :close-on-click-modal="false" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="学生姓名:" prop="studname">
+                    <div>{{ruleForm.studname}}</div>
+                </el-form-item>
+                <el-form-item label="支付金额:" prop="badMoney">
+                    <div>{{ruleForm.badMoney}} {{ruleForm.current}}</div>
+                </el-form-item>
+                <el-form-item label="支付方式:" prop="paytype">
+                    <el-select v-model="ruleForm.paytype" placeholder="请选择支付方式" :disabled="true">
+                        <el-option label="订单支付" value="0"></el-option>
+                        <el-option label="余额支付" value="1"></el-option>
+                        <el-option label="转账支付" value="2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders" :data="data" :multiple="true"
+                           accept="image/png, image/jpeg" :action="url" :on-preview="handlePreview"
+                           :on-remove="handleRemove"
+                           :on-success="success" :http-request="uploadFile" :on-error="onerror" :file-list="fileList"
+                           list-type="picture" :on-change="change" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload">上传到服务器</el-button>
+                </el-upload>
+                <el-form-item label="备注:" prop="remark" style="margin-top:20px;">
+                    <el-input v-model="ruleForm.remark" v-model="textarea" :rows="3"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="back">返回</el-button>
+                <el-button type="primary" @click="save3('ruleForm')" v-bind:loading="btnstatus">{{btnval}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="model3" :close-on-click-modal="false" width="50%">
+            <div style="font-size:16px;">请确认充值金额与转账截图金额一致！</div>
+            <div style="font-size:16px;">充值金额:
+                <span class="red">{{ruleForm.badMoney}} {{ruleForm.current}}</span>
+            </div>
+            <div style="font-size:16px;">转账截图:</div>
+            <el-row style="margin-top:10px;">
+                <el-col v-for="imgs in imgs" :span="span">
+                    <img style="width:100%" :src="imgs.url">
+                </el-col>
+            </el-row>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="no3()">取消</el-button>
+                <el-button type="primary" @click="yes3()" v-bind:loading="btnstatus">{{btnval}}</el-button>
+            </span>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/pay.js');
+    }
+</script>
+
+</html>

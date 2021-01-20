@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .clearfix:after {
+        display: block;
+        clear: both;
+        content: "";
+        visibility: hidden;
+        height: 0
+    }
+
+    .fl {
+        float: left;
+    }
+
+    .red {
+        color: red;
+    }
+
+    .green {
+        color: green;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <template>
+            <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tab-pane label="基本信息" name="first"></el-tab-pane>
+                <el-tab-pane label="高级设置" name="second"></el-tab-pane>
+                <el-tab-pane label="考核列表" name="testlist"></el-tab-pane>
+            </el-tabs>
+        </template>
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="200px" style="width:100%"
+                 class="demo-ruleForm">
+            <div v-show="!showa">
+                <el-form-item label="手机号" prop="mobile">
+                    <el-select v-model="mobileCode" style="width:100px;">
+                        <!-- :label="'+' + item.code + ' ' + item.name" -->
+                        <el-option v-for="item in countrys" :key="item.id"
+                                   :value="item.code">
+                            <span style="display:inline-block;width:30px;text-align: right;">
+                                {{'+' + item.code}}
+                            </span>
+                            <span style="display:inline-block;">
+                                {{item.name}}
+                            </span>
+                        </el-option>
+                    </el-select>
+                    <el-input
+                              style="width:160px;"
+                              v-model="ruleForm.mobile"
+                              type="number"
+                              placeholder="请输入手机号">
+                    </el-input>
+                    <i class="el-icon-error" style="color:red" v-show="yes"></i>
+                    <i class="el-icon-success" style="color:green" v-show="no"></i>
+                    <el-button type="primary" @click="iftrue" id="tab">查询</el-button>
+                    <i v-show="error" :class="color">{{error}}</i>
+                </el-form-item>
+                <!-- <el-form-item label="手机号" prop="mobile">
+        <el-input v-model="ruleForm.mobile"></el-input>
+      </el-form-item> -->
+                <el-form-item label="密码" prop="password">
+                    <el-input v-model="ruleForm.password"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名" prop="username">
+                    <el-input v-model="ruleForm.username"></el-input>
+                </el-form-item>
+                <el-form-item label="昵称">
+                    <el-input v-model="ruleForm.nickName"></el-input>
+                </el-form-item>
+                <el-form-item label="选择国家" prop="country">
+                    <el-select v-model="ruleForm.country" placeholder="请选择国家" @change="change_country">
+                        <el-option
+                                   v-for="item in countrys"
+                                   :key="item.id"
+                                   :label="item.name"
+                                   :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="选择学校" prop="universityName">
+                    <el-select v-model="ruleForm.universityName" filterable placeholder="请选择学校"
+                               @change="change_university">
+                        <el-option
+                                   v-for="item in universitys"
+                                   :key="item.id"
+                                   :label="item.name"
+                                   :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="专业" prop="professionalCourses">
+                    <el-select v-model="ruleForm.professionalCourses" filterable multiple placeholder="请选择"
+                               @change="change_professionalCourse">
+                        <el-option
+                                   v-for="item in professionalCoursesNames"
+                                   :key="item.value"
+                                   :label="item.chineseName"
+                                   :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="学历" prop="eduName">
+                    <el-select v-model="ruleForm.eduName" filterable placeholder="请选择">
+                        <el-option
+                                   v-for="item in eduNames"
+                                   :key="item.value"
+                                   :label="item.name"
+                                   :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="擅长学科" prop="specializedName">
+                    <el-input v-model="ruleForm.specializedName"></el-input>
+                </el-form-item>
+                <el-form-item label="性别" prop="sex">
+                    <el-select v-model="ruleForm.sex" placeholder="请选择性别">
+                        <el-option label="男" value="MALE"></el-option>
+                        <el-option label="女" value="FEMALE"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="生日">
+                    <el-col :span="11">
+                        <el-form-item prop="birthday">
+                            <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.birthday"
+                                            value-format="yyyy-MM-dd HH:mm:ss" style="width: 100%;"></el-date-picker>
+                        </el-form-item>
+                    </el-col>
+                </el-form-item>
+                <el-form-item label="微信号" prop="wxAccount">
+                    <el-input v-model="ruleForm.wxAccount"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱" prop="email">
+                    <el-input v-model="ruleForm.email"></el-input>
+                </el-form-item>
+                <el-button type="primary" @click="next()" style="margin-left:50%;">下一步</el-button>
+            </div>
+            <div v-show="!showb">
+                <el-form-item label="老师类型" prop="type">
+                    <el-select v-model="ruleForm.type" placeholder="请输入老师类型" @change="change">
+                        <el-option label="合作讲师" value="4"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="讲师级别" prop="grade">
+                    <el-select v-model="ruleForm.grade" placeholder="请输入老师类型" @change="change_gread">
+                        <el-option label="银牌讲师" value="1"></el-option>
+                        <el-option label="金牌讲师" value="2"></el-option>
+                        <el-option label="王牌老师" value="3"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="时薪" prop="hourlyWage">
+                    <el-input v-model="ruleForm.hourlyWage" style="width:215px" :disabled="true"></el-input>
+                    <el-button v-show="dw">G/H</el-button>
+                </el-form-item>
+                <el-form-item label="授课经验" prop="teachingExperience">
+                    <el-input v-model="ruleForm.teachingExperience" style="width:215px"
+                              oninput="this.value=this.value.replace(/[^0-9.]+/,'')"></el-input>
+                    <el-button>课时</el-button>
+                </el-form-item>
+                <el-form-item label="赠送时长" prop="presenterTimeLimit">
+                    <el-input v-model="ruleForm.presenterTimeLimit" style="width:215px"
+                              oninput="this.value=this.value.replace(/[^0-9.]+/,'')"></el-input>
+                    <el-button>分钟</el-button>
+                </el-form-item>
+                <el-form-item label="最大抢单数" prop="maxLootNum">
+                    <el-input v-model="ruleForm.maxLootNum" style="width:215px"
+                              oninput="this.value=this.value.replace(/[^0-9.]+/,'')"></el-input>
+                    <el-button>个</el-button>
+                </el-form-item>
+                <!-- <el-form :model="ruleForm" ref="ruleForm" label-width="200px" class="demo-dynamic"> -->
+                <el-form-item style="margin-left:-40px"
+                              v-for="(domain, index) in ruleForm.domains"
+
+                              :key="domain.key"
+                              :prop="'domains.' + index + '.content'">
+                    <div><span style="margin-right:15px;">标签</span>
+                        <el-input v-model="domain.snLabel" style="width:140px;" maxlength="6"></el-input>
+                    </div>
+                    <div style="margin-top:10px;"><span style="margin-right:15px;">描述</span>
+                        <el-input v-model="domain.content" style="width:300px;" maxlength="500" type="textarea"
+                                  :rows="3"></el-input>
+                    </div>
+                    <div style="margin-top:10px;"><span style="margin-right:15px;">评价</span><template>
+                            <el-radio v-model="domain.snType" label="0">好评</el-radio>
+                            <el-radio v-model="domain.snType" label="1">差评</el-radio>
+                        </template></div>
+                    <el-button @click.prevent="removeDomain(domain)" id="del">删除</el-button>
+                </el-form-item>
+                <el-form-item>
+                    <!-- <el-button type="primary" @click="submitForms('ruleForm')">提交</el-button> -->
+                    <el-button @click="addDomain">增加小报告</el-button>
+                </el-form-item>
+                <!-- </el-form> -->
+                <el-button type="primary" @click="next1()" style="margin-left:50%;">下一步</el-button>
+            </div>
+            <div v-show="!showc">
+                <p>复试</p>
+                <el-form-item label="辅导技巧" prop="coachingSkills">
+                    <el-select v-model="ruleForm.coachingSkills" placeholder="请输入辅导技巧">
+                        <el-option label="1分" value="1"></el-option>
+                        <el-option label="2.1分" value="2.1"></el-option>
+                        <el-option label="2.2分" value="2.2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="专业知识" prop="proKnowledge">
+                    <el-select v-model="ruleForm.proKnowledge" placeholder="请输入专业知识">
+                        <el-option label="1分" value="1"></el-option>
+                        <el-option label="2.1分" value="2.1"></el-option>
+                        <el-option label="2.2分" value="2.2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="工作态度" prop="workingAttitude">
+                    <el-select v-model="ruleForm.workingAttitude" placeholder="请输入工作态度">
+                        <el-option label="1分" value="1"></el-option>
+                        <el-option label="2.1分" value="2.1"></el-option>
+                        <el-option label="2.2分" value="2.2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="工作规范" prop="jobSpecification">
+                    <el-select v-model="ruleForm.jobSpecification" placeholder="请输入工作态度">
+                        <el-option label="1分" value="1"></el-option>
+                        <el-option label="2.1分" value="2.1"></el-option>
+                        <el-option label="2.2分" value="2.2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="培训1评价" prop="rate1">
+                    <el-input v-model="ruleForm.rate1" style="width:310px;" type="textarea"></el-input>
+                </el-form-item>
+                <el-form-item label="培训2评价" prop="rate2">
+                    <el-input v-model="ruleForm.rate2" style="width:310px;" type="textarea"></el-input>
+                </el-form-item>
+                <el-form-item label="培训3评价" prop="rate3">
+                    <el-input v-model="ruleForm.rate3" style="width:310px;" type="textarea"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm('ruleForm')">{{btnval}}
+                    </el-button>
+                </el-form-item>
+            </div>
+        </el-form>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/hzteachernum.js');
+    }
+
+</script>
+
+</html>

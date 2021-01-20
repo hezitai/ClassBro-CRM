@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .el-icon-success {
+        color: green;
+    }
+
+    .el-icon-error {
+        color: red;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入" style="width:240px"></el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <!-- <el-button type="primary" @click="creatBadClassroom" v-show="classbtn">创建班课</el-button> -->
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+        label=""
+        width="70">
+        <template slot-scope="scope">
+            <span class="el-icon-success" v-if='scope.row.isMy ===1'>我的</span>
+            <span v-if='scope.row.isMy ===0'>别人的</span>
+        </template>
+      </el-table-column> -->
+            <el-table-column label="班课订单" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span @click="seedetail(scope.row,scope.$index)"
+                          style="cursor: pointer;color: #409EFF;">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="课程代码" :show-overflow-tooltip="true" width="120">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.studPurchaseOrder.courseCode }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="课程所属学校">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.studPurchaseOrder.universityName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="状态" :show-overflow-tooltip="true" width="120">
+                <template slot-scope="scope">
+                    <el-tag v-if='scope.row.statused ===1'>未处理（无任何销售接单）</el-tag>
+                    <el-tag v-if='scope.row.statused ===2'>待审核</el-tag>
+                    <el-tag v-if='scope.row.statused ===4'>待确定</el-tag>
+                    <el-tag v-if='scope.row.statused ===8'>待规划（等待教师/运营接单）</el-tag>
+                    <el-tag v-if='scope.row.statused ===16'>规划中(订单第一次超时等待运营接单)</el-tag>
+                    <el-tag v-if='scope.row.statused ===32'>规划中(订单第二次超时等待运营主管强制指派)</el-tag>
+                    <el-tag v-if='scope.row.statused ===64'>规划中(运营接单待指派，正在处理)</el-tag>
+                    <el-tag v-if='scope.row.statused ===128'>待排课</el-tag>
+                    <el-tag v-if='scope.row.statused ===256'>已排课</el-tag>
+                    <el-tag v-if='scope.row.statused ===512'>待结课</el-tag>
+                    <el-tag v-if='scope.row.statused ===1024'>已结课</el-tag>
+                    <el-tag v-if='scope.row.statused ===2048'>已强制结课</el-tag>
+                    <el-tag v-if='scope.row.statused ===4096'>已取消</el-tag>
+                    <el-tag v-if='scope.row.statused ===8192'>坏单申请中</el-tag>
+                    <el-tag v-if='scope.row.statused ===16384'>坏单已确认结束</el-tag>
+                    <el-tag v-if='scope.row.statused ===32768'>销售被更换 </el-tag>
+                    <el-tag v-if='scope.row.statused ===65536'>事故单申请中</el-tag>
+                    <el-tag v-if='scope.row.statused ===131072'>事故单已处理</el-tag>
+                    <el-tag v-if='scope.row.statused ===262144'>事故单更换教师</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="100px">
+                <template slot-scope="scope">
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                            下拉操作
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item v-if="hasPermission('sys:seller:dabankelist:bianjibanke')"
+                                              @click.native="seebill(scope.row,scope.$index)">编辑班课</el-dropdown-item>
+                            <el-dropdown-item v-if="hasPermission('sys:seller:dabankelist:jieshubanke')"
+                                              @click.native="deleteClasseoom(scope.row,scope.$index)">结束班课
+                            </el-dropdown-item>
+                            <el-dropdown-item v-if="hasPermission('sys:seller:dabankelist:larenjinban')"
+                                              @click.native="creatOrder(scope.row,scope.$index)">拉人进班</el-dropdown-item>
+                            <el-dropdown-item v-if="hasPermission('sys:seller:dabankelist:genghuanbanzhuren')"
+                                              @click.native="change_Master(scope.row,scope.$index)">更换班主任
+                            </el-dropdown-item>
+                            <el-dropdown-item v-if="hasPermission('sys:seller:dabankelist:shangchuankejian')"
+                                              @click.native="upFile(scope.row,scope.$index)">上传课件</el-dropdown-item>
+                            <el-dropdown-item 
+                                              @click.native="activateClasseoom(scope.row,scope.$index)">激活
+                            </el-dropdown-item>
+                            <!-- v-if="hasPermission('sys:seller:dabankemuban:jihuobanke')" -->
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </el-table-column>
+
+        </el-table>
+
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+        <el-dialog :visible.sync="mm" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders" :data="data" :multiple="true"
+                           :action="url" :on-preview="handlePreview"
+                           :on-remove="handleRemove" :on-change="change" :on-success="success" :on-error="onerror"
+                           :file-list="fileList" :auto-upload="false">
+                    <el-select v-model="ruleForm.course" @change="change_course" placeholder="请选择"
+                               style="margin-left:5px">
+                        <el-option v-for="item in courses" :key="item.id" :label="item.groupName" :value="item.id">
+                        </el-option>
+                    </el-select>
+                    <el-button slot="trigger" type="primary">选择文件</el-button>
+                    <el-button type="success" @click="submitUpload">上传</el-button>
+                </el-upload>
+            </el-form>
+        </el-dialog>
+        <el-dialog :visible.sync="masterModel" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="20%" class="demo-ruleForm">
+                <el-form-item label="分配销售" prop="title">
+                    <el-select placeholder="请选择" v-model="ruleForm.title" style="width:80%;">
+                        <el-option v-for="item in selects" :key="item.userId" :label="item.username"
+                                   :value="item.userId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/sellerbigClassRoomList.js');
+    }
+</script>
+
+</html>

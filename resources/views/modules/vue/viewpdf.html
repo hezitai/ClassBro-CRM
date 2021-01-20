@@ -1,0 +1,20 @@
+<html>
+<head>
+<title>PDFObject example</title>
+<script type="text/javascript" src="js/pdfobject.js"></script>
+<script type="text/javascript">
+        var urlinfo = window.location.href;//获取url 
+        if(urlinfo.indexOf('=') >= 0){ //判断输入框中是否输入了a
+            var userName = urlinfo.split("?")[1].split("=")[1];//拆分url得到”=”后面的参数 
+            var key = decodeURI(userName);   
+		}
+		var url =  "http://www.classbro.ca/crm/resource/courseware,20181015-164836/20181015-164836-84.pdf";
+		alert(url)
+	window.onload = function (){	
+	var myPDF = new PDFObject({ url: url }).embed();
+	};
+</script>
+</head>
+<body>
+</body>
+</html>

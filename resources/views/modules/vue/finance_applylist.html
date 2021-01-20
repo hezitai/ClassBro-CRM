@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-button type="primary" @click="checkAll">批量审核</el-button>
+        <el-button type="primary" @click="getOut">导出</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column type="selection" width="50">
+            </el-table-column>
+            <el-table-column label="订单号">
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单来源" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.deptName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="时间" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="关联销售" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.sellerName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="学生名称" width="100" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.nickName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="充值方式" width="80" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <el-tag v-if='scope.row.postWay===1'>支付宝充值</el-tag>
+                    <el-tag v-if='scope.row.postWay===2'>微信充值</el-tag>
+                    <el-tag v-if='scope.row.postWay===3'>PayPal</el-tag>
+                    <el-tag v-if='scope.row.postWay===4'>转账</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="支付来源" width="80" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.studId===null'>学生充值</span>
+                    <span v-if='scope.row.studId!==null'>销售充值</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="转账金额" width="80" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.money }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="货币" width="70" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.current }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="凭证">
+                <template slot-scope="scope">
+                    <a v-for="thumbPaths in scope.row.thumbPaths" @click="view(thumbPaths)">
+                        <img :src="thumbPaths"
+                             style="width:50px;height:50px;margin-right:10px;border:1px solid #ddd;cursor: pointer;">
+                    </a>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="财务充值说明">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.remark }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="详情" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.description }}</span>
+                </template>
+            </el-table-column>description
+            <el-table-column label="操作" width="100">
+                <template slot-scope="scope">
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                            下拉操作
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item v-if="hasPermission('sys:caiwubu:caiwujilu:tongguo')"
+                                              @click.native="yes(scope.row,scope.$index)">通过</el-dropdown-item>
+                            <el-dropdown-item v-if="hasPermission('sys:caiwubu:caiwujilu:butongguo')"
+                                              @click.native="no(scope.row,scope.$index)">不通过</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </el-table-column>
+        </el-table>
+
+        <el-dialog :visible.sync="mm" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="理由" prop="description">
+                    <el-input v-model="ruleForm.description"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="save('ruleForm')">{{btnval}}</el-button>
+            </span>
+        </el-dialog>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage" :page-sizes="[15,20]" :page-size="limit"
+                       layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
+
+
+
+        <el-dialog title="批量审核" :visible.sync="showCheckAllOnoff" width="50%">
+            <div>
+                <!-- <el-form-item label="特殊资源"> -->
+                <p style="color:red">您选择了 {{dataNum}} 条充值记录</p>
+                <el-radio-group v-model="checkAllRadios">
+                    <el-radio label="1">通过</el-radio>
+                    <el-radio label="2">不通过</el-radio>
+                </el-radio-group>
+                <p>理由：</p>
+                <el-input type="textarea" v-model="checkAlldoc"></el-input>
+                <!-- </el-form-item> -->
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="showCheckAllOnoff = false">取 消</el-button>
+                <el-button type="primary" @click='submitCheckAll'>确 定</el-button>
+            </span>
+        </el-dialog>
+
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/finance_applylist.js');
+    }
+</script>
+
+</html>

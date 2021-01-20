@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入" style="width:240px"></el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-button type="primary" @click="addmodel">添加</el-button>
+        <el-button type="primary" @click="del">批量删除</el-button>
+        <el-table
+                  :data="tableDataEnd"
+                  ref="multipleTable"
+                  border
+                  style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column
+                             type="selection"
+                             width="50">
+            </el-table-column>
+            <el-table-column
+                             label="学校名称"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.name }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="添加时间"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="更新时间"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.updateAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="150px">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="change(scope.row,scope.$index)">修改</el-button>
+                    <el-button size="mini" @click="delone(scope.row,scope.$index)">删除</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 添加的弹框 -->
+        <el-dialog
+                   :visible.sync="countrymodel"
+                   width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="20%" class="demo-ruleForm">
+                <el-form-item label="国家" prop="countryId">
+                    <el-select placeholder="请选择" v-model="ruleForm.countryId">
+                        <el-option
+                                   v-for="item in countryIds"
+                                   :key="item.id"
+                                   :label="item.name"
+                                   :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="TYPE" prop="countryId">
+                    <el-select v-model="ruleForm.type" placeholder="请选择" @change="change_spoTypeArr">
+                        <el-option
+                                   v-for="item in tudStatuseds"
+                                   :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="ranking" prop="ranking">
+                    <el-input v-model="ruleForm.ranking"></el-input>
+                </el-form-item>
+                <el-form-item label="学校名称" prop="name">
+                    <el-input v-model="ruleForm.name"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="save('ruleForm')">{{btnval}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog
+                   :visible.sync="updatemodel"
+                   width="40%">
+            <el-form :model="ruleForms" :rules="rules" ref="ruleForm" label-width="20%" class="demo-ruleForm">
+                <el-form-item label="国家" prop="countryId">
+                    <el-select placeholder="请选择" v-model="ruleForms.countryId">
+                        <el-option
+                                   v-for="item in countryIds"
+                                   :key="item.id"
+                                   :label="item.name"
+                                   :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="TYPE" prop="countryId">
+                    <el-select v-model="ruleForms.type" placeholder="请选择" @change="change_spoTypeArr">
+                        <el-option
+                                   v-for="item in tudStatuseds"
+                                   :key="item.value"
+                                   :label="item.label"
+                                   :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="ranking" prop="ranking">
+                    <el-input v-model="ruleForms.ranking"></el-input>
+                </el-form-item>
+                <el-form-item label="学校名称" prop="name">
+                    <el-input v-model="ruleForms.name"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="update('ruleForm')">{{btnval}}</el-button>
+            </span>
+        </el-dialog>
+        <el-pagination
+                       style="margin-top:15px"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]"
+                       :page-size="limit"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/university.js');
+    }
+</script>
+
+</html>

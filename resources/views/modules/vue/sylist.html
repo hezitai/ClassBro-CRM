@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <!-- <el-button type="primary" @click="openData">重置</el-button>
+            <el-button type="primary" @click="add">添加</el-button>
+            <el-button type="primary" @click="handleDelete">删除</el-button> -->
+        <el-table
+                  :data="tableDataEnd"
+                  ref="multipleTable"
+                  border
+                  style="width: 100%;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column
+                             type="selection"
+                             width="50">
+            </el-table-column>
+            <el-table-column
+                             label="id"
+                             width="50">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.id }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="昵称"
+                             width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.callName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="群名"
+                             width="200">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.groupName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="群组id"
+                             width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.groupNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="学校名称"
+                             width="120">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.schoolName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="临时课程名"
+                             width="110">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.temCourseName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="微信号"
+                             width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.wxAccount }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="创建时间"
+                             width="160">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="dialogVisible(scope.row,scope.$index)">分配订单</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 添加的弹框 -->
+        <el-dialog
+                   :visible.sync="dialogFormVisible2"
+                   width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="140px" class="demo-ruleForm">
+                <el-form-item label="分配教教师订单" prop="country">
+                    <el-form-item>
+                        <el-select placeholder="请选择分配教教师" v-model="ruleForm.country" style="width: 200px;"
+                                   @change="handleChange">
+                            <el-option
+                                       v-for="item in selects"
+                                       :key="item.id"
+                                       :label="item.username"
+                                       :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm2('ruleForm')">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!-- 编辑的弹框 -->
+        <el-dialog
+                   :visible.sync="dialogFormVisible"
+                   width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="活动标题" prop="title">
+                    <el-input v-model="ruleForm.title" ref="code"></el-input>
+                </el-form-item>
+                <el-form-item label="活动编号" prop="activityNo">
+                    <el-input v-model="ruleForm.activityNo" ref="activityNo"></el-input>
+                </el-form-item>
+                <el-form-item label="参与人员" prop="participantUser">
+                    <el-input v-model="ruleForm.participantUser" ref="participantUser"></el-input>
+                </el-form-item>
+                <el-form-item label="参与人数" prop="partNumber">
+                    <el-input v-model="ruleForm.partNumber" ref="partNumber"></el-input>
+                </el-form-item>
+                <el-form-item label="实际花费" prop="actualCost">
+                    <el-input v-model="ruleForm.actualCost" ref="actualCost"></el-input>
+                </el-form-item>
+                <el-form-item label="活动地区" prop="value1">
+                    <el-col :span="8">
+                        <el-form-item>
+                            <el-select placeholder="请选择" v-model="ruleForm.value1" style="width: 120px;"
+                                       @change="handleChange">
+                                <el-option
+                                           v-for="item in selects"
+                                           :key="item.id"
+                                           :label="item.name"
+                                           :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <!-- <el-button @click="resetForm('ruleForm')">重 置</el-button> -->
+                <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+            </span>
+        </el-dialog>
+        <el-pagination
+                       style="margin-top:15px"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[6]"
+                       :page-size="6"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<!-- import Vue before Element -->
+<script src="js/vue.js"></script>
+<!-- import JavaScript -->
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/sylist.js');
+    }
+</script>
+
+</html>

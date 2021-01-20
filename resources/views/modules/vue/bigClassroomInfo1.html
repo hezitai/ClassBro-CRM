@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+        .el-dialog__wrapper {
+            left: 0 !important;
+        }
+
+        .demo-ruleForm {
+            width: 100%;
+        }
+
+        .clears:after {
+            display: block;
+            clear: both;
+            content: "";
+            visibility: hidden;
+            height: 0
+        }
+
+        .grid-content:after {
+            display: block;
+            clear: both;
+            content: "";
+            visibility: hidden;
+            height: 0
+        }
+
+        .grid-content span {
+            float: left;
+        }
+
+        .grid-content span:last-child {
+            max-width: 75%;
+        }
+
+        .el-message-box__wrapper {
+            position: fixed;
+            top: -20px;
+            bottom: 0;
+            left: 0px !important;
+            right: 0;
+            text-align: center;
+        }
+
+        i {
+            font-style: normal
+        }
+
+        ul li {
+            list-style: none;
+            border-bottom: 1px solid #ddd;
+            height: 46px;
+            line-height: 46px;
+            width: 100%;
+            display: block;
+        }
+
+        ul li a {
+            margin-right: 10px;
+        }
+
+        .button {
+            cursor: pointer;
+            color: #fff;
+            background-color: #409eff;
+            border-color: #409eff;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            margin-left: 10px;
+            text-align: center;
+            box-sizing: border-box;
+            outline: none;
+            margin-top: 6px;
+            transition: .1s;
+            border: 1px solid #dcdfe6;
+            float: right;
+        }
+
+        .view {
+            color: #409EFF;
+            cursor: pointer;
+            /* overflow: hidden; */
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 70%;
+            display: inline-block;
+            height: 30px;
+        }
+
+        #logs li {
+            font-size: 14px !important;
+            border-bottom: 1px solid #ddd;
+            height: auto !important;
+            line-height: 26px !important;
+        }
+
+        .title {
+            font-weight: 600;
+            font-size: 18px;
+            margin: 5px 0 !important;
+            border-bottom: 1px solid #99a9bf;
+            padding-bottom: 8px;
+            height: 30px;
+        }
+
+        .label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .grid-content {
+            background: #fff;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .el-table__empty-block {
+            background: #fff;
+        }
+
+        .progress {
+            margin-top: 2px;
+            width: 100%;
+            height: 14px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+        }
+
+        .progress-bar {
+            background-color: rgb(92, 184, 92);
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.14902) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.14902) 50%, rgba(255, 255, 255, 0.14902) 75%, transparent 75%, transparent);
+            background-size: 40px 40px;
+            box-shadow: rgba(0, 0, 0, 0.14902) 0px -1px 0px 0px inset;
+            box-sizing: border-box;
+            color: rgb(255, 255, 255);
+            display: block;
+            float: left;
+            font-size: 12px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            transition-delay: 0s;
+            transition-duration: 0.6s;
+            transition-property: width;
+            transition-timing-function: ease;
+            width: 100%;
+        }
+
+        .maskLoading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9999999;
+            /* display: none; */
+        }
+
+        .maskLoading .imgText {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            width: 400px;
+            height: 180px;
+        }
+
+        .maskLoading .imgText p {
+            color: #fff;
+            text-align: center;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .coursewaressssss .el-upload-list {
+            /* display: none; */
+        }
+
+        .coursewaressssss .el-icon-circle-check:before {
+            display: none;
+        }
+
+        .coursewaressssss .el-upload-list__item {
+            line-height: 3;
+        }
+
+        .coursewaressssss .el-upload-list__item .el-icon-close {
+            display: none !important;
+        }
+
+        .coursewaressssss ul li {
+            border-bottom: none;
+        }
+        .classRed{
+            background:rgba(245,108,108, 0.4)!important;
+        }
+    </style>
+</head>
+
+<body style="background: #e5e9f2;">
+    <div id="app">
+        <transition name="el-fade-in-linear">
+            <div class="maskLoading" v-cloak v-show='updataFiles'>
+                <div class="imgText">
+                    <img style="margin-left: 40%;" src="images/loading.gif" alt="">
+                    <p>文件较大或上行网速较慢，请耐心等待上传。<br />过程中请不要关闭或刷新浏览器！避免上传失败。<br />上传成功后页面自动刷新</p>
+                </div>
+            </div>
+        </transition>
+        <transition name="el-fade-in-linear">
+            <div class="maskLoading" v-cloak v-show='downloadFiles'>
+                <div class="imgText">
+                    <img style="margin-left: 40%;" src="images/loading.gif" alt="">
+                    <p>打包下载中，请耐心等待。<br />过程中请不要关闭或刷新浏览器！避免下载失败。</p>
+                </div>
+            </div>
+        </transition>
+        <!-- 编辑班课 -->
+        <el-dialog :visible.sync="compileClass" width="60%" top='3vh' :before-close="compileClassCloseEvent">
+            <iframe :src="compileClassUrl" style="width: 100%; min-height: 700px;" frameborder="0"></iframe>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="compileClassCloseEvent">关闭</el-button>
+            </span>
+        </el-dialog>
+        <!-- 拉人进班 -->
+        <el-dialog :visible.sync="pullManToClass" width="60%" top='3vh' :before-close="pullManToClassCloseEvent">
+            <iframe :src="pullManToClassUrl" style="width: 100%; min-height: 700px;" frameborder="0"></iframe>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="pullManToClassCloseEvent">关闭</el-button>
+            </span>
+        </el-dialog>
+        <!-- 新增课堂 -->
+        <el-dialog :visible.sync="addNewClass" width="60%" top='5vh' :before-close="addNewClassCloseEvent">
+            <iframe :src="addNewClassUrl" style="width: 100%; min-height: 600px;" frameborder="0"></iframe>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="addNewClassCloseEvent">关闭</el-button>
+            </span>
+        </el-dialog>
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="mm1" width="40%">
+            <el-form :model="ruleForm1" :rules="rules1" ref="ruleForm1" label-width="120px" class="demo-ruleForm">
+                <el-form-item label="姓名" prop="studname">
+                    <el-input v-model="ruleForm1.studname" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="定金" prop="amount1">
+                    <el-input v-model="ruleForm1.amount1" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="金额" prop="amount">
+                    <el-input v-model="ruleForm1.amount" type="number"
+                              onkeyup="this.value=this.value.replace(/[^\d.]/g,'').replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3')">
+                    </el-input>
+                </el-form-item>
+                <template>
+                    <el-radio v-show="radshow" v-model="radio" label="1">订单扣款</el-radio>
+                    <el-radio v-model="radio" label="2">余额扣款</el-radio>
+                </template>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save1('ruleForm1')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="personmodel" width="60%">
+            <el-table style="background: #e5e9f2;" :data="persondata" border style="width: 100%;margin-top:5px;">
+                <el-table-column label="学生姓名" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.nickName }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="销售名称" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.username }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="订单状态" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.classroomName }}</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                           :current-page="currentPage" :page-sizes="[5]" :page-size="limit"
+                           layout="total, sizes, prev, pager, next, jumper" :total="total">
+            </el-pagination>
+        </el-dialog>
+        <el-dialog :visible.sync="mm" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+                <el-form-item label="姓名" prop="studname">
+                    <el-input v-model="ruleForm.studname" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="账单总金额" prop="amount1" v-show="s1">
+                    <el-input v-model="ruleForm.amount1" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="还需充值" prop="amount" v-show="s2">
+                    <el-input v-model="ruleForm.amount" type="number"></el-input>
+                </el-form-item>
+                <span style="color:red;margin-left:75px"> {{red}} </span>
+                <el-form-item label="转账备注">
+                    <el-input type="textarea" :rows="4" v-model="ruleForm.remark"></el-input>
+                </el-form-item>
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders1" :data="data1" :multiple="true"
+                           accept="image/png, image/jpeg" :action="url1" :on-preview="handlePreview1"
+                           :on-remove="handleRemove1" :on-success="success1" :http-request="uploadFile1"
+                           :on-error="onerror1"
+                           :file-list="fileList1" list-type="picture" :on-change="change1" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload1">上传到服务器
+                    </el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save('ruleForm')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="shigumodel" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="理由" prop="descriptions">
+                    <el-input v-model="ruleForm.descriptions"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForms('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="shigumodels" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="理由" prop="descriptionss">
+                    <el-input v-model="ruleForm.descriptionss"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitFormss('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <el-row :gutter="20" style="margin:0;">
+            <el-col :span="12" id="leftdiv">
+                <div class="grid-content bg-purple">
+                    <p class="title">课程信息
+                        <el-button type="primary" size="mini" @click="seebill" v-show="btnshow">编辑班课</el-button>
+                        <el-button type="primary" size="mini" @click="deleteClasseoom" v-show="btnshow">结束班课</el-button>
+                        <el-button type="primary" size="mini" @click="change_teacher1" v-show="btnshow"
+                                   v-bind:disabled="changebtn">申请更换讲师</el-button>
+                    </p>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课名称:</span>
+                        <span>{{ruleForm.temCourseName}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">课程代码:</span>
+                        <span>{{ruleForm.courseCode}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">优惠信息:</span>
+                        <span>{{ruleForm.preferential}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">课程状态:</span>
+                        <span>{{ruleForm.statused}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课所属国家:</span>
+                        <span>{{ruleForm.countryName}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课所属学校:</span>
+                        <span>{{ruleForm.universityName}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课辅导需求:</span>
+                        <span>{{ruleForm.explained }}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课总课时:</span>
+                        <span>{{ruleForm.decimalScheduledTime}} H</span>
+                    </div>
+                    <div class="grid-content bg-purple" style="position: relative">
+                        <p style="line-height: 40px;margin: 0;">
+                            <span class="label">Deal Deadline:</span>
+                            <span>{{ruleForm.endCourseTime}}</span>
+                        </p>
+                        <img style="position:absolute;top:17px;right:20px;display:block;width:25px;height:25px;cursor: pointer;"
+                             src="images/changeTime.png" @click='changeExamTime' v-if='showChangeExamTime == true'
+                             alt="">
+                    </div>
+                    <!--  v-if='showChangeExamTime == true' -->
+
+                    <div class="grid-content bg-purple">
+                        <span class="label">班主任:</span>
+                        <span>{{ruleForm.sysSeller}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课讲师:</span>
+                        <span>{{ruleForm.teacNickName}}</span>
+                    </div>
+                </div>
+            </el-col>
+            <el-col :span="12">
+                <div class="grid-content bg-purple" id="rightdivup">
+                    <p class="title">
+                        <span
+                              style="vertical-align:middle;display: inline-block;height:25px;line-height: 25px;">课程流水</span>
+                        <img @click='addCourseLogs' v-show='false'
+                             style="width:25px;height:25px;vertical-align:middle;display: inline-block;margin-left: 10px;cursor: pointer;"
+                             src="images/plus.png" alt="" title='添加课程流水'></p>
+                    <ul id="logs" style="max-height: 422px;overflow-y:auto;"></ul>
+                </div>
+            </el-col>
+        </el-row>
+        <div style="background:#fff;padding:10px;margin:8px 10px;">
+            <p class="title">用户信息
+                <el-button type="primary" size="mini" @click="creatOrder" v-show="btnshow">拉人进班</el-button>
+                <el-button type="primary" size="mini" @click="xuke">批量续课</el-button>
+                <!-- <el-button type="primary" size="mini" @click="shenqing">申请事故单</el-button> -->
+            </p>
+            <el-table style="background: #e5e9f2;" :data="extSysPaymentdata" border style="width: 100%;margin-top:5px;"
+                      @selection-change="handleSelectionChange" :row-class-name="tableRowClassName">
+                <el-table-column @change="handleSelectionChange" type="selection" width="50"></el-table-column>
+                <el-table-column label="订单号" width="280">
+                    <template slot-scope="scope">
+                        <span style="color:#409EFF;cursor: pointer;"
+                              @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="用户姓名" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.nickName }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="销售名称" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.username }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="已报课堂" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.classroomName }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="220">
+                    <template slot-scope="scope">
+                        <!-- <el-button size="mini" @click="editOrder(scope.row,scope.$index)">修改订单</el-button>   -->
+                        <el-button size="mini" v-show="btnshow" :disabled='scope.row.scStatused == 131072 || scope.row.scStatused == 4096 || scope.row.scStatused == 2048 || scope.row.scStatused == 65535 || scope.row.scStatused == 1024' @click="change_teacher(scope.row,scope.$index)">申请事故单
+                        </el-button>
+                        <el-button size="mini" v-show="btnshow" :disabled='scope.row.scStatused == 131072 || scope.row.scStatused == 4096 || scope.row.scStatused == 2048 || scope.row.scStatused == 65535 || scope.row.scStatused == 1024'  @click="change_lession(scope.row,scope.$index)">续课
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <div style="background:#fff;padding:10px;margin:8px 10px;">
+
+            <p class="title">课堂信息
+                <el-button type="primary" size="mini" @click="addClasseoom" v-show="btnshow">新增课堂</el-button>
+            </p>
+            <el-table style="background: #e5e9f2;" :data="classroomdata" border style="width: 100%;margin-top:5px;"
+                      @selection-change="">
+                <el-table-column label="课堂类型" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span v-if='scope.row.roomType ===1'>普通课堂</span>
+                        <span v-if='scope.row.roomType ===4'>引流课堂</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="课堂名称" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.name }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="课堂费用" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.roomCost }}{{ scope.row.currency }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="课堂说明" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.description }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="预计开始时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.startTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="预计结束时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.endTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="报名人数" width="80">
+                    <template slot-scope="scope">
+                        <span style="color:#409EFF;cursor: pointer;"
+                              @click="person(scope.row,scope.$index)">{{ scope.row.buyNumber }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="状态" width="80">
+                    <template slot-scope="scope">
+                        <span v-if='scope.row.statused ===1'>待确认课堂</span>
+                        <span v-if='scope.row.statused ===2'>未开始</span>
+                        <span v-if='scope.row.statused ===4'>进行中</span>
+                        <span v-if='scope.row.statused ===8'>已结束</span>
+                        <span v-if='scope.row.statused ===16'>异常课堂</span>
+                        <span v-if='scope.row.statused ===32'>申请取消课堂中</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="180">
+                    <template slot-scope="scope">
+                        <el-button size="mini" @click="rview(scope.row,scope.$index)">回放</el-button>
+                        <el-button size="mini" @click="rviewimg(scope.row,scope.$index)">屏幕快照</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <el-dialog title="课堂回放" :visible.sync="rviewsmodel" width="60%" style="margin-left:210px;">
+            <el-table style="background: #e5e9f2;" :data="rviews" border style="width: 100%;margin-top:5px;"
+                      @selection-change="">
+                <el-table-column label="回放地址" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.https_playpath }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="时长" width="100" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.duration }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="size" width="100" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.size }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="80">
+                    <template slot-scope="scope">
+                        <el-button size="mini" id="btn" @click='copy(scope.row,scope.$index)'>复制</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-dialog>
+        <el-dialog :visible.sync="showExamTimeDialog" width="40%">
+            <div>
+                <div>
+                    <span style="display: inline-block;width: 160px;text-align: right;">修改Deal Deadline:</span>
+                    <el-date-picker v-model="changeEndCourseTimeData" type="datetime"
+                                    value-format="yyyy-MM-dd HH:mm:ss"
+                                    :picker-options="pickerOptions"
+                                    placeholder="选择日期">
+                    </el-date-picker>
+                </div>
+                <!-- <div style="margin-top:10px;">
+                    <span style="display: inline-block;width: 160px;text-align: right;">修改Official Deadline:</span>
+                    <el-date-picker v-model="changeExamTimeData" type="datetime" value-format="yyyy-MM-dd HH:mm:ss"
+                                    placeholder="选择日期"
+                                    :picker-options="pickerOptions"></el-date-picker>
+                </div> -->
+
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click='showExamTimeSubmit'>确 定</el-button>
+            </span>
+        </el-dialog>
+        <div style="background:#fff;padding:10px;margin:8px 10px;">
+            <p class="title">课件信息</p>
+            <!-- <div style="float:left;">
+                <el-checkbox style="margin-left:20px;margin-right:20px" v-model="checked" @change="check"
+                             v-show="filebtn">全选</el-checkbox>
+                <el-button type="primary" @click="downfile" v-bind:loading="btnstatus" v-show="filebtn">下载</el-button>
+            </div>
+            <el-upload v-show="filebtn" style="display:inline-block;margin-left:5px;" class="upload-demo" ref="upload"
+                       :headers="myHeaders" :data="data" :multiple="true" :action="url" :on-preview="handlePreview"
+                       :on-remove="handleRemove" :on-change="change" :on-success="success" :on-error="onerror"
+                       :file-list="fileList" list-type="picture" :http-request="uploadFile" :auto-upload="false">
+                <el-select v-model="ruleForm.course" @change="change_course" placeholder="请选择" style="margin-left:5px">
+                    <el-option v-for="item in courses" :key="item.id" :label="item.groupName" :value="item.id">
+                    </el-option>
+                </el-select>
+                <el-button slot="trigger" type="primary">选择文件</el-button>
+                <el-button type="success" @click="submitUpload" v-bind:loading="b1">{{b2}}</el-button>
+            </el-upload> -->
+            <!-- <el-progress :percentage="percentage" :status="percentagestatus"></el-progress> -->
+            <!-- <div id="ul" v-for="(item,index) in courses">
+                <div>{{item.groupName}}
+                    <ul :class="item.name" id="ss"> </ul>
+                </div>
+            </div> -->
+            <div class="coursewaressssss" style='border:1px solid #ddd;padding:20px;margin:10px;position: relative;'>
+                <p style="margin-top:0;text-indent: 4px;margin-bottom: 80px;">上传课件</p>
+                <div style='width:700px;position:absolute;left: -50px;top:70px;'>
+                    <el-steps :active="uploadFileActive" finish-status="success" align-center>
+                        <el-step title="选择课件组"></el-step>
+                        <el-step title="选择文件"></el-step>
+                        <el-step title="点击上传文件"></el-step>
+                    </el-steps>
+                </div>
+
+                <el-select v-model="ruleForm.course" @change="change_course" placeholder="请选择课件组"
+                           style="margin-left:5px;margin-bottom:10px;padding-left:20px;margin-top: 20px;width:200px;">
+                    <el-option v-for="item in courses" :key="item.id" :label="item.groupName" :value="item.id">
+                    </el-option>
+                </el-select>
+                <br>
+                <div style="padding-left: 25px;margin-top:10px;">
+                    <el-button :disabled='getCourseGroup' type="primary" id='selectfiles'>选择文件</el-button>
+                    <div style="padding: 10px 0;" id="ossfile">你的浏览器不支持flash,Silverlight或者HTML5！</div>
+                    <el-button :disabled='getCourseGroup' type="success" id='postfiles' v-bind:loading="b1">上传文件
+                    </el-button>
+                </div>
+                <!-- <el-progress v-show='showUploadProgress' :percentage="uploadPercent" :status='uploadStatus'>
+                </el-progress> -->
+            </div>
+
+
+            <div style='border: 1px solid rgb(221, 221, 221); padding: 20px; margin: 10px;' class="batchDownload">
+                <p style="margin-top:0;    text-indent: 4px;">下载课件</p>
+                <div style="margin-bottom: 10px;">
+                    <el-button type="primary" @click="downloadZip" v-bind:loading="downLoadChooseCourseLoading"
+                               title='选中你想下载的文件后点击'>选择批量下载</el-button>
+                    <el-button type="warning" @click="checkBoxAll" v-bind:loading="downloadAllCourseLoading"
+                               title='直接下载包含整个课件的压缩包'>下载全部课件</el-button>
+                    <!-- <el-checkbox style="margin-right:20px" v-model="checkedBoxAll" @change="checkBoxAll">全选
+                        </el-checkbox> -->
+                    <!-- <a style=" margin-left:20px;color:#409EFF;text-decoration:underline;cursor:pointer;"
+                       @click="downfileTypeOther" v-show='downfileTypeOtherBtn == true'>资料整理模板 / 编辑文件 下载</a>
+                    <a style=" margin-left:20px;color:#409EFF;text-decoration:underline;cursor:pointer;"
+                       type="primary" @click="downfileType4" v-show='downfileType4Btn == true'>论文大礼包模板 / 编辑文件
+                        下载</a> -->
+                </div>
+
+                <!-- <el-progress v-show='showProgress' :percentage="percentage" :status="percentagestatus"></el-progress> -->
+                <div v-for="(item,index) in courses" id="batchDownload">
+                    <div>{{item.groupName}}
+                        <ul>
+                            <li v-for='it in coursesItem' v-if='item.groupName == it.groupName'>
+                                <div style='position:relative'>
+                                    <el-checkbox style="padding-right:10px;" @change='chooseDownLoadCheckBox(it)'>
+                                    </el-checkbox>
+                                    <a class='view' @click='downFiles(it)'>
+                                        {{it.name}}
+                                    </a>
+                                    <span
+                                          style='display:inline-block;overflow: hidden;position: absolute; right: 5px; background: #fff; z-index: 999;padding-left:10px;'>
+                                        {{it.createAt | spliting}}
+                                        <el-button type='primary' size='mini' @click='deleteFiles(it.id)'
+                                                   style='margin-left: 20px;'>
+                                            删除
+                                        </el-button>
+                                    </span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <el-dialog title="课堂记录" :visible.sync="dialogVisible" width="30%">
+            <div v-for="item in history" class="text item">
+                <div>{{item.suerrole}} {{ item.nickname }} {{ item.joinTime }} 进入了课堂</div>
+                <div>{{item.suerrole}} {{ item.nickname }} {{ item.leaveTime }} 离开了课堂</div>
+                <div>持续了 {{ item.duration }} 分钟</div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog title="屏幕快照" :visible.sync="viewimgs" width="40%">
+            <el-carousel trigger="click" height="150px">
+                <el-carousel-item v-for="item in imgs" :key="item">
+                    <h3>
+                        <img :src="item">
+                    </h3>
+                </el-carousel-item>
+            </el-carousel>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="libs/crypto.js"></script>
+<script src="libs/hmac.js"></script>
+<script src="libs/sha1.js"></script>
+<script src="libs/base64.js"></script>
+<script src="libs/plupload.full.min.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/bigClassroomInfo1.js');
+    }
+</script>
+
+</html>

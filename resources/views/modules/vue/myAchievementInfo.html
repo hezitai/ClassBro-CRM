@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- <el-button type="">G币数:{{num.money}}个</el-button>
+            <el-button type="" v-show="sss">OTG币数:{{num.otherMoney}}个</el-button> -->
+        <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+        <el-date-picker v-model="data" type="daterange" align="right" unlink-panels range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期" @change="choosedata" value-format="yyyy-MM-dd">
+        </el-date-picker>
+        <el-button type="primary" @click="search">搜索</el-button>
+
+        <!-- <el-button type="primary" @click="apply()">银行卡管理</el-button> 
+            <el-button type="primary" @click="tx()" v-bind:disabled="disabledInput">提现</el-button>  -->
+        <el-table
+                  :data="tableDataEnd"
+                  ref="multipleTable"
+                  border
+                  style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column
+                             label="订单号"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="课程名称">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.offCourseName }}</span>
+                </template>
+            </el-table-column>
+            <!-- createAt -->
+            <el-table-column
+                             label="消耗时间">
+                <template slot-scope="scope">
+                    <span>{{scope.row.createAt}}</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column 
+          label="收入类型"
+          width="120">
+          <template slot-scope="scope">
+             <span v-if='scope.row.type===4'>课程收入</span>
+             <span v-if='scope.row.type===8'>大礼包收入</span>
+             <span v-if='scope.row.type===16'>评价奖励 </span>
+             <span v-if='scope.row.type===32'>赠送收入</span>
+             <span v-if='scope.row.type===64'>工资扣除</span>
+          </template>
+          </el-table-column> -->
+            <el-table-column
+                             label="课程类型">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.classroomId==null'>课程</span>
+                    <span v-if='scope.row.classroomId!=null'>课堂</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="金额">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.money }}{{ scope.row.current }}</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column label="操作">  
+                <template slot-scope="scope">  
+
+                </template>  
+            </el-table-column>  -->
+        </el-table>
+        <!-- 弹框 -->
+        <el-dialog
+                   :visible.sync="modal"
+                   width="50%">
+            <el-table
+                      :data="carddata"
+                      ref="multipleTable"
+                      border
+                      style="width: 100%;margin-top:5px;"
+                      @selection-change="handleSelectionChange">
+                <el-table-column
+                                 label="id"
+                                 width="40">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.id }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                                 label="银行名称"
+                                 width="80">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.bankName }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                                 label="持卡人"
+                                 width="70">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.userName }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                                 label="开户行"
+                                 width="80">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.bankOfDeposit }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                                 label="银行卡号"
+                                 width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.accountNumber }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button size="mini" @click="remove(scope.row,scope.$index)">解绑</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="add()">添加银行卡</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog
+                   :visible.sync="txmodal"
+                   width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="140px" class="demo-ruleForm">
+                <el-form-item label="请输入G币" prop="price1">
+                    <el-input v-model="ruleForm.price1" style="width:220px" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="请输入OTG币" prop="price2">
+                    <el-input v-model="ruleForm.price2" style="width:220px" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="计算" prop="prices">
+                    <el-input v-model="ruleForm.prices" style="width:80px" :disabled="true"></el-input>
+                    <el-button>CNY</el-button>
+                    <el-button type="primary" @click="jx">确 定</el-button>
+                </el-form-item>
+                <el-form-item label="选择银行卡" prop="card">
+                    <el-select v-model="ruleForm.card" placeholder="请选择银行卡">
+                        <el-option
+                                   v-for="item in cards"
+                                   :key="item.id"
+                                   :label="item.bankName"
+                                   :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm1('ruleForm')">确 定</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog
+                   :visible.sync="cardmodal"
+                   width="50%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="银行名称" prop="bankName">
+                    <el-input v-model="ruleForm.bankName"></el-input>
+                </el-form-item>
+                <el-form-item label="开户行" prop="bankOfDeposit">
+                    <el-input v-model="ruleForm.bankOfDeposit"></el-input>
+                </el-form-item>
+                <el-form-item label="持卡人" prop="userName">
+                    <el-input v-model="ruleForm.userName"></el-input>
+                </el-form-item>
+                <el-form-item label="银行卡号" prop="accountNumber">
+                    <el-input v-model="ruleForm.accountNumber"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+            </span>
+        </el-dialog>
+        <el-pagination
+                       style="margin-top:15px"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]"
+                       :page-size="limit"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/myAchievementInfo.js');
+    }
+</script>
+
+
+</html>

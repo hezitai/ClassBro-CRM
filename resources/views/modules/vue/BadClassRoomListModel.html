@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .el-icon-success {
+        color: green;
+    }
+
+    .el-icon-error {
+        color: red;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入" style="width:240px"></el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-button type="primary" @click="creatBadClassroom" v-show="classbtn">创建班课</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+            @selection-change="handleSelectionChange">
+            <el-table-column label="班课名称" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.offCourseName  }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="课程代码" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.studPurchaseOrder.courseCode  }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="课程所属学校">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.studPurchaseOrder.universityName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="100px">
+                <template slot-scope="scope">
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                            下拉操作<i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item v-if="hasPermission('sys:seller:dabankemuban:jihuobanke')"
+                                @click.native="deleteClasseoom(scope.row,scope.$index)">激活</el-dropdown-item>
+                            <el-dropdown-item @click.native="seedetail(scope.row,scope.$index)">查看详情</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </el-table-column>
+
+        </el-table>
+
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+            :current-page="currentPage" :page-sizes="[15,20]" :page-size="limit"
+            layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
+        <el-dialog :visible.sync="mm" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders" :data="data" :multiple="true"
+                    :action="url" :on-preview="handlePreview" :on-remove="handleRemove" :on-change="change"
+                    :on-success="success" :on-error="onerror" :file-list="fileList" :auto-upload="false">
+                    <el-select v-model="ruleForm.course" @change="change_course" placeholder="请选择"
+                        style="margin-left:5px">
+                        <el-option v-for="item in courses" :key="item.id" :label="item.groupName" :value="item.id">
+                        </el-option>
+                    </el-select>
+                    <el-button slot="trigger" type="primary">选择文件</el-button>
+                    <el-button type="success" @click="submitUpload">上传</el-button>
+                </el-upload>
+            </el-form>
+        </el-dialog>
+
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/BadClassRoomListModel.js');
+    }
+</script>
+
+</html>

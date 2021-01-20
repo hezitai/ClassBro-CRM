@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入姓名" style="width:240px">
+        </el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-table
+                  :data="tableDataEnd"
+                  ref="multipleTable"
+                  border
+                  style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column
+                             label="订单号">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.parentId !==null'><img style="width:15px" src="images/ss.svg"></span>
+                    <span class="link" style="color:#409EFF;cursor: pointer;"
+                          @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             :show-overflow-tooltip="true"
+                             label="Official Deadline">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.studPurchaseOrder.examTime }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="订单来源"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.deptName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="姓名"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.callName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="学校名称"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.schoolName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="专业名称"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.professionalName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="课程名称"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.temCourseName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="创建时间"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="200px">
+                <template slot-scope="scope">
+                    <el-button size="mini" v-if="hasPermission('sys:shizizhuguan:yichangOrder:shenhe')"
+                               @click="dialogVisible(scope.row,scope.$index)">审核</el-button>
+                    <el-button size="mini" @click="seedetail(scope.row,scope.$index)">查看详情</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 添加的弹框 -->
+        <el-dialog
+                   :visible.sync="dialogFormVisible2"
+                   width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="20%" class="demo-ruleForm">
+                <el-form-item label="处理意见" prop="suggest">
+                    <el-select placeholder="请选择处理意见" v-model="ruleForm.suggest" style="width:80%"
+                               @change="change_suggest">
+                        <el-option label="驳回申请" value="1"></el-option>
+                        <el-option label="同意放回订单池" value="2"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="理由" prop="descriptions" v-show="show">
+                    <el-input v-model="ruleForm.descriptions"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm2('ruleForm')">确 定</el-button>
+            </span>
+        </el-dialog>
+        <el-pagination
+                       style="margin-top:15px"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]"
+                       :page-size="limit"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/abnormal_leader_orderlist.js');
+    };
+</script>
+
+
+</html>

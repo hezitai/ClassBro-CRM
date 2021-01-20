@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .progress {
+        margin-top: 2px;
+        width: 100%;
+        height: 14px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+    }
+
+    .progress-bar {
+        background-color: rgb(92, 184, 92);
+        background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.14902) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.14902) 50%, rgba(255, 255, 255, 0.14902) 75%, transparent 75%, transparent);
+        background-size: 40px 40px;
+        box-shadow: rgba(0, 0, 0, 0.14902) 0px -1px 0px 0px inset;
+        box-sizing: border-box;
+        color: rgb(255, 255, 255);
+        display: block;
+        float: left;
+        font-size: 12px;
+        height: 20px;
+        line-height: 20px;
+        text-align: center;
+        transition-delay: 0s;
+        transition-duration: 0.6s;
+        transition-property: width;
+        transition-timing-function: ease;
+        width: 100%;
+    }
+
+    .maskLoading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 9999999;
+        /* display: none; */
+    }
+
+    .maskLoading .imgText {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        width: 400px;
+        height: 180px;
+    }
+
+    .maskLoading .imgText p {
+        color: #fff;
+        text-align: center;
+    }
+
+    [v-cloak] {
+        display: none;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <transition name="el-fade-in-linear">
+            <div class="maskLoading" v-cloak v-show='updataFiles'>
+                <div class="imgText">
+                    <img style="margin-left: 40%;" src="images/loading.gif" alt="">
+                    <p>文件较大或上行网速较慢，请耐心等待上传。<br />过程中请不要关闭或刷新浏览器！避免上传失败。<br />上传成功后页面自动刷新</p>
+                </div>
+            </div>
+        </transition>
+        <div style="margin-bottom:5px;">
+            <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入" style="width:240px">
+            </el-input>
+            <el-button type="primary" @click="search">搜索</el-button>
+        </div>
+        <el-select v-model="ruleForm.spoTypeArr" placeholder="请选择订单类型" @change="change_spoTypeArr">
+            <el-option label="全部" value=""></el-option>
+            <el-option label="定制辅导" value="0"></el-option>
+            <el-option label="考前突击" value="1"></el-option>
+            <el-option label="班课辅导" value="64"></el-option>
+            <el-option label="论文辅导" value="4"></el-option>
+            <el-option label="特殊订单" value="32"></el-option>
+        </el-select>
+        <el-select v-model="ruleForm.sooTypeedArr" placeholder="请选择订单分类" @change="change_sooTypeedArr">
+            <el-option label="全部" value=""></el-option>
+            <el-option label="委派订单" value="1"></el-option>
+            <el-option label="自主抢单" value="2"></el-option>
+        </el-select>
+        <el-select v-model="ruleForm.sooStatusedArr" placeholder="请选择订单状态" @change="change_sooStatusedArr">
+            <el-option label="全部" value="0;1;2;5;7;8"></el-option>
+            <el-option label="待委派" value="0"></el-option>
+            <el-option label="讲师未接单" value="1"></el-option>
+            <el-option label="待排课" value="128"></el-option>
+            <el-option label="已排课" value="256"></el-option>
+            <el-option label="申请结课中" value="512"></el-option>
+        </el-select>
+        <el-select placeholder="请选择" v-model="ruleForm.country" @change="handleuser">
+            <el-option v-for="item in users" :key="item.id" :label="item.username" :value="item.userId">
+            </el-option>
+        </el-select>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column label="订单号" width="280">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.spoType ==64'>
+                        <img style="width:15px" src="images/bigC.png">
+                    </span>
+                    <span v-if='scope.row.parentId !==null&&scope.row.spoType !==64'>
+                        <img style="width:15px" src="images/ss.svg">
+                    </span>
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="seedetail(scope.row,scope.$index, scope.offCourseName)">{{ scope.row.orderNo }}</span>
+                    <br />
+                    <span style="color:red;font-size:12px">{{ scope.row.studPurchaseOrder.operRemark }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单备注" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.remark }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="Official Deadline">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.studPurchaseOrder.examTime }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="师资名称" width="80" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.operUsername }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="讲师姓名" width="80" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.teacUserName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="委派时间" v-if='sooStatusedArr != 512' :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.updateAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="申请时间" v-if='sooStatusedArr == 512' :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.updateAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单状态" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.statused>=8 && scope.row.statused<=64'>未接单</span>
+                    <span v-if='scope.row.statused===128'>待排课</span>
+                    <span v-if='scope.row.statused===256'>已排课</span>
+                    <span v-if='scope.row.statused===512'>申请结课中</span>
+                    <span v-if='scope.row.statused===65536'>事故单申请中</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column 
+            label="预获G币"
+            width="75"
+            :show-overflow-tooltip="true">
+            <template slot-scope="scope">
+                <span>{{ scope.row.teacFixedPrice }}</span>
+            </template>
+            </el-table-column> -->
+            <el-table-column :show-overflow-tooltip="true" label="销售名称">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.sellerName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单来源" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.deptName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="100" color="#000">
+                <template slot-scope="scope">
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                            下拉操作
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click.native="change_hourlyWage(scope.row,scope.$index)"
+                                              v-if="(scope.row.statused===128||scope.row.statused===256)&&hasPermission('sys:shizizhuguan:weiwanchengdingdan:tiaozhengshixin')">
+                                调整时薪</el-dropdown-item>
+                            <el-dropdown-item disabled
+                                              v-if="(scope.row.statused!==128&&scope.row.statused!==256)&&hasPermission('sys:shizizhuguan:weiwanchengdingdan:tiaozhengshixin')">
+                                调整时薪</el-dropdown-item>
+                            <el-dropdown-item @click.native="sure_end(scope.row,scope.$index)"
+                                              v-if="(scope.row.statused===512&&scope.row.spoType!==64)&&hasPermission('sys:shizizhuguan:weiwanchengdingdan:querenjieke')">
+                                确认结课</el-dropdown-item>
+                            <el-dropdown-item disabled
+                                              v-if="(scope.row.statused!==512||scope.row.spoType!=64)&&hasPermission('sys:shizizhuguan:weiwanchengdingdan:querenjieke')">
+                                确认结课</el-dropdown-item>
+                            <el-dropdown-item @click.native="cancel(scope.row,scope.$index)"
+                                              v-if="scope.row.sooStatused===1&&hasPermission('sys:shizizhuguan:weiwanchengdingdan:quxiaoweipai')">
+                                取消委派</el-dropdown-item>
+                            <el-dropdown-item disabled
+                                              v-if="scope.row.sooStatused!==1&&hasPermission('sys:shizizhuguan:weiwanchengdingdan:quxiaoweipai')">
+                                取消委派</el-dropdown-item>
+                            <el-dropdown-item @click.native="give2(scope.row,scope.$index)"
+                                              v-if="scope.row.sooStatused==0&&hasPermission('sys:shizizhuguan:weiwanchengdingdan:weipaidingdan')">
+                                委派订单</el-dropdown-item>
+                            <el-dropdown-item disabled
+                                              v-if="scope.row.sooStatused!=0&&hasPermission('sys:shizizhuguan:weiwanchengdingdan:weipaidingdan')">
+                                委派订单</el-dropdown-item>
+                            <el-dropdown-item @click.native="give1(scope.row,scope.$index)"
+                                              v-if="(scope.row.statused===128||scope.row.statused===256)&&hasPermission('sys:shizizhuguan:weiwanchengdingdan:yufuGbi')">
+                                预付G币</el-dropdown-item>
+                            <el-dropdown-item disabled
+                                              v-if="(scope.row.statused!==128&&scope.row.statused!==256)&&hasPermission('sys:shizizhuguan:weiwanchengdingdan:yufuGbi')">
+                                预付G币</el-dropdown-item>
+                            <el-dropdown-item v-if="hasPermission('sys:shizizhuguan:weiwanchengdingdan:jiangliGbi')"
+                                              @click.native="give(scope.row,scope.$index)">奖励G币</el-dropdown-item>
+                            <el-dropdown-item @click.native="apply_Accident(scope.row,scope.$index)">申请售后单
+                                <!--  v-if="hasPermission('sys:shizizhuanyuan:myorder:shenqingshigudan')" -->
+                            </el-dropdown-item>
+                            <el-dropdown-item @click.native="reduceWages(scope.row,scope.$index)">扣除讲师收入
+                            </el-dropdown-item>
+                            <el-dropdown-item @click.native="addRemark(scope.row,scope.$index)">添加备注</el-dropdown-item>
+                            <el-dropdown-item @click.native="imchat(scope.row,scope.$index)"
+                                              v-if="scope.row.groupNo!==''">聊天记录</el-dropdown-item>
+                            <el-dropdown-item disabled v-if="scope.row.groupNo===''">聊天记录</el-dropdown-item>
+                            <el-dropdown-item @click.native='qingzhigenghuanyunying(scope.row,scope.$index)'>强制更换运营
+                            </el-dropdown-item>
+                            <el-dropdown-item v-show='scope.row.sooStatused == 0'
+                                              @click.native="createOutUrl(scope.row,scope.$index)">生成外链
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </el-table-column>
+        </el-table>
+
+
+        <el-dialog :visible.sync="shigumodel" width="40%" :before-close='shigumodelClose' v-loading='shigumodelLoading'>
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="事故类别" prop='shigutype'>
+                    <el-select v-model="ruleForm.shigutype" placeholder="请选择事故类别">
+                        <el-option key="2"
+                                   label="讲师问题"
+                                   value="2">
+                        </el-option>
+                        <el-option key="4"
+                                   label="售后问题"
+                                   value="4">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="申请理由" prop="descriptions">
+                    <el-input v-model="ruleForm.descriptions" type='textarea'></el-input>
+                </el-form-item>
+                <el-form-item label="上传文件">
+                    <el-button type="primary" id='selectfiles'>选择文件</el-button>
+                    <div style="padding: 10px 0;" id="ossfile"></div>
+                    <!-- <el-button type='primary'>上传文件</el-button> -->
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="shigumodelLoading" @click="shigumodelSubmit">确 定
+                </el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog :visible.sync="Wagesmodel" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="G币" prop="gb1">
+                    <el-input v-model="ruleForm.gb1" style="width:240px" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="OTG币" prop="otgb1" v-show="otg">
+                    <el-input v-model="ruleForm.otgb1" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="理由" prop="description">
+                    <el-input v-model="ruleForm.description" type="textarea" :rows="3"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="WagesSave('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="dialogFormVisible1" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="奖励G币" prop="gb">
+                    <el-input v-model="ruleForm.gb" style="width:240px" type="number"></el-input>
+                </el-form-item>
+                <!-- <el-form-item label="追付OTG币" prop="otgb" v-show="otg">
+                    <el-input v-model="ruleForm.otgb"></el-input>
+                  </el-form-item> -->
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm1('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="hourlyWagemodel" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="时薪" prop="hourlyWage">
+                    <el-input type="number" v-model="ruleForm.hourlyWage" style="width:240px"></el-input>
+                </el-form-item>
+                <div style="color:red;margin-left:100px">当前讲师时薪为{{hourlyWagewww}}GB</div>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitFormhour('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="dialogFormVisible5" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="预付G币" prop="gb1">
+                    <el-input v-model="ruleForm.gb1" style="width:240px"></el-input>
+                </el-form-item>
+                <el-form-item label="预付OTG币" prop="otgb1" v-show="otg">
+                    <el-input v-model="ruleForm.otgb1"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm5('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="dialogFormVisible2" width="40%" @close='closeTeacDialog'>
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="140px" class="demo-ruleForm">
+                <el-form-item label="选择更换讲师" prop="country">
+                    <el-form-item>
+                        <el-select placeholder="请选择更换讲师" :filter-method="teacFilter" v-model="ruleForm.country"
+                                   style="width: 200px;">
+                            <el-option v-for="item in selects" :key="item.id" :label="item.nickName" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form-item>
+                <el-form-item label="一口价" prop="one" v-show="sss">
+                    <el-input v-model="ruleForm.one" style="width:140px;"></el-input>
+                    <el-button type="">G</el-button>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm2('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="dialogFormVisible3" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="操作" prop="doSomething">
+                    <el-select placeholder="请选择" v-model="ruleForm.doSomething" style="width: 200px;"
+                               @change="handleChange">
+                        <el-option label="同意" value="1"></el-option>
+                        <el-option label="不同意" value="0"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="理由" prop="description" v-show="sub4">
+                    <el-input v-model="ruleForm.description"></el-input>
+                </el-form-item>
+                <el-form-item label="赠送G币" prop="sendGb" v-show="sub6">
+                    <el-input v-model="ruleForm.sendGb"></el-input>
+                </el-form-item>
+                <el-form-item label="G币" prop="gb1" v-show="sub3">
+                    <el-input v-model="ruleForm.gb1"></el-input>
+                </el-form-item>
+                <el-form-item label="OTG币" prop="otgb1" v-show="sub5">
+                    <el-input v-model="ruleForm.otgb1"></el-input>
+                </el-form-item>
+                <el-form-item label="讲师姓名:" prop="">
+                    <span>{{teacherInformation.teacUserName}}</span>
+                </el-form-item>
+                <el-form-item label="讲师级别:" prop="">
+                    <span v-if='teacherInformation.tuGrade == 1'>银牌讲师</span>
+                    <span v-if='teacherInformation.tuGrade == 2'>金牌讲师</span>
+                    <span v-if='teacherInformation.tuGrade == 3'>王牌讲师</span>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm3('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <!-- 添加的弹框评价 -->
+        <el-dialog :visible.sync="evaluate" width="40%">
+            <div class="text item">
+                课堂网络质量: {{evaluates.networkRate}}分
+            </div>
+            <div class="text item">
+                是否达到您的订单需求: {{evaluates.expectRate}}分
+            </div>
+            <div class="text item">
+                使用万能班长满意度: {{evaluates.platRate}}分
+            </div>
+            <div class="text item">
+                专业水平: {{evaluates.professRate}}分
+            </div>
+            <div class="text item">
+                上课态度: {{evaluates.attitudeRate}}分
+            </div>
+            <div class="text item">
+                辅导技巧: {{evaluates.skillRate}}分
+            </div>
+            <div class="text item">
+                意见及建议: {{evaluates.proposal}}分
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="exit">确 定</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="dialogFormVisible4" width="40%" @close='closeTeacDialog'>
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="140px" class="demo-ruleForm">
+                <el-form-item label="请选择分配讲师" prop="country">
+                    <el-form-item>
+                        <el-select placeholder="请选择分配讲师" filterable :filter-method="teacFilter"
+                                   v-model="ruleForm.country" style="width: 200px;">
+                            <el-option v-for="item in selects" :key="item.id" :label="item.username" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form-item>
+                <el-form-item label="G币" prop="price" v-show="gg">
+                    <el-input v-model="ruleForm.price"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm4('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage" :page-sizes="[15,20]" :page-size="limit"
+                       layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
+
+        <!-- <el-dialog :visible.sync="shigumodel" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="理由" prop="descriptions">
+                    <el-input v-model="ruleForm.descriptions"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForms('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog> -->
+        <el-dialog :visible.sync="remarkmodel" width="40%">
+            <el-form :model="ruleForm" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="理由" prop="remark">
+                    <el-input type="textarea" :rows="2" v-model="ruleForm.remark"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="remarkForm('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="genghuanyunyingDialog" width="40%">
+            <el-form class="demo-ruleForm">
+                <el-form-item label="强制更换运营" prop="qiangzhigenghuanyunying">
+                    <el-select v-model="qiangzhigenghuanyunyingInfo" placeholder="请选择" @change='chiocegenghuanyunying'>
+                        <el-option
+                                   v-for="item in qiangzhigenghuanyunyingArray"
+                                   :key="item.userId"
+                                   :label="item.username"
+                                   :value="item.userId">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="qiangzhigenghuanyunyingSub">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <!-- CreateOutUrl Dialog -->
+        <el-dialog :visible.sync="createOutUrlDialog" width="40%" v-loading="createOutUrlDialogLoading"
+                   :before-close="createOutUrlDialogClose" top='2vh'>
+            <el-tabs v-model="createOutUrlActiveName" @tab-click="createOutUrlHandleClick" style="margin-bottom:10px;">
+                <el-tab-pane label="外链入口" name="first"></el-tab-pane>
+                <el-tab-pane label="系统内分享" name="second"></el-tab-pane>
+            </el-tabs>
+            <div v-show='createOutUrlActive1 == true'>
+                <div style="display: flex;justify-content:space-around;">
+                    <div style="width:200px;">
+                        <p style="background:#e8e8e8;text-align: center;margin: 0;padding: 14px 0;">方法一：通过微信扫码</p>
+                        <div>
+                            <img :src="erweimaPic" :alt="erweimaPic">
+                        </div>
+                        <div style="text-align:center;">
+                            <el-button size='mini' style="margin-top:10px;" @click='downErweimaPic(erweimaPic)'>下载
+                            </el-button>
+                        </div>
+                    </div>
+                    <div style="width:200px;">
+                        <p style="background:#e8e8e8;text-align: center;margin: 0;padding: 14px 0;">方法二：通过分享链接</p>
+                        <p>讲师入口链接（此链接电脑端和手机端都可以使用）</p>
+                        <div style="text-align: center;">
+                            <a style="word-wrap:break-word;color:#409EFF;cursor: pointer;"
+                               @click='openOutUrl(shareOutUrl)'>{{ shareOutUrl }}</a>
+                            <input id='input_url' v-model='shareOutUrl' style='opacity: 0;position: absolute;z-index: 1'
+                                   type="text">
+                        </div>
+                        <div style="text-align:center;">
+                            <el-button style="margin-top:10px;" @click='copyShareOutUrl(shareOutUrl)' size='mini'>复制链接
+                            </el-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-show='createOutUrlActive1 == false'>
+                <span>选择讲师：</span>
+                <el-select v-model="level" style="width:120px;" placeholder="请选择" @change="changecreateOutUrlLevel">
+                    <el-option v-for="item in levels" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                </el-select>
+                <el-input style="width:180px;" v-model='searchKey' placeholder='请输入姓名或专业'></el-input>
+                <el-button type='primary' @click='createOutUrlSearchTeacher'>搜索</el-button>
+
+                <el-table :data="createOutUrlSearchResult" border style="width: 100%;margin-top:5px;"
+                          @selection-change="createOutUrlSearchSelectionChange">
+                    <el-table-column type="index" width="50" align='center'>
+                    </el-table-column>
+                    <el-table-column type="selection" width="50" align='center'>
+                    </el-table-column>
+                    <el-table-column label="姓名" align='center'>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.username }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="手机号" align='center'>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.mobile }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="级别" align='center'>
+                        <template slot-scope="scope">
+                            <span v-if='scope.row.rank == 0'>S级别</span>
+                            <span v-if='scope.row.rank == 1'>A级别</span>
+                            <span v-if='scope.row.rank == 2'>B级别</span>
+                            <span v-if='scope.row.rank == 3'>C级别</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="专业" align='center'>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.professionalCoursesName }}</span>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <el-pagination layout="prev, pager, next" @size-change="createOutUrlHandleSizeChange"
+                               @current-change="createOutUrlHandleCurrentChange" :current-page="createOutUrlCurrentPage"
+                               :page-sizes="[10,15]" :page-size="createOutUrlLimit" :total="createOutUrlTotal">
+                </el-pagination>
+                <div style='text-align: right'>
+                    <el-button type="success" @click="shareTeacEvent">分 享</el-button>
+                </div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="createOutUrlDialogClose">关 闭</el-button>
+            </span>
+        </el-dialog>
+
+
+        <el-dialog :visible.sync="shareToTeacher" width="40%" :before-close="shareToTeacherDialogClose">
+            <div>
+                <el-input type='textarea' v-model='shareDesc' rows='3' placeholder='请给讲师留言'></el-input>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click='shareToTeacherDialogClose'>取 消</el-button>
+                <el-button type="primary" @click="shareSubmit">确 定</el-button>
+            </span>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="libs/crypto.js"></script>
+<script src="libs/hmac.js"></script>
+<script src="libs/sha1.js"></script>
+<script src="libs/base64.js"></script>
+<script src="libs/plupload.full.min.js"></script>
+<script src="js/axios.min.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/operatororder.js');
+    }
+</script>
+
+</html>

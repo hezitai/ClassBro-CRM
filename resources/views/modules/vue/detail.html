@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .demo-table-expand {
+        font-size: 0;
+    }
+
+    .demo-table-expand label {
+        width: 90px;
+        color: #99a9bf;
+    }
+
+    .demo-table-expand .el-form-item {
+        margin-right: 0;
+        margin-bottom: 0;
+        width: 50%;
+    }
+</style>
+
+<body>
+    <div id="app" style="width:99%">
+
+
+
+        <!-- 
+            <p>
+                <span
+                    style="display:inline-block;width:70px;text-align:left">price:</span><span>{{order.coin}}&nbsp;{{order.total_amount}}</span>
+            </p>
+            <p><span
+                    style="display:inline-block;width:70px;text-align:left">Deposit:</span><span>{{order.coin}}&nbsp;{{order.deposit}}</span>
+            </p>
+            <p><span
+                    style="display:inline-block;width:70px;text-align:left">Balance:</span><span>{{order.coin}}&nbsp;{{order.balance}}</span>
+            </p>
+         -->
+        <el-row :gutter="20" style="margin:0;">
+            <el-col :span="12" id="leftdiv">
+                <div class="grid-content bg-purple">
+                    <div class="grid-content bg-purple">
+                        <span class="label">课程代码:</span>
+                        <span>{{order.course_code}}</span>
+                    </div>
+                    <p style="border-top:1px dashed #409EFF"></p>
+                    <!-- <div class="grid-content bg-purple">
+                        <span class="label">课程总价:</span>
+                        <span>{{}}</span>
+                    </div> -->
+                    <div class="grid-content bg-purple">
+                        <span class="label">课程单价:</span>
+                        <span>{{order.coin}}&nbsp;{{order.total_amount}}</span>
+                    </div>
+                    <!-- <div class="grid-content bg-purple">
+                        <span class="label">购买课时:</span>
+                        <span>{{}}</span>
+                    </div> -->
+                    <!-- <div class="grid-content bg-purple">
+                        <span class="label">材料费:</span>
+                        <span>{{}}</span>
+                    </div> -->
+                    <div class="grid-content bg-purple">
+                        <span class="label">已支付金额:</span>
+                        <span>{{order.coin}}&nbsp;{{order.deposit}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">课程尾款:</span>
+                        <span>{{order.coin}}&nbsp;{{order.balance}}</span>
+                    </div>
+                    <!-- <div class="grid-content bg-purple">
+                        <span class="label">剩余金额:</span>
+                        <span>{{}}</span>
+                    </div> -->
+                    <!-- <div class="grid-content bg-purple">
+                        <span class="label">欠费金额:</span>
+                        <span>{{}}</span>
+                    </div> -->
+                    <p style="border-top:1px dashed #409EFF"></p>
+                    <div class="grid-content bg-purple">
+                        <span class="label">字数:</span>
+                        <span>{{order.word_count}} 字</span>
+                    </div>
+                    <!-- <div class="grid-content bg-purple">
+                        <span class="label">特殊报价:</span>
+                        <span>{{}</span>
+                    </div> -->
+                    <!-- <div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">报价人:</span>
+                            <span>{{}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">实际工作量:</span>
+                            <span>{{}} 字</span>
+                        </div>
+                    </div> -->
+                    <!-- <p style="border-top:1px dashed #409EFF"></p> -->
+                    <!-- <div class="grid-content bg-purple">
+                        <span class="label">学生已上课时:</span>
+                        <span>{{}} MIN</span>
+                    </div> -->
+                    <!-- <div class="grid-content bg-purple">
+                        <span class="label">学期卡实际抵扣课时:</span>
+                        <span>{{}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">系统赠送时长:</span>
+                        <span>{{}} MIN</span>
+                    </div> -->
+                    <p style="border-top:1px dashed #409EFF"></p>
+                    <div class="grid-content bg-purple">
+                        <span class="label">Deadline:</span>
+                        <span>{{order.deadline}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">Deal Deadline:</span>
+                        <span>{{order.real_deadline}}</span>
+                    </div>
+                    <!-- <div class="grid-content bg-purple">
+                        <span class="label">Official Deadline:</span>
+                        <span>{{}}</span>
+                    </div> -->
+                    <p style="border-top:1px dashed #409EFF"></p>
+
+                    <div class="grid-content bg-purple">
+                        <span class="label">师资费用(Moon):</span>
+                        <span>{{order.moon}} Moon</span>
+                    </div>
+                    <!-- <div class="grid-content bg-purple">
+                        <span class="label">订单讲师时薪:</span>
+                        <span>{{}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">讲师已获(G):</span>
+                        <span>{{}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">讲师已获(OTG):</span>
+                        <span>{{}}</span>
+                    </div> -->
+                    <p style="border-top:1px dashed #409EFF"></p>
+                    <div class="grid-content bg-purple">
+                        <span class="label">辅导需求:</span>
+                        <span>{{order.client_message}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">订单备注:</span>
+                        <span>{{order.remark}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <p>Reference style: {{ order.reference_style }}</p>
+                        <p>Reference Guide: <a v-if="order.reference_guide" :href="order.reference_guide.file_path"
+                               :download="order.reference_guide.real_name" target="_blank"
+                               class="link-type">{{ order.reference_guide.real_name }}</a></p>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <p>University: {{ order.university }}</p>
+                        <p>University URL: <a :href="order.university_url" target="_blank"
+                               class="link-type">{{ order.university_url }}</a></p>
+                    </div>
+                    <!-- <p class="title">学生信息</p>
+                    <div class="grid-content bg-purple">
+                        <span class="label">姓名:</span>
+                        <span>{{}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">学校名称:</span>
+                        <span>{{}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">专业:</span>
+                        <span>{{}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">学历:</span>
+                        <span>{{}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">学年:</span>
+                        <span>{{}}</span>
+                    </div> -->
+
+                    <div class="grid-content bg-purple">
+                        <span class="label">学校系统账号:</span>
+                        <span>{{order.blackboard_id}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">学校系统密码:</span>
+                        <span>{{order.password}}</span>
+                    </div>
+                </div>
+            </el-col>
+            <el-col :span="12">
+                <div class="grid-content bg-purple">
+                    <p class="title">课程流水</p>
+                    <ul id="logs" style="min-height:971px;max-height:971px;overflow-y:scroll;"></ul>
+                </div>
+            </el-col>
+            <!-- <el-col :span="12">
+                <div class="grid-content bg-purple">
+                    <p class="title">课程流水</p>
+                    <ul id="logs" style="min-height:971px;max-height:971px;overflow-y:scroll;"></ul>
+                </div>
+                <div style="background:#fff;padding:10px;margin:8px 0px 0 0;height:412px">
+                    <p class="title">空余时间 (北京时间)</p>
+                    <el-row :gutter="20">
+                        <el-col :span="3">
+                            <div class="grid-content bg-purple">周一</div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">上午:</span>
+                                <span>{{ruleForm2.am1}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">中午:</span>
+                                <span>{{ruleForm2.bm1}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">下午:</span>
+                                <span>{{ruleForm2.pm1}}</span>
+                            </div>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20">
+                        <el-col :span="3">
+                            <div class="grid-content bg-purple">周二</div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">上午:</span>
+                                <span>{{ruleForm2.am2}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">中午:</span>
+                                <span>{{ruleForm2.bm2}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">下午:</span>
+                                <span>{{ruleForm2.pm2}}</span>
+                            </div>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20">
+                        <el-col :span="3">
+                            <div class="grid-content bg-purple">周三</div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">上午:</span>
+                                <span>{{ruleForm2.am3}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">中午:</span>
+                                <span>{{ruleForm2.bm3}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">下午:</span>
+                                <span>{{ruleForm2.pm3}}</span>
+                            </div>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20">
+                        <el-col :span="3">
+                            <div class="grid-content bg-purple">周四</div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">上午:</span>
+                                <span>{{ruleForm2.am4}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">中午:</span>
+                                <span>{{ruleForm2.bm4}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">下午:</span>
+                                <span>{{ruleForm2.pm4}}</span>
+                            </div>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20">
+                        <el-col :span="3">
+                            <div class="grid-content bg-purple">周五</div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">上午:</span>
+                                <span>{{ruleForm2.am5}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">中午:</span>
+                                <span>{{ruleForm2.bm5}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">下午:</span>
+                                <span>{{ruleForm2.pm5}}</span>
+                            </div>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20">
+                        <el-col :span="3">
+                            <div class="grid-content bg-purple">周六</div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">上午:</span>
+                                <span>{{ruleForm2.am6}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">中午:</span>
+                                <span>{{ruleForm2.bm6}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">下午:</span>
+                                <span>{{ruleForm2.pm6}}</span>
+                            </div>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="20">
+                        <el-col :span="3">
+                            <div class="grid-content bg-purple">周日</div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">上午:</span>
+                                <span>{{ruleForm2.am7}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">中午:</span>
+                                <span>{{ruleForm2.bm7}}</span>
+                            </div>
+                        </el-col>
+                        <el-col :span="7">
+                            <div class="grid-content bg-purple">
+                                <span class="label">下午:</span>
+                                <span>{{ruleForm2.pm7}}</span>
+                            </div>
+                        </el-col>
+                    </el-row>
+                </div>
+            </el-col>
+        </el-row> -->
+            <!-- <div style="background:#fff;padding:10px;margin:8px 10px;">
+            <p class="title">课堂信息</p>
+            <el-table style="background: #e5e9f2;" :data="classroomdata" border style="width: 100%;margin-top:5px;"
+                @selection-change="">
+                <el-table-column label="课堂名称" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.name }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="课堂说明" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.description }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="开始时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.startTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="结束时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.endTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="实际开始时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.reaStartTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="实际结束时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.reaEndTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="上课时长" width="80">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.schooltime }}分</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="赠送时长" width="80">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.presenterTime }}分</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="评分" width="80">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.rate }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="180">
+                    <template slot-scope="scope">
+                        <el-button size="mini" @click="revise(scope.row,scope.$index)">课堂记录</el-button>
+                        <el-button size="mini" @click="rview(scope.row,scope.$index)">回放</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div> -->
+
+            <!-- <div style="background:#fff;padding:10px;margin:8px 10px;">
+            <p class="title">课件信息</p>
+            <div style="float:left;">
+                <el-checkbox style="margin-left:20px;margin-right:20px" v-model="checked" @change="check">全选
+                </el-checkbox>
+                <el-button type="primary" @click="downfile" v-bind:loading="btnstatus">下载</el-button>
+            </div>
+            <el-upload style="display:inline-block;margin-left:5px;" class="upload-demo" ref="upload"
+                :headers="myHeaders" :data="data" :multiple="true" :action="url" :on-preview="handlePreview"
+                :on-remove="handleRemove" :on-change="change" :file-list="fileList" list-type="picture"
+                :http-request="uploadFile" :auto-upload="false">
+                <el-select v-model="ruleForm.course" @change="change_course" placeholder="请选择" style="margin-left:5px">
+                    <el-option v-for="item in courses" :key="item.id" :label="item.groupName" :value="item.id">
+                    </el-option>
+                </el-select>
+                <el-button slot="trigger" type="primary">选择文件</el-button>
+                <el-button type="success" @click="submitUpload" v-bind:loading="b1">{{b2}}</el-button>
+            </el-upload>
+            <el-progress :percentage="percentage" :status="percentagestatus"></el-progress>
+            <div id="ul" v-for="(item,index) in courses">
+                <div>{{item.groupName}}
+                    <ul :class="item.name" id="ss"> </ul>
+                </div>
+            </div>
+        </div> -->
+
+            <!-- <el-dialog title="课堂记录" :visible.sync="dialogVisible" width="30%">
+            <div v-for="item in history" class="text item">
+                <div>{{item.suerrole}} {{ item.nickname }} {{ item.joinTime }} 进入了课堂</div>
+                <div>{{item.suerrole}} {{ item.nickname }} {{ item.leaveTime }} 离开了课堂</div>
+                <div>持续了 {{ item.duration }} 分钟</div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+            </span>
+        </el-dialog> -->
+            <!-- <div style="background:#fff;padding:10px;margin:8px 10px;"> -->
+            <!-- <div id="parents"> -->
+            <!-- <p class="title">关联订单信息</p> -->
+            <!-- <div class="grid-content bg-purple" v-show="aboutOrder">
+                        <div class="grid-content bg-purple">
+                          <span class="label">关联订单总金额:</span><span>{{ruleForm.parentTotalPrice  }}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                          <span class="label">总支付金额:</span><span>{{ruleForm.Integer }}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                          <span class="label">总剩余金额:</span><span>{{ruleForm.parentLastPrepayment }}</span>
+                        </div>
+                      </div> -->
+            <!-- </div> -->
+            <!-- <el-table style="background: #e5e9f2;" :data="studCourses" border style="width: 100%;margin-top:5px;"
+                @selection-change="">
+                <el-table-column label="订单号" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span style="color:#409EFF;cursor: pointer;"
+                            @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <textarea id="input" style="position: absolute;z-index:-99;top:10px;left:20px;">这是占位文本</textarea> -->
+            <!-- <el-dialog title="课堂回放" :visible.sync="rviewsmodel" width="60%" style="margin-left:210px;">
+                <el-table style="background: #e5e9f2;" :data="rviews" border style="width: 100%;margin-top:5px;"
+                    @selection-change="">
+                    <el-table-column label="回放地址" :show-overflow-tooltip="true">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.https_playpath }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="时长" width="100" :show-overflow-tooltip="true">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.duration }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="size" width="100" :show-overflow-tooltip="true">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.size }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="80">
+                        <template slot-scope="scope">
+                            <el-button size="mini" id="btn" @click='copy(scope.row,scope.$index)'>复制</el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </el-dialog> -->
+            <!-- </div> -->
+
+
+
+
+            <div v-loading="listLoading" class="app-container">
+                <el-row :gutter="22">
+                    <el-col :span="12">
+                        <el-card class="grid-content bg-info" shadow="never">
+                            <span><i class="el-icon-third-lianjie" />&nbsp;{{ order.order_name }}</span>
+                        </el-card>
+                        <!-- <el-card class="grid-content bg-purple-light" shadow="never"> -->
+                        <p v-if="order.order_type != 9 && order.order_type != 10">Deadline: <el-tag type="warning">
+                                {{ order.deadline }}</el-tag>
+                        </p>
+                        <p>Deal Deadline: <el-tag type="warning">{{ order.real_deadline }}</el-tag>
+                        </p>
+                        <p v-if="order.order_type != 9 && order.order_type != 10">Amount: {{ order.moon }}
+                            {{ order.ot_moon == 0? "": "+"+order.ot_moon }} Moon</p>
+                        <p>University: {{ order.university }}</p>
+                        <p>University URL: <a :href="order.university_url" target="_blank"
+                               class="link-type">{{ order.university_url }}</a></p>
+                        <p>Blackboard ID: {{ order.blackboard_id }} </p>
+                        <p>Password：{{ order.password }}</p>
+                        <p>Course Name/Code: {{ order.course_code }}</p>
+                        <p v-if="order.order_type != 9 && order.order_type != 10">Word count: {{ order.word_count }}</p>
+                        <p>Client level: {{ order.client_level }}</p>
+                        <p>Reference style: {{ order.reference_style }}</p>
+                        <p>Reference Guide: <a v-if="order.reference_guide" :href="order.reference_guide.file_path"
+                               :download="order.reference_guide.real_name" target="_blank"
+                               class="link-type">{{ order.reference_guide.real_name }}</a></p>
+                        <p>Clients message: </p>
+                        <div class="bg-warming" v-html="order.client_message">&nbsp;</div>
+                        <p>备注：{{order.remark}}</p>
+
+                        <div class="" style="border-top:1px dashed #ccc;border-bottom:1px dashed #ccc;">
+                            <p><span
+                                      style="display:inline-block;width:70px;text-align:left">price:</span><span>{{order.coin}}&nbsp;{{order.total_amount}}</span>
+                            </p>
+                            <p><span
+                                      style="display:inline-block;width:70px;text-align:left">Deposit:</span><span>{{order.coin}}&nbsp;{{order.deposit}}</span>
+                            </p>
+                            <p><span
+                                      style="display:inline-block;width:70px;text-align:left">Balance:</span><span>{{order.coin}}&nbsp;{{order.balance}}</span>
+                            </p>
+                        </div>
+
+                        <div v-for="(items,keys, indexs) in order.upload">
+                            <p :key="indexs"><strong>{{ items[0].type }}</strong></p>
+                            <div v-for="(item,key, index) in items">
+                                <p :key="index" @click="down(item.file_path,item.real_name)"
+                                   style="cursor :pointer;color:#408EF4;font-weight: 600;">{{ item.real_name }} <span
+                                          style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <br>
+                        <!-- </el-card> -->
+                    </el-col>
+
+                    <!-- <el-col :span="10"> -->
+                    <!-- <el-container style="width:100%;"> -->
+                    <el-header style="width:100%; font-size: 20px;">Logs</el-header>
+                    <div v-if="log != ''">
+                        <div v-for="(items,keys, indexs) in log">
+                            <div :key="indexs">
+                                <p>
+                                    {{ items.name }}&nbsp;&nbsp;{{ items.username }}@{{ items.created_at }}&nbsp;&nbsp;{{ items.info }}&nbsp;&nbsp;{{ items.order_name }}
+                                </p>
+                                <span v-if="items.message" style="text-indent: 2em;">{{ items.message }}</span>
+                            </div>
+                            <div v-for="(item,key, index) in items.upload">
+                                <p :key="index"><a href="item.file_path" target="_blank" download="item.real_name"
+                                       style="cursor :pointer "
+                                       class="link-type">{{ item.real_name }}</a>&nbsp;&nbsp;&nbsp;&nbsp;{{ item.created_at }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- </el-container> -->
+                    <!-- </el-col> -->
+                </el-row>
+            </div>
+    </div>
+    <script src="js/jquery.js"></script>
+    <script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+    <script src="js/vue.js"></script>
+    <script src="js/index.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+        loadJsOrCss('pagejs/detail.js');
+    }
+
+    </script>
+    <style scoped>
+        .grid-content {
+            margin-bottom: 20px;
+        }
+
+        .bg-info {
+            background: #f5f5f5;
+        }
+
+        .bg-light {
+            background: #ffffff;
+        }
+
+        .bg-warming {
+            border: 1px #ff8000 dashed;
+            padding: 2px 8px;
+        }
+
+        .el-header {
+            text-align: center;
+            background-color: #f5f5f5;
+            line-height: 60px;
+        }
+
+        .el-main {
+            background-color: #ffffff;
+            color: #333;
+        }
+    </style>
+</body>
+
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入" style="width:200px"></el-input>
+        <el-date-picker v-model="data" type="daterange" align="right" unlink-panels range-separator="至"
+                        start-placeholder="开始日期" end-placeholder="结束日期" @change="choosedata"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        :picker-options="pickerOptions2">
+        </el-date-picker>
+        <el-select v-model="ruleForm.userType" @change="changetype">
+            <el-option label="学生" value="S"></el-option>
+            <el-option label="讲师" value="T"></el-option>
+        </el-select>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-button type="primary" v-if="hasPermission('sys:caiwubu:caiwujilu:daochu')" @click="down">导出</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column label="订单号" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="sees(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="时间" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单来源" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.deptName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="学生名称" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.nickName }}</span>
+                </template>
+            </el-table-column>
+
+            <el-table-column label="关联销售" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.salesName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="充值方式" width="80">
+                <template slot-scope="scope">
+                    <el-tag type="success" v-if='scope.row.type===1'>提现</el-tag>
+                    <el-tag type="warning" v-if='scope.row.type===2'>充值</el-tag>
+                    <el-tag type="warning" v-if='scope.row.type===8'>追加预付款</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="转账金额" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.money }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="货币" width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.current }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="状态" width="80">
+                <template slot-scope="scope">
+                    <el-tag type="success" v-if='scope.row.statused===1'>成功</el-tag>
+                    <el-tag type="warning" v-if='scope.row.statused===2'>失败</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="类别" width="80">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.userType==="T"'>教师</span>
+                    <span v-if='scope.row.userType==="S"'>学生</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="充值说明" width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.description }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="凭证" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <a v-for="thumbPaths in scope.row.thumbPaths" @click="view(thumbPaths)"><img :src="thumbPaths"
+                             style="width:50px;height:50px;margin-right:10px;border:1px solid #ddd;cursor: pointer;"></a>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage" :page-sizes="[15]" :page-size="15"
+                       layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript" src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/blob.js@1.0.1/Blob.js"></script>
+<script type="text/javascript" src="https://unpkg.com/file-saver@1.3.3/FileSaver.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/finance_record.js');
+    }
+</script>
+
+</html>

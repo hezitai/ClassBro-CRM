@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入" style="width:240px"></el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column label="订单号">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.spoType ==64'>
+                        <img style="width:15px" src="images/bigC.png">
+                    </span>
+                    <span v-if='scope.row.parentId !==null&&scope.row.spoType !==64'>
+                        <img style="width:15px" src="images/ss.svg">
+                    </span>
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="订单备注">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.remark }}</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column 
+            label="订单分类"
+            width="80"
+            :show-overflow-tooltip="true">
+            <template slot-scope="scope">
+                <span v-if='scope.row.sooTypeed===1'>委派订单</span>
+                <span v-if='scope.row.sooTypeed===0'>自主抢单</span>
+           </template>
+           </el-table-column> -->
+            <el-table-column label="师资名称" width="80" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.operUsername }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="讲师姓名" width="80" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.teacUserName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="委派时间" width="160" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.orderTime }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单状态" width="80" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.statused===1024'>已结课</span>
+                    <span v-if='scope.row.statused===2048'>已强制结课</span>
+                    <span v-if='scope.row.statused===4096'>已取消</span>
+                    <span v-if='scope.row.statused===16384'>坏单已确认结束</span>
+                    <span v-if='scope.row.statused===131072'>已更换讲师</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="已获G币" width="80">
+                <template slot-scope="scope">
+                    <span>{{scope.row.allTeacherG}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="销售名称">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.sellerName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单来源" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.deptName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="100px;">
+                <template slot-scope="scope">
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                            下拉操作
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click.native="imchat(scope.row,scope.$index)"
+                                              v-if="scope.row.groupNo!==''">聊天记录</el-dropdown-item>
+                            <el-dropdown-item disabled v-if="scope.row.groupNo===''">聊天记录</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="dialogFormVisible2" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="30%" class="demo-ruleForm">
+                <el-form-item label="赠送G币的个数" prop="glod" v-show="glod">
+                    <el-input v-model="ruleForm.glod" style="width:70%"></el-input>
+                </el-form-item>
+                <el-form-item label="赠送otG币的个数" prop="glod1" v-show="glod1">
+                    <el-input v-model="ruleForm.glod1" style="width:70%"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm2('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="Wagesmodel" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="G币" prop="gb1">
+                    <el-input v-model="ruleForm.gb1" style="width:240px" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="OTG币" prop="otgb1" v-show="otg">
+                    <el-input v-model="ruleForm.otgb1" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="理由" prop="description">
+                    <el-input v-model="ruleForm.description" type="textarea" :rows="3"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="WagesSave('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <!-- 添加的弹框评价 -->
+        <el-dialog :visible.sync="evaluate" width="40%">
+            <div class="text item">
+                课堂网络质量: {{evaluates.networkRate}}分
+            </div>
+            <div class="text item">
+                是否达到您的订单需求: {{evaluates.expectRate}}分
+            </div>
+            <div class="text item">
+                使用万能班长满意度: {{evaluates.platRate}}分
+            </div>
+            <div class="text item">
+                专业水平: {{evaluates.professRate}}分
+            </div>
+            <div class="text item">
+                上课态度: {{evaluates.attitudeRate}}分
+            </div>
+            <div class="text item">
+                辅导技巧: {{evaluates.skillRate}}分
+            </div>
+            <div class="text item">
+                意见及建议: {{evaluates.proposal}}分
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="exit">确 定</el-button>
+            </span>
+        </el-dialog>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="js/axios.min.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/endoperatororder_copy.js');
+    }
+</script>
+
+</html>

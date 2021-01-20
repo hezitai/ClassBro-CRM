@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title id="tit"></title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/AdminLTE.min.css">
+    <link rel="stylesheet" href="css/all-skins.min.css">
+    <!-- <link rel="stylesheet" href="css/main.css"> -->
+    <link rel="stylesheet" href="modules/vue/css/index.css">
+    <link rel="icon" id="icon" href="" type="image/x-icon" />
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<style>
+    .sidebar {
+        height: 100%;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .main-sidebar {
+        height: 100%;
+        /* padding-top: 200px; */
+    }
+
+    @media screen and (min-width:1200px) {
+        .main-sidebar {
+            height: 100%;
+        }
+
+        .content {
+            padding: 0;
+            -webkit-overflow-scrolling: touch;
+            overflow: hidden;
+            width: 100%;
+        }
+    }
+
+    /*大于960px小于1199px屏幕尺寸应用以下样式*/
+    @media screen and (min-width:960px) and (max-width:1199px) {
+        .main-sidebar {
+            height: 100%;
+        }
+
+        .content {
+            padding: 0;
+            -webkit-overflow-scrolling: touch;
+            overflow: hidden;
+            width: 100%;
+        }
+    }
+
+    /*大于768px小于959px屏幕尺寸应用以下样式*/
+    @media screen and (min-width: 768px) and (max-width: 959px) {
+        .main-sidebar {
+            height: 100%;
+        }
+
+        .content {
+            padding: 0;
+            -webkit-overflow-scrolling: touch;
+            overflow: auto;
+            width: 100%;
+        }
+    }
+
+    /*大于480px小于767px屏幕尺寸应用以下样式*/
+    @media only screen and (min-width: 480px) and (max-width:767px) {
+        .main-sidebar {
+            height: 100%;
+        }
+
+        .content {
+            padding: 0;
+            -webkit-overflow-scrolling: touch;
+            overflow: auto;
+            width: 100%;
+        }
+    }
+
+    /*小于479px屏幕尺寸应用以下样式*/
+    @media only screen and (max-width: 479px) {
+        .main-sidebar {
+            height: 100%;
+            padding-top: 200px;
+        }
+
+        .content {
+            padding: 0;
+            -webkit-overflow-scrolling: touch;
+            overflow: auto;
+            width: 100%;
+        }
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        border-radius: 0;
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+    }
+
+
+
+    .search {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-indent: 10px;
+        height: 30px;
+        line-height: 30px;
+        margin-top: 10px;
+        /* pointer-events: none; */
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+    }
+
+    #xiaoshou {
+        display: none;
+    }
+
+    .exchange-dialog {
+        width: 600px;
+        height: 300px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        background: #ccc;
+        display: none;
+    }
+
+    .exchangeDialogContent {
+        margin-left: 200px;
+    }
+    .form-horizontal .form-group{
+        margin-left:0;
+        margin-right: 0;
+    }
+</style>
+
+<body class="hold-transition skin-blue-light sidebar-mini body">
+    <div class="wrapper" id="rrapp" v-cloak style="  overflow-y: hidden; ">
+        <header class="main-header">
+            <a href="#main.html" onclick="backIndex()" class="logo" id="logo">
+                ClassBro
+                <!-- <span class="logo-mini">
+                    <b id="title1"></b>
+                </span>
+                <span class="logo-lg">
+                    <b id="title"></b>
+                </span> -->
+            </a>
+            <nav class="navbar navbar-static-top" role="navigation">
+                <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
+                <div style="float:left;color:#fff;padding:15px 10px;">欢迎 {{user.username}}</div>
+                <div style="float:left;color:#000;">
+                    <input class="search" id="allsearch" type="text" placeholder="按回车搜索">
+                </div>
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <!-- <li id="xiaoshou">
+                            <a onclick="method1()" style="cursor: pointer">
+                                <span>销售：</span>
+                                <span id="sales"></span>
+                                <span style="margin-left:10px">消耗：</span>
+                                <span id="consumption"></span>
+                            </a>
+                            <a id="customerCard" style="display:none" href="#modules/vue/connor/customerCard.html"></a>
+                        </li> -->
+                        <li>
+                            <a href="javascript:;" id="exchange" data-id="" @click='exchangeDialogShow'>
+                                <i class="fa fa-box"></i> &nbsp;汇率转换工具</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" id="chat" data-id="">
+                                <i class="fa fa-commenting"></i> &nbsp;在线聊天</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;" @click="updatePassword">
+                                <i class="fa fa-lock"></i> &nbsp;修改密码</a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" id="logout">
+                                <i class="fa fa-sign-out"></i> &nbsp;退出系统</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <aside class="main-sidebar">
+            <section class="sidebar">
+                <ul class="sidebar-menu">
+                    <li class="header">导航菜单</li>
+                    <menu-item :item="item" :index="index" v-for="(item, index) in menuList"></menu-item>
+                </ul>
+            </section>
+        </aside>
+        <div class="content-wrapper" style="height:100%;">
+            <section class="content-header">
+                <ol class="breadcrumb" id="nav_title" style="position:static;float:none;">
+                    <li class="active">
+                        <i class="fa fa-home" style="font-size:20px;position:relative;top:2px;left:-3px;"></i> &nbsp; 首页
+                    </li>
+                    <li class="active">{{navTitle}}</li>
+                </ol>
+            </section>
+
+            <section class="content" style="background:#fff;">
+                <iframe scrolling="yes" id="iframe" frameborder="0"
+                        style="width:100%;min-height:200px;overflow:visible;background:#fff;" :src="main"></iframe>
+            </section>
+        </div>
+        <div class="control-sidebar-bg"></div>
+
+        <div id="passwordLayer" style="display: none;">
+            <form class="form-horizontal">
+                <div class="form-group">
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">账号</div>
+                        <span class="label label-success" style="vertical-align: bottom;">{{user.username}}</span>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">原密码</div>
+                        <div class="col-sm-6">
+                            <input type="password" class="form-control" v-model="password" placeholder="原密码" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">新密码</div>
+                        <div class="col-sm-6">
+                            <input type="password" class="form-control" v-model="newPassword" placeholder="新密码" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <el-dialog title="汇率转换" :visible.sync="exchangeDialog" width="40%" class='exchangeDialogContent'
+                   :before-close="closeExchangeDialog">
+            <div style="display:flex;justify-content:center;">
+                <div style="display:inline-block;margin:0 5px;">
+                    <el-input v-model="firstSum" placeholder="请输入金额" style="width:100px;" @blur='firstSumEvent'>
+                    </el-input>
+                </div>
+                <div style="display:inline-block;margin:0 5px;">
+                    <el-select v-model="firstCurrency" style="width:100px;" placeholder="请选择"
+                               @change='changeFirstCurrency'>
+                        <el-option v-for="item in firstCurrencyArray" :key="item.id"
+                                   :value="item.tagerCurrency" :label='item.tagerCurrency'>
+                        </el-option>
+                    </el-select>
+                </div>
+                <div style="display:inline-block;margin:0 5px;width: 40px;height:40px;cursor: pointer;">
+                    <img style="width:100%;" @click='changeOther' src="./modules/vue/images/twoWays.png" alt="">
+                </div>
+                <div style="display:inline-block;margin:0 5px;">
+                    <!-- <el-input v-model="secondSum" style="width:100px;" placeholder="请输入内容" @blur='secondSumEvent'></el-input> -->
+                </div>
+                <div style="display:inline-block;margin:0 5px;">
+                    <el-select v-model="secondCurrency" style="width:100px;" placeholder="请选择"
+                               @change='changesecondCurrency'>
+                        <el-option v-for="item in secondCurrencyArray" :key="item.id"
+                                   :value="item.tagerCurrency" :label='item.tagerCurrency'>
+                        </el-option>
+                    </el-select>
+                </div>
+
+            </div>
+            <p style="color:red;text-align: right;padding-right:155px" v-show='bothSame'>
+                请选择货币不同的单位
+            </p>
+            <p style='text-align: center; margin: 20px 20px 0 20px; font-size: 20px;'
+               v-show='firstSum!=0 && secondCurrency != ""'>
+                {{autoFirstSum}} {{autoFirstCurrency}} = {{secondSum}} {{secondCurrency}}
+            </p>
+            <span slot="footer" class="dialog-footer">
+                <p style="color:#999;text-align: center;margin:20px 0;">
+                    <span style="color:red">数据仅供参考</span>，交易时以系统实时汇率为准 更新时间:{{todayTime}}
+                </p>
+            </span>
+        </el-dialog>
+    </div>
+    <!-- <div class="drag">
+        <p class="clos">
+            <span class="clos-span" id="del">一</span>
+        </p>
+        <iframe class="drags" src="im/main.html"></iframe>
+    </div> -->
+
+    <div id="newchat"></div>
+    <script src="libs/jquery.min.js"></script>
+    <!-- <script src="js/base.js"></script> -->
+    <script type="text/javascript">
+        document.write('<script src="js/base.js?tmp=' + new Date().getTime() +
+            '" type="text/javascript" charset="utf-8"><\/script>');
+    </script>
+    <script src="plugins/jqgrid/jquery.jqGrid.min.js"></script>
+    <script src="libs/vue.min.js"></script>
+    <script src="libs/router.js"></script>
+    <script src="libs/bootstrap.min.js"></script>
+    <script src="modules/vue/js/index.js"></script>
+    <script src="libs/app.js"></script>
+    <script src="plugins/layer/layer.js"></script>
+    <script src="js/common.js"></script>
+    <!-- <script src="js/index.js"></script> -->
+    <script type="text/javascript">
+        window.onload = function () {
+            loadJsOrCss('js/index.js');
+            loadJsOrCss('css/main.css');
+        }
+    </script>
+</body>
+
+</html>

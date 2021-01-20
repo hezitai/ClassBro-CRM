@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" placeholder="请输入" @keyup.enter.native="search" style="width:240px"></el-input>
+        <el-select v-model="status" placeholder="选择反馈类型" @change="changes">
+            <el-option v-for="item in statuses" :key="item.userId" :label="item.label" :value="item.status">
+            </el-option>
+        </el-select>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;">
+            <el-table-column label="订单号" align='center'>
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="sees(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="课堂名称" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.name }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="课堂状态" align='center'>
+                <template slot-scope="scope">
+                    <span v-if='scope.row.statused===2'>已确认</span>
+                    <span v-if='scope.row.statused==4'>上课中</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="讲师姓名" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.teacUserName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="讲师类型" align='center'>
+                <template slot-scope="scope">
+                    <span v-if='scope.row.teacType==1'>全职</span>
+                    <span v-if='scope.row.teacType==2'>兼职</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="讲师级别" align='center'>
+                <template slot-scope="scope">
+                    <span v-if='scope.row.teacGrade==1'>银牌讲师</span>
+                    <span v-if='scope.row.teacGrade==2'>金牌讲师</span>
+                    <span v-if='scope.row.teacGrade==3'>王牌讲师</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="预计上课时间" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.startTime }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="实际开始时间" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.reaStartTime }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="房间号/课堂ID" width="160" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.roomId }} / {{scope.row.id}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="200px" align='center'>
+                <template slot-scope="scope">
+                    <!-- <el-button size="mini" @click="enterteac(scope.row,scope.$index)">巡课进入</el-button> 
+        <el-button size="mini" @click="enterstud(scope.row,scope.$index)">助教进入</el-button>    -->
+                    <el-button size="mini" v-if="hasPermission('sys:peixunbu:zhiliangjiance:xunkejinru')"
+                               @click="enterteac(scope.row,scope.$index)">巡课进入</el-button>
+                    <el-button size="mini" v-if="hasPermission('sys:peixunbu:zhiliangjiance:zhujiaojinru')"
+                               @click="enterstud(scope.row,scope.$index)">助教进入</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage" :page-sizes="[15,20]" :page-size="6"
+                       layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/creat_monitorings.js');
+    }
+</script>
+
+</html>

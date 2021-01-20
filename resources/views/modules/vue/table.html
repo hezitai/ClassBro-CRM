@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <h2>{{ message }}</h2>
+    </div>
+
+    <div id="tableView">
+        <!--列表顶部搜索和工具条-->
+        <el-row>
+            <el-form :inline="true" :model="searchForm" class="demo-form-inline">
+                <el-form-item label="ID">
+                    <el-input v-model="searchForm.id" placeholder="ID"></el-input>
+                </el-form-item>
+                <el-form-item label="名称">
+                    <el-input v-model="searchForm.name" placeholder="名称"></el-input>
+                </el-form-item>
+                <el-form-item label="状态">
+                    <el-select v-model="searchForm.state" placeholder="状态">
+                        <el-option label="区域一" value="shanghai"></el-option>
+                        <el-option label="区域二" value="beijing"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" icon="search" @click="searchClick">查询</el-button>
+                    <el-button type="success" icon="plus" @click="addClick">新增</el-button>
+                </el-form-item>
+            </el-form>
+        </el-row>
+        <!--列表-->
+        <el-row>
+            <el-table
+                      :data="tableData"
+                      v-loading.body="loading"
+                      border
+                      @selection-change="selectionChange"
+                      style="width: 100%">
+                <el-table-column
+                                 type="selection"
+                                 width="55">
+                </el-table-column>
+                <el-table-column
+                                 prop="birth"
+                                 label="日期"
+                                 width="150">
+                </el-table-column>
+                <el-table-column
+                                 prop="name"
+                                 label="姓名"
+                                 width="120">
+                </el-table-column>
+                <el-table-column
+                                 prop="province"
+                                 label="省份"
+                                 width="120">
+                </el-table-column>
+                <el-table-column
+                                 prop="city"
+                                 label="市区"
+                                 width="120">
+                </el-table-column>
+                <el-table-column
+                                 prop="address"
+                                 label="地址"
+                                 width="300">
+                </el-table-column>
+                <el-table-column
+                                 prop="zip"
+                                 label="邮编"
+                                 width="120">
+                </el-table-column>
+                <el-table-column
+                                 label="操作">
+                    <template scope="scope">
+                        <el-button :plain="true" type="success" size="small" icon="edit" @click="editClick(scope.row)">
+                            编辑</el-button>
+                        <el-button :plain="true" type="danger" size="small" icon="delete"
+                                   @click="deleteClick(scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-row>
+
+        <!--列表底部工具条和分页符-->
+        <el-row style="margin-top: 20px" type="flex" justify="end">
+            <el-col :span="6">
+                <el-button :plain="true" type="danger" size="small" icon="delete" @click="removeSelection">删除所选
+                </el-button>
+            </el-col>
+            <el-col :span="18">
+                <el-pagination
+                               style="float: right"
+                               @size-change="pageSizeChange"
+                               @current-change="currentPageChange"
+                               :current-page="currentPage"
+                               :page-sizes="[10, 20, 30, 50]"
+                               :page-size="pageSize"
+                               layout="total, sizes, prev, pager, next, jumper"
+                               :total="total">
+                </el-pagination>
+            </el-col>
+        </el-row>
+
+        <!--编辑界面-->
+        <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
+            <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
+                <el-form-item label="姓名" prop="name">
+                    <el-input v-model="editForm.name" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="性别">
+                    <el-radio-group v-model="editForm.sex">
+                        <el-radio class="radio" :label="1">男</el-radio>
+                        <el-radio class="radio" :label="0">女</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item label="年龄">
+                    <el-input-number v-model="editForm.age" :min="0" :max="200"></el-input-number>
+                </el-form-item>
+                <el-form-item label="生日">
+                    <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
+                </el-form-item>
+                <el-form-item label="地址">
+                    <el-input type="textarea" v-model="editForm.address"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click.native="editFormVisible = false">取消</el-button>
+                <el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+            </div>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/table.js');
+    }
+</script>
+
+</html>

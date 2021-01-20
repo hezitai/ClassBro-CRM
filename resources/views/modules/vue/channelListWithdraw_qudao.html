@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app" v-loading='loadingshow'>
+        <el-date-picker
+                        v-model="chooseMonth"
+                        type="month"
+                        value-format='yyyy-MM'
+                        @change='monthChange'
+                        placeholder="选择月">
+        </el-date-picker>
+        <!-- <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入" style="width:240px"></el-input> -->
+        <el-select v-model="ruleForm.tudStatused" placeholder="请选择状态" @change="change_spoTypeArr">
+            <el-option
+                       v-for="item in tudStatuseds"
+                       :key="item.value"
+                       :label="item.label"
+                       :value="item.value">
+            </el-option>
+        </el-select>
+        <!-- <el-button type="primary" @click="search">搜索</el-button> -->
+        <!-- <el-button type="primary" @click="creatChanne">创建渠道</el-button> -->
+        <el-table
+                  :data="tableDataEnd"
+                  ref="multipleTable"
+                  border
+                  style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column
+                             label="渠道名称"
+                             align='center'
+                             :show-overflow-tooltip="true"
+                             width="120">
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="view_detail(scope.row,scope.$index)">{{ scope.row.stcChannelName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             :show-overflow-tooltip="true"
+                             align='center'
+                             label="账号">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.stcAccount }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="提成明细"
+                             align='center'
+                             width="80">
+                <template slot-scope="scope">
+                    <el-button size='mini' type='primary' @click='chakan(scope.row)'>查看</el-button>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="总金额"
+                             align='center'
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.money }} 元</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="银行名称"
+                             align='center'
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.extSysTeacChannelCard.bankName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             align='center'
+                             label="开户行">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.extSysTeacChannelCard.bankOfDeposit }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             align='center'
+                             label="持卡人">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.extSysTeacChannelCard.userName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             align='center'
+                             label="银行卡号"
+                             width="120">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.extSysTeacChannelCard.idCardNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             align='center'
+                             label="操作">
+                <template slot-scope="scope">
+                    <div v-show='scope.row.extSysTeacChannelCard.bankOfDeposit!=null'>
+                        <el-button size='mini' @click='pass(scope.row)' v-show='scope.row.statused == 1' type='primary' >通过</el-button>
+                        <el-button size='mini' disabled type='primary'  v-show='scope.row.statused == 2'>财务已处理</el-button>
+                        <el-button size='mini' disabled type='warning'  v-show='scope.row.statused == 4'>已拒绝</el-button>
+                        <el-button size='mini' disabled type='primary'  v-show='scope.row.statused == 8'>渠道审核通过</el-button>
+                    </div>
+
+                    <span v-show='scope.row.extSysTeacChannelCard.bankOfDeposit==null'>
+                        未添加银行卡，请在微信小程序绑定银行卡信息</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column
+                             label="渠道方账号"
+                             width="100"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.account }}</span>
+                </template>
+            </el-table-column> -->
+        </el-table>
+        <el-pagination
+                       style="margin-top:15px"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]"
+                       :page-size="limit"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+        <el-dialog
+                   title="查看"
+                   :visible.sync="showtichengmingxi"
+                   width="50%"
+                   top='2vh'
+                   :before-close="showtichengmingxiClose">
+            <div>
+                <el-table
+                          :data="tableDataEnd1"
+                          ref="multipleTable"
+                          border
+                          style="width: 100%;margin-top:5px;">
+                    <el-table-column
+                                     label="日期"
+                                     align='center'
+                                     :show-overflow-tooltip="true">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.createAt }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                                     :show-overflow-tooltip="true"
+                                     align='center'
+                                     label="教师姓名">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.tuUserName }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                                     label="状态"
+                                     align='center'>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.description }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                                     label="提成金额"
+                                     align='center'
+                                     :show-overflow-tooltip="true">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.money }}</span>
+                        </template>
+                    </el-table-column>
+
+                    <!-- <el-table-column
+                               label="渠道方账号"
+                               width="100"
+                               :show-overflow-tooltip="true">
+                  <template slot-scope="scope">
+                      <span>{{ scope.row.account }}</span>
+                  </template>
+              </el-table-column> -->
+                </el-table>
+                <el-pagination
+                               style="margin-top:15px"
+                               @size-change="handleSizeChange1"
+                               @current-change="handleCurrentChange1"
+                               :current-page="currentPage1"
+                               :page-sizes="[15,20]"
+                               :page-size="limit1"
+                               layout="total, sizes, prev, pager, next, jumper"
+                               :total="total1">
+                </el-pagination>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="showtichengmingxiClose">取 消</el-button>
+                <!-- <el-button type=" primary" @click="showtichengmingxiSubmit">确 定</el-button> -->
+            </span>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/channelListWithdraw_qudao.js');
+    }
+</script>
+
+</html>

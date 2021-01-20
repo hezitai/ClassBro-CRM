@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="icon" href="https://www.classbro.com/static/images/cont/logo.png" type="image/x-icon" />
+    <style>
+        .el-dialog__wrapper {
+            left: 0 !important;
+        }
+
+        .demo-ruleForm {
+            width: 100%;
+        }
+
+        .clears:after {
+            display: block;
+            clear: both;
+            content: "";
+            visibility: hidden;
+            height: 0
+        }
+
+        .grid-content:after {
+            display: block;
+            clear: both;
+            content: "";
+            visibility: hidden;
+            height: 0
+        }
+
+        .grid-content span {
+            float: left;
+        }
+
+        .grid-content span:last-child {
+            max-width: 75%;
+        }
+
+        .el-message-box__wrapper {
+            position: fixed;
+            top: -20px;
+            bottom: 0;
+            left: 0px !important;
+            right: 0;
+            text-align: center;
+        }
+
+        i {
+            font-style: normal
+        }
+
+        ul li {
+            list-style: none;
+            border-bottom: 1px solid #ddd;
+            height: 46px;
+            line-height: 46px;
+            width: 100%;
+            display: block;
+        }
+
+        ul li a {
+            margin-right: 10px;
+        }
+
+        .button {
+            cursor: pointer;
+            color: #fff;
+            background-color: #409eff;
+            border-color: #409eff;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            margin-left: 10px;
+            text-align: center;
+            box-sizing: border-box;
+            outline: none;
+            margin-top: 6px;
+            transition: .1s;
+            border: 1px solid #dcdfe6;
+            float: right;
+        }
+
+        .view {
+            color: #409EFF;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 70%;
+            display: inline-block;
+            height: 30px;
+        }
+
+        #logs li {
+            font-size: 14px !important;
+            border-bottom: 1px solid #ddd;
+            height: auto !important;
+            line-height: 26px !important;
+        }
+
+        .title {
+            font-weight: 600;
+            font-size: 18px;
+            margin: 5px 0 !important;
+            border-bottom: 1px solid #99a9bf;
+            padding-bottom: 8px;
+            height: 30px;
+        }
+
+        .label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .grid-content {
+            background: #fff;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .el-table__empty-block {
+            background: #fff;
+        }
+    </style>
+</head>
+
+<body style="background: #e5e9f2;">
+    <div id="app">
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="mm1" width="40%">
+            <el-form :model="ruleForm1" :rules="rules1" ref="ruleForm1" label-width="120px" class="demo-ruleForm">
+                <el-form-item label="姓名" prop="studname">
+                    <el-input v-model="ruleForm1.studname" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="定金" prop="amount1">
+                    <el-input v-model="ruleForm1.amount1" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="金额" prop="amount">
+                    <el-input v-model="ruleForm1.amount" type="number"
+                              onkeyup="this.value=this.value.replace(/[^\d.]/g,'').replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3')">
+                    </el-input>
+                </el-form-item>
+                <template>
+                    <el-radio v-show="radshow" v-model="radio" label="1">订单扣款</el-radio>
+                    <el-radio v-model="radio" label="2">余额扣款</el-radio>
+                </template>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save1('ruleForm1')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="personmodel" width="60%">
+            <el-table style="background: #e5e9f2;" :data="persondata" border style="width: 100%;margin-top:5px;">
+                <el-table-column label="学生姓名" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.nickName }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="销售名称" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.username }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="订单状态" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.classroomName }}</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                           :current-page="currentPage" :page-sizes="[5]" :page-size="limit"
+                           layout="total, sizes, prev, pager, next, jumper" :total="total">
+            </el-pagination>
+        </el-dialog>
+        <el-dialog :visible.sync="mm" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+                <el-form-item label="姓名" prop="studname">
+                    <el-input v-model="ruleForm.studname" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="账单总金额" prop="amount1" v-show="s1">
+                    <el-input v-model="ruleForm.amount1" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="还需充值" prop="amount" v-show="s2">
+                    <el-input v-model="ruleForm.amount" type="number"></el-input>
+                </el-form-item>
+                <span style="color:red;margin-left:75px"> {{red}} </span>
+                <el-form-item label="转账备注">
+                    <el-input type="textarea" :rows="4" v-model="ruleForm.remark"></el-input>
+                </el-form-item>
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders1" :data="data1" :multiple="true"
+                           accept="image/png, image/jpeg" :action="url1" :on-preview="handlePreview1"
+                           :on-remove="handleRemove1" :on-success="success1" :http-request="uploadFile1"
+                           :on-error="onerror1"
+                           :file-list="fileList1" list-type="picture" :on-change="change1" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload1">上传到服务器
+                    </el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save('ruleForm')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="shigumodel" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="理由" prop="descriptions">
+                    <el-input v-model="ruleForm.descriptions"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForms('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="shigumodels" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="理由" prop="descriptionss">
+                    <el-input v-model="ruleForm.descriptionss"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitFormss('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <el-row :gutter="20" style="margin:0;">
+            <el-col :span="12" id="leftdiv">
+                <div class="grid-content bg-purple">
+                    <p class="title">课程信息
+                        <el-button type="primary" size="mini" @click="seebill" v-show="btnshow">编辑班课</el-button>
+                        <el-button type="primary" size="mini" @click="deleteClasseoom" v-show="btnshow">结束班课</el-button>
+                        <el-button type="primary" size="mini" @click="change_teacher1" v-show="btnshow"
+                                   v-bind:disabled="changebtn">申请更换讲师</el-button>
+                    </p>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课名称:</span>
+                        <span>{{ruleForm.temCourseName}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">课程代码:</span>
+                        <span>{{ruleForm.courseCode}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">课程状态:</span>
+                        <span>{{ruleForm.statused}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课所属国家:</span>
+                        <span>{{ruleForm.countryName}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课所属学校:</span>
+                        <span>{{ruleForm.universityName}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课辅导需求:</span>
+                        <span>{{ruleForm.explained }}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课总课时:</span>
+                        <span>{{ruleForm.decimalScheduledTime}} H</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班主任:</span>
+                        <span>{{ruleForm.sysSeller}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">班课讲师:</span>
+                        <span>{{ruleForm.teacNickName}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">Deal Deadline:</span>
+                        <span>{{ruleForm.endCourseTime}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">Offcial Deadline:</span>
+                        <span>{{ruleForm.examTime}}</span>
+                    </div>
+                </div>
+            </el-col>
+            <el-col :span="12">
+                <div class="grid-content bg-purple" id="rightdivup">
+                    <p class="title">
+                        <span
+                              style="vertical-align:middle;display: inline-block;height:25px;line-height: 25px;">课程流水</span>
+                        <img @click='addCourseLogs' v-show='false'
+                             style="width:25px;height:25px;vertical-align:middle;display: inline-block;margin-left: 10px;cursor: pointer;"
+                             src="images/plus.png" alt="" title='添加课程流水'></p>
+                    <ul id="logs" style="height:300px;overflow-y:scroll;"></ul>
+                </div>
+            </el-col>
+        </el-row>
+        <div style="background:#fff;padding:10px;margin:8px 10px;">
+            <p class="title">用户信息
+                <el-button type="primary" size="mini" @click="creatOrder" v-show="btnshow">拉人进班</el-button>
+                <el-button type="primary" size="mini" @click="xuke">续课</el-button>
+                <el-button type="primary" size="mini" @click="shenqing">申请事故单</el-button>
+                <el-button type="primary" size="mini" @click="quxiao">取消报名</el-button>
+            </p>
+            <el-table style="background: #e5e9f2;" :data="extSysPaymentdata" border style="width: 100%;margin-top:5px;"
+                      @selection-change="">
+                <el-table-column label="订单号" width="280">
+                    <template slot-scope="scope">
+                        <span style="color:#409EFF;cursor: pointer;"
+                              @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="用户姓名" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.nickName }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="销售名称" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.username }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="已报课堂" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.classroomName }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="220">
+                    <template slot-scope="scope">
+                        <!-- <el-button size="mini" @click="editOrder(scope.row,scope.$index)">修改订单</el-button>   -->
+                        <el-button size="mini" v-show="btnshow" @click="change_teacher(scope.row,scope.$index)">申请事故单
+                        </el-button>
+                        <el-button size="mini" v-show="btnshow" @click="change_lession(scope.row,scope.$index)">续课
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <div style="background:#fff;padding:10px;margin:8px 10px;">
+
+            <p class="title">课堂信息
+                <el-button type="primary" size="mini" @click="addClasseoom" v-show="btnshow">新增课堂</el-button>
+            </p>
+            <el-table style="background: #e5e9f2;" :data="classroomdata" border style="width: 100%;margin-top:5px;"
+                      @selection-change="handleSelectionChange">
+                <el-table-column @change="handleSelectionChange" type="selection" width="50"></el-table-column>
+                <el-table-column label="课堂类型" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span v-if='scope.row.roomType ===1'>普通课堂</span>
+                        <span v-if='scope.row.roomType ===4'>引流课堂</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="课堂名称" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.name }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="课堂费用" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.roomCost }}{{ scope.row.currency }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="课堂说明" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.description }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="预计开始时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.startTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="预计结束时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.endTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="报名人数" width="80">
+                    <template slot-scope="scope">
+                        <span style="color:#409EFF;cursor: pointer;"
+                              @click="person(scope.row,scope.$index)">{{ scope.row.buyNumber }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="状态" width="80">
+                    <template slot-scope="scope">
+                        <span v-if='scope.row.statused ===1'>待确认课堂</span>
+                        <span v-if='scope.row.statused ===2'>未开始</span>
+                        <span v-if='scope.row.statused ===4'>进行中</span>
+                        <span v-if='scope.row.statused ===8'>已结束</span>
+                        <span v-if='scope.row.statused ===16'>异常课堂</span>
+                        <span v-if='scope.row.statused ===32'>申请取消课堂中</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button size="mini" @click="rview(scope.row,scope.$index)">回放</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <el-dialog title="课堂回放" :visible.sync="rviewsmodel" width="60%" style="margin-left:210px;">
+            <el-table style="background: #e5e9f2;" :data="rviews" border style="width: 100%;margin-top:5px;"
+                      @selection-change="">
+                <el-table-column label="回放地址" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.https_playpath }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="时长" width="100" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.duration }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="size" width="100" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.size }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="80">
+                    <template slot-scope="scope">
+                        <el-button size="mini" id="btn" @click='copy(scope.row,scope.$index)'>复制</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-dialog>
+        <div style="background:#fff;padding:10px;margin:8px 10px;">
+            <p class="title">课件信息</p>
+            <div style="float:left;">
+                <el-checkbox style="margin-left:20px;margin-right:20px" v-model="checked" @change="check"
+                             v-show="filebtn">全选</el-checkbox>
+                <el-button type="primary" @click="downfile" v-bind:loading="btnstatus" v-show="filebtn">下载</el-button>
+            </div>
+            <el-upload v-show="filebtn" style="display:inline-block;margin-left:5px;" class="upload-demo" ref="upload"
+                       :headers="myHeaders" :data="data" :multiple="true" :action="url" :on-preview="handlePreview"
+                       :on-remove="handleRemove" :on-change="change" :on-success="success" :on-error="onerror"
+                       :file-list="fileList" list-type="picture" :http-request="uploadFile" :auto-upload="false">
+                <el-select v-model="ruleForm.course" @change="change_course" placeholder="请选择" style="margin-left:5px">
+                    <el-option v-for="item in courses" :key="item.id" :label="item.groupName" :value="item.id">
+                    </el-option>
+                </el-select>
+                <el-button slot="trigger" type="primary">选择文件</el-button>
+                <el-button type="success" @click="submitUpload" v-bind:loading="b1">{{b2}}</el-button>
+            </el-upload>
+            <el-progress :percentage="percentage" :status="percentagestatus"></el-progress>
+            <div id="ul" v-for="(item,index) in courses">
+                <div>{{item.groupName}}
+                    <ul :class="item.name" id="ss"> </ul>
+                </div>
+            </div>
+        </div>
+        <el-dialog title="课堂记录" :visible.sync="dialogVisible" width="30%">
+            <div v-for="item in history" class="text item">
+                <div>{{item.suerrole}} {{ item.nickname }} {{ item.joinTime }} 进入了课堂</div>
+                <div>{{item.suerrole}} {{ item.nickname }} {{ item.leaveTime }} 离开了课堂</div>
+                <div>持续了 {{ item.duration }} 分钟</div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog :visible.sync="addCourseLogDialog" width="30%" :before-close="addCourseLogDialogBeforeClose">
+            <div>
+                <p>添加课程流水：</p>
+                <el-input type="textarea" v-model='addCourseDesc'></el-input>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="addCourseLogDialog = false">取 消</el-button>
+                <el-button type="primary" @click="submitAddCourseLog">确 定</el-button>
+            </span>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/bigClassroomInfo.js');
+    }
+</script>
+
+</html>

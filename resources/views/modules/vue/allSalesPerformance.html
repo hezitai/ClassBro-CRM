@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-date-picker
+                        v-model="data"
+                        type="daterange"
+                        align="right"
+                        unlink-panels
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        @change="choosedata"
+                        value-format="yyyy-MM-dd"
+                        :picker-options="pickerOptions2">
+        </el-date-picker>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-table
+                  :data="tableDataEnd"
+                  ref="multipleTable"
+                  border
+                  style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column
+                             label="订单号"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.parentId !==null&&scope.row.spoType !==64'><img style="width:15px"
+                             src="images/ss.svg"></span>
+                    <span class="link" style="color:#409EFF;cursor: pointer;"
+                          @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="课程名称">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.offCourseName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="销售姓名">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.sellerName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="学生姓名">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.studName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="业绩类型">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.perType===1'>销售业绩</span>
+                    <span v-if='scope.row.perType===2'>消耗业绩</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="金额">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.money }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="币种">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.current }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="来源">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.fromSource===1'>销售预付</span>
+                    <span v-if='scope.row.fromSource===2'>学生预付</span>
+                    <span v-if='scope.row.fromSource===4'>学生追付</span>
+                    <span v-if='scope.row.fromSource===8'>课程消耗</span>
+                    <span v-if='scope.row.fromSource===16'>课堂消耗</span>
+                    <span v-if='scope.row.fromSource===32'>赠送时长</span>
+                    <span v-if='scope.row.fromSource===64'>课程退款</span>
+                    <span v-if='scope.row.fromSource===128'>系统扣除</span>
+                    <span v-if='scope.row.fromSource===256'>系统补偿</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="产生时间">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination
+                       style="margin-top:15px"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]"
+                       :page-size="6"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function(){
+        loadJsOrCss('pagejs/allSalesPerformance.js');
+    }
+</script>
+
+</html>

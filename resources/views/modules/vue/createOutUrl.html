@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+    <title>Classbro</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+    <style>
+        .el-dialog__wrapper {
+            left: 0 !important;
+        }
+
+        .demo-ruleForm {
+            width: 100%;
+        }
+
+        .clears:after {
+            display: block;
+            clear: both;
+            content: "";
+            visibility: hidden;
+            height: 0
+        }
+
+        .grid-content:after {
+            display: block;
+            clear: both;
+            content: "";
+            visibility: hidden;
+            height: 0
+        }
+
+        .grid-content span {
+            float: left;
+        }
+
+        .grid-content span:last-child {
+            max-width: 75%;
+        }
+
+        .el-message-box__wrapper {
+            position: fixed;
+            top: -20px;
+            bottom: 0;
+            left: 0px !important;
+            right: 0;
+            text-align: center;
+        }
+
+        i {
+            font-style: normal
+        }
+
+        ul li {
+            list-style: none;
+            border-bottom: 1px solid #ddd;
+            height: 46px;
+            line-height: 46px;
+            width: 100%;
+            display: block;
+        }
+
+        ul li a {
+            margin-right: 10px;
+        }
+
+        .button {
+            cursor: pointer;
+            color: #fff;
+            background-color: #409eff;
+            border-color: #409eff;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            margin-left: 10px;
+            text-align: center;
+            box-sizing: border-box;
+            outline: none;
+            margin-top: 6px;
+            transition: .1s;
+            border: 1px solid #dcdfe6;
+            float: right;
+        }
+
+        .view {
+            color: #409EFF;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 60%;
+            display: inline-block;
+            height: 46px;
+        }
+
+        #logs li {
+            font-size: 14px !important;
+            border-bottom: 1px solid #ddd;
+            height: auto !important;
+            line-height: 26px !important;
+        }
+
+        .title {
+            font-weight: 600;
+            font-size: 18px;
+            margin: 5px 0 !important;
+            border-bottom: 1px solid #99a9bf;
+            padding-bottom: 8px;
+            height: 25px
+        }
+
+        .label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .grid-content {
+            background: #fff;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .el-table__empty-block {
+            background: #fff;
+        }
+
+        .nowarp {
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body style="background: #e5e9f2;">
+    <div id="app">
+        <div v-show='isWyard == false'>
+            <el-row :gutter="20" style="margin:0;">
+                <!-- :span="12" -->
+                <el-col id="leftdiv" :xs="24" :sm="24" :md="12" :lg="12" :xl="12" style="padding:5px;">
+                    <div class="grid-content bg-purple">
+                        <p class="title"><span>订单信息</span></p>
+                        <div class="grid-content bg-purple">
+                            <span class="label">订单号:</span>
+                            <span>{{ruleForm1.orderNo}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">课程代码:</span>
+                            <span>{{ruleForm2.courseCode}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">订单状态:</span>
+                            <span>{{ruleForm1.statused}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">销售名称:</span>
+                            <span>{{ruleForm1.username}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">负责师资:</span>
+                            <span>{{ruleForm1.nickname}}</span>
+                        </div>
+                        <!-- <div class="grid-content bg-purple">
+                            <span class="label">辅导讲师:</span>
+                            <span>{{ruleForm1.nickname1}}</span>
+                        </div> -->
+                        <p style="border-top:1px dashed #409EFF"></p>
+                        <div class="grid-content bg-purple" v-show="typeOrder">
+                            <span class="label">字数:</span>
+                            <span>{{ruleForm1.wordsNum}} 字</span>
+                        </div>
+                        <p style="border-top:1px dashed #409EFF"></p>
+                        <div class="grid-content bg-purple">
+                            <span class="label">Deal Deadline:</span>
+                            <span>{{ruleForm.endCourseTime}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">Official Deadline:</span>
+                            <span>{{ruleForm.examTime}}</span>
+                        </div>
+                        <p style="border-top:1px dashed #409EFF"></p>
+                        <div class="grid-content bg-purple">
+                            <span class="label">辅导需求:</span>
+                            <span>{{ruleForm1.sellerDemandDesc}}</span>
+                        </div>
+                        <!-- <div class="grid-content bg-purple">
+                                    <span class="label">订单备注:</span>
+                                    <span>{{ruleForm1.remark}}</span>
+                                </div> -->
+                        <p class="title" style="margin-top:20px!important;">学生信息</p>
+                        <div class="grid-content bg-purple">
+                            <span class="label">姓名:</span>
+                            <span>{{ruleForm.nickname}}</span>
+                            <span v-show="studCardBag">(学期卡用户)</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">学校名称:</span>
+                            <span>{{ruleForm.schoolName}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">专业:</span>
+                            <span>{{ruleForm.temCourseName}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">学历:</span>
+                            <span>{{ruleForm.levelName}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">学年:</span>
+                            <span>{{ruleForm.schoolYear}}</span>
+                        </div>
+                        <!-- <div class="grid-content bg-purple">
+                                    <span class="label">学校系统账号:</span>
+                                    <span>{{ruleForm.schoolAccount}}</span>
+                                </div>
+                                <div class="grid-content bg-purple">
+                                    <span class="label">学校系统密码:</span>
+                                    <span>{{ruleForm.schoolPws}}</span>
+                                </div> -->
+                    </div>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12" style="padding:5px;">
+                    <div style="background:#fff;padding:10px;">
+                        <p class="title">课件信息</p>
+                        <div id="ul" v-for="(item,index) in courses">
+                            <div>{{item.groupName}}
+                                <!-- coursesItem -->
+                                <ul>
+                                    <li v-for='it in coursesItem' v-if='item.groupName == it.groupName'>
+                                        <div style='position:relative'><a class='view'
+                                               @click='downFiles(it)'>{{it.name}}</a><span
+                                                  style='display:inline-block;overflow: hidden;position: absolute; right: 5px; background: #fff; z-index: 999;padding-left:10px;'>{{it.createAt | rounding}}</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <!-- <ul :class="item.name" id="ss">
+                                    <li></li>
+                                </ul> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div style="background:#fff;padding:10px;margin:8px 0px 0 0;min-height: 450px;">
+                        <p class="title">空余时间 (北京时间)</p>
+                        <el-row :gutter="20">
+                            <el-col :span="3">
+                                <div class="grid-content bg-purple">周一</div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">上午:</span>
+                                    <span>{{ruleForm2.am1}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">中午:</span>
+                                    <span>{{ruleForm2.bm1}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">下午:</span>
+                                    <span>{{ruleForm2.pm1}}</span>
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20">
+                            <el-col :span="3">
+                                <div class="grid-content bg-purple">周二</div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">上午:</span>
+                                    <span>{{ruleForm2.am2}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">中午:</span>
+                                    <span>{{ruleForm2.bm2}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">下午:</span>
+                                    <span>{{ruleForm2.pm2}}</span>
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20">
+                            <el-col :span="3">
+                                <div class="grid-content bg-purple">周三</div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">上午:</span>
+                                    <span>{{ruleForm2.am3}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">中午:</span>
+                                    <span>{{ruleForm2.bm3}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">下午:</span>
+                                    <span>{{ruleForm2.pm3}}</span>
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20">
+                            <el-col :span="3">
+                                <div class="grid-content bg-purple">周四</div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">上午:</span>
+                                    <span>{{ruleForm2.am4}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">中午:</span>
+                                    <span>{{ruleForm2.bm4}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">下午:</span>
+                                    <span>{{ruleForm2.pm4}}</span>
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20">
+                            <el-col :span="3">
+                                <div class="grid-content bg-purple">周五</div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">上午:</span>
+                                    <span>{{ruleForm2.am5}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">中午:</span>
+                                    <span>{{ruleForm2.bm5}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">下午:</span>
+                                    <span>{{ruleForm2.pm5}}</span>
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20">
+                            <el-col :span="3">
+                                <div class="grid-content bg-purple">周六</div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">上午:</span>
+                                    <span>{{ruleForm2.am6}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">中午:</span>
+                                    <span>{{ruleForm2.bm6}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">下午:</span>
+                                    <span>{{ruleForm2.pm6}}</span>
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row :gutter="20">
+                            <el-col :span="3">
+                                <div class="grid-content bg-purple">周日</div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">上午:</span>
+                                    <span>{{ruleForm2.am7}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">中午:</span>
+                                    <span>{{ruleForm2.bm7}}</span>
+                                </div>
+                            </el-col>
+                            <el-col :span="7">
+                                <div class="grid-content bg-purple">
+                                    <span class="label">下午:</span>
+                                    <span>{{ruleForm2.pm7}}</span>
+                                </div>
+                            </el-col>
+                        </el-row>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+        <div v-show='isWyard == true'>
+            <el-row :gutter="20" style="margin:0;">
+                <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" id="leftdiv" style="padding:5px;">
+                    <div class="grid-content bg-purple">
+                        <p class="title"><span>订单信息</span></p>
+                        <div class="grid-content bg-purple">
+                            <span class="label">订单号:</span>
+                            <span class="nowarp" :title='wyorder.order_name'>{{wyorder.order_name}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">课程代码:</span>
+                            <span class="nowarp">{{wyorder.course_code}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">字数:</span>
+                            <span class="nowarp">{{wyorder.word_count}} 字</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">Deadline:</span>
+                            <span class="nowarp">{{wyorder.deadline}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">Deal Deadline:</span>
+                            <span class="nowarp">{{wyorder.real_deadline}}</span>
+                        </div>
+                        <p style="border-top:1px dashed #409EFF"></p>
+                        <!-- <div class="grid-content bg-purple">
+                            <span class="label">订单备注:</span>
+                            <span>{{wyorder.remark}}</span>
+                        </div> -->
+                        <div class="grid-content bg-purple">
+                            <span class="label">学校名称:</span>
+                            <span class="nowarp">{{wyorder.university}}</span>
+                        </div>
+                        <div class="grid-content bg-purple">
+                            <span class="label">学校网址:</span>
+                            <span class="nowarp">{{wyorder.university_url}}</span>
+                        </div>
+                    </div>
+                    <div style="background:#fff;padding:10px; margin-top: 10px;">
+                        <div style="padding:20px;border:1px solid #ccc;">
+                            <p class="title">课件信息</p>
+                            <div>
+                                <!-- <div v-for="(items,keys, indexs) in wyorder.upload">
+                                    <p :key="indexs"><strong>{{ items[0] }}</strong></p>
+                                    <div v-for="(item,key, index) in items">
+                                        <p :key="index" @click="down(item.file_path,item.real_name)"
+                                           style="cursor :pointer;color:#408EF4;font-weight: 600;">{{ item.real_name }}
+                                            <span
+                                                  style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                                        </p>
+                                    </div>
+                                </div> -->
+
+                                <div>
+                                    <p><strong>lecture_notes:</strong></p>
+                                    <div v-for="(item,key, index) in wyorder.upload.lecture_notes">
+                                        <p :key="index" @click="down(item.file_path,item.real_name)"
+                                           style="cursor :pointer;color:#408EF4;font-weight: 600;">{{ item.real_name }}
+                                            <span
+                                                  style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p><strong>original_work:</strong></p>
+                                    <div v-for="(item,key, index) in wyorder.upload.original_work">
+                                        <p :key="index" @click="down(item.file_path,item.real_name)"
+                                           style="cursor :pointer;color:#408EF4;font-weight: 600;">{{ item.real_name }}
+                                            <span
+                                                  style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p><strong>other_materials:</strong></p>
+                                    <div v-for="(item,key, index) in wyorder.upload.other_materials">
+                                        <p :key="index" @click="down(item.file_path,item.real_name)"
+                                           style="cursor :pointer;color:#408EF4;font-weight: 600;">{{ item.real_name }}
+                                            <span
+                                                  style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p><strong>personal_information:</strong></p>
+                                    <div v-for="(item,key, index) in wyorder.upload.personal_information">
+                                        <p :key="index" @click="down(item.file_path,item.real_name)"
+                                           style="cursor :pointer;color:#408EF4;font-weight: 600;">{{ item.real_name }}
+                                            <span
+                                                  style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p><strong>requirement:</strong></p>
+                                    <div v-for="(item,key, index) in wyorder.upload.requirement">
+                                        <p :key="index" @click="down(item.file_path,item.real_name)"
+                                           style="cursor :pointer;color:#408EF4;font-weight: 600;">{{ item.real_name }}
+                                            <span
+                                                  style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p><strong>samples:</strong></p>
+                                    <div v-for="(item,key, index) in wyorder.upload.samples">
+                                        <p :key="index" @click="down(item.file_path,item.real_name)"
+                                           style="cursor :pointer;color:#408EF4;font-weight: 600;">{{ item.real_name }}
+                                            <span
+                                                  style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p><strong>suggested_readings:</strong></p>
+                                    <div v-for="(item,key, index) in wyorder.upload.suggested_readings">
+                                        <p :key="index" @click="down(item.file_path,item.real_name)"
+                                           style="cursor :pointer;color:#408EF4;font-weight: 600;">{{ item.real_name }}
+                                            <span
+                                                  style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p><strong>unit_guide:</strong></p>
+                                    <div v-for="(item,key, index) in wyorder.upload.unit_guide">
+                                        <p :key="index" @click="down(item.file_path,item.real_name)"
+                                           style="cursor :pointer;color:#408EF4;font-weight: 600;">{{ item.real_name }}
+                                            <span
+                                                  style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding:20px;border:1px solid #ccc;margin-top: 20px;">
+                            <p class="title">Dropbox</p>
+                            <div v-show='dropboxList.length != 0'>
+                                <div v-for="(item,index) in dropboxList">
+                                    <p v-show='item.can_hide == true' :key="index"
+                                       style="cursor :pointer;color:#408EF4;font-weight: 600;">
+                                        <span @click="down(item.file_path,item.real_name)">
+                                            {{ item.real_name }}
+                                        </span>
+                                        <span
+                                              style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                                        <span style="text-align:right;">
+                                            <el-button @click='deleteDropboxBtn(item)' type='primary' size="small">
+                                                删除
+                                            </el-button>
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </el-col>
+                <!-- <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
+
+                </el-col> -->
+            </el-row>
+        </div>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/createOutUrl.js');
+    }
+</script>
+
+</html>

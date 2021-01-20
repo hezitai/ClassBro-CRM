@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .demo-table-expand {
+        font-size: 0;
+    }
+
+    .demo-table-expand label {
+        width: 90px;
+        color: #99a9bf;
+    }
+
+    .demo-table-expand .el-form-item {
+        margin-right: 0;
+        margin-bottom: 0;
+        width: 50%;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column label="时间" :show-overflow-tooltip="true" width="160">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="姓名" :show-overflow-tooltip="true" width="100">
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="viewsInfo(scope.row,scope.$index)">{{ scope.row.nickName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="销售名称" :show-overflow-tooltip="true" width="100">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.sellerName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="账号" :show-overflow-tooltip="true" width="100">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.mobile }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="提现金额" :show-overflow-tooltip="true" width="140">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.money }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="货币种类" :show-overflow-tooltip="true" width="100">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.current }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="银行信息">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.description }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="250">
+                <template slot-scope="scope">
+                    <el-button size="mini" v-if="hasPermission('sys:caiwubu:xueshengtixianshenhe:tongguo')"
+                               @click="yes(scope.row,scope.$index)">通过</el-button>
+                    <el-button size="mini" v-if="hasPermission('sys:caiwubu:xueshengtixianshenhe:butongguo')"
+                               @click="no(scope.row,scope.$index)">不通过</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+        <el-dialog :visible.sync="infoviews" width="60%">
+            <el-table :data="tableDatas" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                      @selection-change="handleSelectionChange">
+                <el-table-column label="时间" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.createAt }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="姓名" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <spa>{{ scope.row.nickName }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="提现金额" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.money }}{{ scope.row.current }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="状态" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span v-if='scope.row.statused===0'>待审核</span>
+                        <span v-if='scope.row.statused===1'>已审核</span>
+                        <span v-if='scope.row.statused===2'>失败</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="流水类型" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span v-if='scope.row.type===1'>提现</span>
+                        <span v-if='scope.row.type===2'>充值余额</span>
+                        <span v-if='scope.row.type===4'>预付款返还</span>
+                        <span v-if='scope.row.type===8'>追加预付款</span>
+                        <span v-if='scope.row.type===16'>消费</span>
+                        <span v-if='scope.row.type===32'>转换账户</span>
+                        <span v-if='scope.row.type===64'>抵扣欠款</span>
+                        <span v-if='scope.row.type===128'>事故单</span>
+                        <span v-if='scope.row.type===256'>共享订单扣款</span>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/finance_withdraw.js');
+    }
+</script>
+
+
+</html>

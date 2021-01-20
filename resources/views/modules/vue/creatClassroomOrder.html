@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .red {
+        color: red;
+    }
+
+    .green {
+        color: green;
+    }
+
+    .clears:after {
+        display: block;
+        clear: both;
+        content: "";
+        visibility: hidden;
+        height: 0
+    }
+
+    .fl {
+        float: left;
+    }
+
+    .fr {
+        float: right;
+    }
+
+    .el-form-item__content {
+        line-height: none !important;
+        position: relative;
+        font-size: 14px;
+    }
+
+    .demo {
+        margin-bottom: 0;
+    }
+
+    ul {
+        display: block;
+        width: 100%;
+        padding-inline-start: 0px;
+        box-sizing: border-box;
+        margin-bottom: 0;
+    }
+
+    .ul li {
+        list-style: none;
+        float: left;
+        box-sizing: border-box;
+    }
+
+    .demo>label {
+        width: 10% !important;
+        color: #333;
+        text-align: left;
+        border-bottom: 1px solid #ebeef5;
+        line-height: 88px;
+        height: 88px;
+        border-left: 1px solid #ebeef5;
+        padding-left: 10px;
+    }
+
+    .checkbox {
+        width: 50px;
+        display: inline-block;
+    }
+
+    .demo>.el-form-item__content {
+        margin-left: 0 !important;
+    }
+
+    .table td {
+        line-height: 20px;
+        word-break: break-all;
+        padding: 12px 0;
+        padding-left: 10px;
+    }
+
+    .table {
+        border: 1px solid #ebeef5;
+    }
+
+    .demos .el-input--suffix input {
+        border: none !important;
+        padding: 0 !important;
+        pointer-events: none;
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    .demos .el-input--suffix .el-input__suffix {
+        display: none;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="110px" class="demo-ruleForm">
+            <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tab-pane label="单拉进班" name="first">
+                    <el-form-item label="手机号" prop="mobile">
+                        <div style="width:140px;display:inline-block">
+                            <el-select v-model="ruleForm.num">
+                                <el-option v-for="item in countrys" :key="item.id" :label="item.code + item.name"
+                                           :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </div>
+                        <el-input v-model="ruleForm.mobile" style="width:155px;" @keyup.enter.native="iftrue"
+                                  @blur="result()"></el-input>
+                        <i class="el-icon-error red" v-show="error"></i>
+                        <i class="el-icon-success green" v-show="success"></i>
+                        <i v-show="tip" :class="color">{{tip}}</i>
+                    </el-form-item>
+                    <el-form-item label="学生姓名" prop="username">
+                        <el-input v-model="ruleForm.username" v-bind:disabled="usernamedisabled" style="width:300px;">
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="留学国家" prop="classCourseCountryId">
+                        <el-select v-model="ruleForm.classCourseCountryId" filterable placeholder="请选择留学国家"
+                                   @change="change_country" style="width:300px;" v-bind:disabled="showcountry">
+                            <el-option v-for="item in countrys" :key="item.id" :label="item.name" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="所属学校" prop="classCourseUniversityId">
+                        <el-select v-model="ruleForm.classCourseUniversityId" filterable placeholder="请选择学校"
+                                   style="width:300px;" v-bind:disabled="university">
+                            <el-option v-for="item in universitys" :key="item.id" :label="item.name" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="是否使用学期卡" v-show="isCard">
+                        <el-switch v-model="ruleForm.isFromCard" @change="change_card"></el-switch>
+                    </el-form-item>
+                    <el-form-item label="学期卡" v-show="cardtime">
+                        <span>{{cardNo}} ({{lastTime}} 小时)</span>
+                    </el-form-item>
+                    <el-form-item label="学期卡单价" v-show="cardtime">
+                        <span>{{xueqikadanjia}}</span>
+                        <span>(CNY/课时)</span>
+                    </el-form-item>
+                    <el-form-item label="学期卡预计抵扣" v-show="cardtime">
+                        <span>{{cardtimes}}</span>
+                        <span>小时</span>
+                    </el-form-item>
+                </el-tab-pane>
+                <!--  v-if="hasPermission('sys:seller:dabankelist:pilianglaren')" -->
+                <el-tab-pane label="群拉进班" name="second">
+                    <el-upload style="float:left" class="upload-demo" ref="upload" :headers="myHeaders" :data="data"
+                               accept=".xlsx" :action="url" :on-remove="handleRemove" :http-request="uploadFile" drag
+                               :limit="1" :file-list="fileList" list-type="picture" :on-change="change"
+                               :auto-upload="false">
+                        <i class="el-icon-upload"></i>
+                        <div class="el-upload__text">将文件拖到此处，或
+                            <em>点击上传</em>
+                        </div>
+                    </el-upload>
+                    <!-- <el-button style="float:left;margin-left:12px;margin-top:144px" size="medium " type="success" @click="submitUpload">上传</el-button> -->
+                </el-tab-pane>
+            </el-tabs>
+            <p class="title">选择课堂</p>
+            <div class="clears">
+                <table style="width:100%;border-spacing: 0px;" border="0" cellpadding="0" cellpadding="0" class="table">
+                    <thead style="color: #909399;font-weight: 500;">
+                        <tr>
+                            <td class="br" style="width:8%">勾选课堂</td>
+                            <td class="br" style="width:7%">课堂类型</td>
+                            <td class="br" style="width:7%">课堂名称</td>
+                            <td class="br" style="width:10%">课堂费用 ({{quanjubizhong}})</td>
+                            <td class="br" style="width:10%">预计开始时间</td>
+                            <td class="br" style="width:10%">预计结束时间</td>
+                            <td class="br" style="width:10%">课堂说明</td>
+                            <td class="br" style="width:10%">优惠折扣</td>
+                            <td class="br" style="width:10%">优惠后价格 ({{quanjubizhong}})</td>
+                            <td class="br" style="width:16%">优惠说明</td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div style="width:100%">
+                <el-form-item class="demo" v-for="(domain, index) in ruleForm.domains" :key="domain.key"
+                              :prop="'domains.' + index + '.value'">
+                    <table border="1" class="table" cellpadding="0" cellpadding="0"
+                           style="width:100%;border-spacing: 0px;">
+                        <tr>
+                            <td style="width:8%">
+                                <template>
+                                    <el-checkbox @change="removeDomain(domain)" v-model="domain.checked" :disabled='domain.entered == true'></el-checkbox>
+                                </template>
+                            </td>
+                            <td style="width:7%">
+                                <el-select v-model="domain.roomType" class="demos" disabled>
+                                    <el-option v-for="item in roomTypes" :key="item.id" :label="item.roomTypename"
+                                               :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </td>
+                            <td style="width:7%">{{domain.name}}</td>
+                            <td style="width:10%">{{domain.roomCost}}</td>
+                            <td style="width:10%">{{domain.startTime}}</td>
+                            <td style="width:10%">{{domain.endTime}}</td>
+                            <td style="width:10%">{{domain.description}}</td>
+                            <td style="width:10%">
+                                <el-select v-model="domain.preferentialPolicId" placeholder="选择折扣"
+                                           @change="changePrice(domain)">
+                                    <el-option v-for="item in studPreferentialPolicies" :key="item.id"
+                                               :label="item.preferential" :value="item.id">
+                                    </el-option>
+                                </el-select>
+                            </td>
+                            <td style="width:10%">
+                                <!-- {{domain.preferentials}} -->
+                                <el-input v-model="domain.saledPay" type='number' placeholder="请输入">
+                            </td>
+                            <td style="width:16%">
+                                <el-input v-model="domain.preferentialPolicRemark" placeholder="请输入"></el-input>
+                            </td>
+                        </tr>
+                    </table>
+                </el-form-item>
+            </div>
+            <el-button type="primary" v-show="first" style="margin-top:20px" v-bind:loading="btnstatus"
+                       @click="saveClass('ruleForm')">{{btnval}}</el-button>
+            <el-button type="primary" v-show="second" style="margin-top:20px" v-bind:loading="btnstatus"
+                       @click="othersaveClass('ruleForm')">{{btnval}}</el-button>
+            <el-button type="primary" style="margin-top:10px" @click="back()" v-show='isIframe == false'>返回</el-button>
+        </el-form>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<!-- <script src="../../js/common.js"></script> -->
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="js/axios.min.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/creatClassroomOrder.js');
+    }
+
+</script>
+
+</html>

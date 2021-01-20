@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>首页</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="modules/vue/css/index.css">
+    <link href="https://cdn.bootcss.com/animate.css/3.7.0/animate.min.css" rel="stylesheet">
+</head>
+<style>
+    #id {
+        font-family: '微软雅黑';
+    }
+
+    .cheart-body {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+        align-items: center;
+        align-content: space-around;
+    }
+
+    .cheart-body-column {
+        flex-direction: column;
+    }
+
+    .cheart-body-row {
+        flex-direction: row;
+    }
+
+    #firstCircleEcharts {
+        width: 400px;
+        height: 250px;
+    }
+
+    .secondCircleEcharts {
+        width: 230px;
+        height: 250px;
+        display: inline-block;
+        margin: 5px 10px;
+        padding: 5px 10px;
+        position: relative;
+    }
+
+    #secondCircleContent {
+        margin-top: 30px;
+        /* padding: 0 30px; */
+        justify-content: space-between;
+    }
+
+    .margin55-00 {
+        margin: 5px 0;
+    }
+
+    .margintop10 {
+        margin-top: 10px;
+    }
+
+    .top-body {
+        border: 1px solid #EEF0F3;
+        padding: 10px;
+        margin: 10px;
+        background: #F9FAFC;
+        position: relative;
+    }
+
+    .fourth-row-content {
+        /* padding: 0 40px; */
+        margin-top: 30px;
+        justify-content: space-between;
+        font-weight: 550;
+    }
+
+    .fourthXiaoZu {
+        padding: 0 0 0 120px;
+    }
+
+    .fourthXiaoShou {
+        padding: 0 120px 0 0;
+    }
+
+    .updateBtn {
+        position: absolute;
+        top: 48px;
+        right: 5px;
+        border: 1px solid #409EFF;
+        background: #409EFF;
+        border-radius: 5px;
+        color: #fff;
+        width: 50px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        cursor: pointer;
+
+    }
+
+    .updateBtnFirst {
+        position: absolute;
+        top: 50px;
+        right: 90px;
+        border: 1px solid #409EFF;
+        background: #409EFF;
+        border-radius: 5px;
+        color: #fff;
+        width: 50px;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 999;
+
+    }
+
+    .case-body {
+        display: inline-block;
+        width: 200px;
+        height: 100px;
+        text-align: center;
+        border: 1px solid #EEF0F3;
+        color: #46ADFF;
+        font-size: 16px;
+        font-weight: 550;
+        margin: 10px;
+        padding: 20px;
+    }
+
+    .third-row-content {
+        margin-top: 20px;
+    }
+
+    #sixthCircleEcharts {
+        margin-left: 30px;
+    }
+
+    #seventhCircleEcharts {
+        margin-left: 30px;
+        margin-top: 30px;
+    }
+
+    .border {
+        border: 1px solid #EEF0F3;
+    }
+
+    #fivthLineEcharts {
+        margin-left: 30px;
+    }
+
+    .fivth-content {
+        position: relative;
+    }
+
+    .fivth-content-btn {
+        position: absolute;
+        top: 20px;
+        left: 200px;
+        z-index: 999;
+    }
+
+    .fivth-content-btn button {
+        border: none;
+        background: #409EFF;
+        border-radius: 5px;
+        color: #fff;
+        width: 70px;
+        height: 40px;
+        line-height: 30px;
+        text-align: center;
+        cursor: pointer;
+        margin: 0 10px;
+    }
+
+    /* .choiceDept-content .el-checkbox-group {
+        display: flex;
+        flex-direction: column;
+        color: #409EFF;
+        padding: 15px;
+    } */
+    .choiceDeptDropDown .el-dropdown-menu__item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .choiceDeptDropDown .el-checkbox+.el-checkbox {
+        margin-left: 0;
+    }
+
+    .choiceDept-content p {
+        margin: 0;
+        padding: 15px 10px;
+        border: 1px solid #EAEFF7;
+        /* border-bottom:none; */
+        background: #fff;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .choiceDept-content .el-checkbox {
+        margin: 3px 0;
+        color: #409EFF;
+    }
+
+    .choiceDept-content {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        /* border: 1px solid #EAEFF7; */
+        /* padding: 20px; */
+        color: #409EFF;
+        /* width: 200px; */
+        /* overflow-x:auto; */
+    }
+
+    .backlog-body {
+        border: 1px solid #EEF0F3;
+        padding: 10px;
+        margin: 10px;
+        background: #FFFFFF;
+        position: relative;
+    }
+
+    .el-table .warning-row {
+        color: #ccc;
+        text-decoration: line-through;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <!-- <el-table-column label="单号" align='center'>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.scOrderNo }}</span>
+                        </template>
+                    </el-table-column> -->
+
+
+        <div class="backlog-body" v-loading='backlogLoading' style="display: none">
+            <p style="margin-top: 0;display: flex;justify-content:space-between"><span>待办事项</span>
+                <el-button size="small" type="primary" @click='addBacklog = true'>添加事项</el-button>
+            </p>
+            <div>
+                <el-table :data="backlogData" style="width: 100%" :row-class-name="tableRowClassName">
+                    <el-table-column label="优先级" align='center'>
+                        <template slot-scope="scope">
+                            <span v-show='scope.row.level == 1'>
+                                <el-button type="primary" size="mini">普通</el-button>
+                            </span>
+                            <span v-show='scope.row.level == 2'>
+                                <el-button type="warning" size="mini">紧急</el-button>
+                            </span>
+                            <span v-show='scope.row.level == 4'>
+                                <el-button type="danger" size="mini">非常紧急</el-button>
+                            </span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column label="消息内容" align='center'>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.details }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="日期" align='center'>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.createAt }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="来源" align='center'>
+                        <template slot-scope="scope">
+                            <span v-show='scope.row.fromUserId == 0'>
+                                系统创建
+                            </span>
+                            <span v-show='scope.row.fromUserId != 0'>
+                                {{scope.row.suUsername}} 创建
+                            </span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="是否解决" width="180" align='center'>
+                        <template slot-scope="scope">
+                            <el-checkbox @change='changeCheckbox(scope.row)' v-model="scope.row.checked"></el-checkbox>
+                        </template>
+                    </el-table-column>
+                </el-table>
+            </div>
+            <el-pagination layout="prev, pager, next" @size-change="backlogDataSizeChange"
+                           @current-change="backlogDataCurrentChange" :current-page="backlogDataCurrentPage"
+                           :page-size="backlogDataLimit" :total="backlogDataTotal">
+            </el-pagination>
+        </div>
+
+        <el-dialog title="添加待办事项" :visible.sync="addBacklog" width="40%" :before-close="addBacklogClose">
+            <div>
+                <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4}" placeholder="请输入事项内容"
+                          v-model="addBacklogtextarea">
+                </el-input>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="addBacklogClose">取 消</el-button>
+                <el-button type="primary" @click="addBacklogSubmit">确 定</el-button>
+            </span>
+        </el-dialog>
+
+
+
+
+        <div class="top-body">
+            <!-- 选择月份 -->
+            <!-- <el-button type="primary" @click="href2">CreateDDan</el-button> -->
+            <div class="choiceDept-content" v-if='isLevel3'>
+                <el-dropdown type="primary" trigger="click" :hide-on-click='false' style="color:#409EFF">
+                    <p class="el-dropdown-link">选择考核范围<i class="el-icon-arrow-down el-icon--right"></i></p>
+                    <el-dropdown-menu slot="dropdown" class="choiceDeptDropDown">
+                        <el-checkbox-group v-model="ChoiceDeptArray">
+                            <el-dropdown-item>
+                                <el-checkbox :label="item.deptId" :key="item.deptId" v-for="item in checkBoxChoiceDept"
+                                             :value='item.deptId' :checked='(item.assessed == true? true : false)'
+                                             @change="choiceDeptChange(item)">{{item.name}}</el-checkbox>
+                            </el-dropdown-item>
+                        </el-checkbox-group>
+                    </el-dropdown-menu>
+                </el-dropdown>
+            </div>
+
+            <div>
+                <div class="chooseMonth">
+                    <span>选择月份:</span>
+                    <el-select v-model="chooseMonth" placeholder="请选择" @change='chooseMonthEvent' style='width:100px'>
+                        <el-option v-for="item in monthArray" :key="item.value" :label="item.label" :value="item.value">
+                        </el-option>
+                    </el-select>
+                </div>
+            </div>
+            <!-- 第一排echarts -->
+            <div class="cheart-body">
+                <div style="width: 400px; height: 250px;position: relative">
+                    <button class="updateBtnFirst" v-if='firstCircleData.level != 3' @click='updataFirstRow'>编辑</button>
+                    <div id="firstCircleEcharts"></div>
+                </div>
+            </div>
+            <!-- 第二排echarts -->
+            <div class="" style="width:100%">
+                <div id='secondCircleContent' class="cheart-body cheart-body-row"></div>
+            </div>
+        </div>
+
+        <!-- 第三排数据列表 -->
+        <div class="cheart-body cheart-body-row third-row-content">
+            <div class="cheart-body cheart-body-column case-body">
+                <p>今日新增订单</p>
+                <p>{{thirdRowData.allTypeCount}}</p>
+                <p><span>{{thirdRowData.type0}}</span> / <span>{{thirdRowData.type1}}</span> /
+                    <span>{{thirdRowData.type4}}</span> / <span>{{thirdRowData.type32}}</span> /
+                    <span>{{thirdRowData.type64}}</span></p>
+            </div>
+            <div class="cheart-body cheart-body-column case-body">
+                <p>今日销售总额（AUD）</p>
+                <p>{{thirdRowData.sellerValueToday}}</p>
+            </div>
+            <div class="cheart-body cheart-body-column case-body">
+                <p>上月销售总额（AUD）</p>
+                <p>{{thirdRowData.sellerValueTheLastMonth}}</p>
+            </div>
+            <div class="cheart-body cheart-body-column case-body">
+                <p>本年度销售总额（AUD）</p>
+                <p>{{thirdRowData.sellerValueThisYear}}</p>
+            </div>
+            <div class="cheart-body cheart-body-column case-body">
+                <p>本年度消耗总额（AUD）</p>
+                <p>{{thirdRowData.sellerUseValueThisYear}}</p>
+            </div>
+        </div>
+        <!-- 第四排小组、销售业绩排行 -->
+        <div class="cheart-body fourth-row-content">
+            <div class="fourthXiaoZu">
+                <p>小组本月业绩排行（AUD）</p>
+                <div v-for='(item, index) in fourthRowData.xiaozu'>
+                    <p><span>{{index + 1}}、</span> <span>{{item.deptName}}</span><span>（{{item.money}}）</span></p>
+                </div>
+            </div>
+            <div class="fourthXiaoShou">
+                <p>销售本月业绩排行（AUD）</p>
+                <div v-for='(item, index) in fourthRowData.xiaoshou'>
+                    <p><span>{{index + 1}}、</span> <span>{{item.sellerName}}</span><span>（{{item.money}}）</span></p>
+                </div>
+                <!-- getThisMonthPerformanceRankList showThisMonthList = true -->
+                <p style="font-weight:500;color:#57B4FF; cursor: pointer;" @click='showAllPreListEvent'>点击查看全部 >>></p>
+            </div>
+        </div>
+        <!-- 第五排折线图 -->
+        <div class="cheart-body fivth-content">
+            <div class="fivth-content-btn">
+                <el-select v-model="chooseLineYearData" placeholder="请选择年份" @change='chooseLineYeaEvent'
+                           style='width:150px'>
+                    <el-option v-for="item in LineYearArray" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                </el-select>
+
+                <el-select v-model="chooseLineMonthData" placeholder="请选择月份" @change='chooseLineMonthEvent'
+                           style='width:100px'>
+                    <el-option v-for="item in LineMonthArray" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                </el-select>
+            </div>
+            <div id='fivthLineEcharts' style="width: 100%;height:450px;margin-top:20px;"></div>
+        </div>
+        <!-- 第六排国家占比饼状图 -->
+        <div class="cheart-body border">
+            <div id="sixthCircleEcharts" style="width: 100%;height:450px;margin-top:20px;"></div>
+        </div>
+        <!-- 第七排学校占比echarts -->
+        <div class="cheart-body border margintop10">
+            <div id="seventhCircleEcharts" style="width: 100%;height:400px;margin-top:20px;"></div>
+        </div>
+
+
+
+        <el-dialog title="调整业绩目标" :visible.sync="updataUseMoney" width="40%">
+            <div>
+                调整业绩目标:
+                <el-input :maxlength='9' v-model="updataUseMoneyNum" type='number' placeholder="请输入内容"
+                          style='width:200px;'>
+                </el-input>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="updataUseMoney = false">取 消</el-button>
+                <el-button type="primary" @click="updataUseMoneySubmit">确 定</el-button>
+            </span>
+        </el-dialog>
+
+
+        <el-dialog title="调整业绩目标" :visible.sync="updataUseMoney2" width="40%">
+            <div>
+                调整业绩目标:
+                <el-input v-model="updataUseMoneyNum2" type='number' placeholder="请输入内容" style='width:200px;'>
+                </el-input>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="updataUseMoney2 = false">取 消</el-button>
+                <el-button type="primary" @click="updataUseMoneySubmit2">确 定</el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog title='本月销售业绩排行' :visible.sync='showThisMonthList' width='60%' top='3vh' style="z-index:999999;">
+            <div style="height:700px;">
+                <iframe style="width:100%;height:100%;" src="modules/vue/monitor.html" frameborder="0"></iframe>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="showThisMonthList = false">关闭</el-button>
+            </span>
+        </el-dialog>
+
+        <el-dialog title='本月销售业绩排行' :visible.sync='showThisMonthListP2' width='60%' top='3vh' style="z-index:999999;">
+            <div style="height:700px;">
+                <iframe style="width:100%;height:100%;" :src="putIframeSrc" frameborder="0"></iframe>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="showThisMonthListP2 = false">关闭</el-button>
+            </span>
+        </el-dialog>
+    </div>
+</body>
+<script src="modules/vue/js/jquery.js"></script>
+<!-- <script src="js/base.js"></script> -->
+<script type="text/javascript">
+    document.write('<script src="js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="modules/vue/js/vue.js"></script>
+<script src="modules/vue/js/index.js"></script>
+<script src="modules/vue/js/echarts.min.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('js/main.js');
+    }
+</script>
+
+</html>

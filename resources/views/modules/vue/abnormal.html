@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入姓名" style="width:240px">
+        </el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column label="订单号" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.spoType ==64'>
+                        <img style="width:15px" src="images/bigC.png">
+                    </span>
+                    <span v-if='scope.row.parentId !==null&&scope.row.spoType !==64'>
+                        <img style="width:15px" src="images/ss.svg">
+                    </span>
+                    <span @click="seedetail(scope.row,scope.$index)"
+                          style="cursor: pointer;color: #409EFF;">{{ scope.row.studCourse.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="下单时间" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="销售" :show-overflow-tooltip="true" width="100">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.sellerName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="Official Deadline">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.examTime }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="异常类型" :show-overflow-tooltip="true" width="90">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.exceptionType===1'>价格不符</span>
+                    <span v-if='scope.row.exceptionType===2'>师资资源</span>
+                    <span v-if='scope.row.exceptionType===3'>客户意向不足</span>
+                    <span v-if='scope.row.exceptionType===4'>其他</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="详情" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.description }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="处理状态" :show-overflow-tooltip="true" width="90">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.statused===32'>未处理</span>
+                    <span v-if='scope.row.statused!==32'>已处理</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="200px">
+                <template slot-scope="scope">
+                    <el-button size="mini" disabled v-if="scope.row.statused !== 32">确认状态</el-button>
+                    <el-button size="mini" @click="dialogVisible(scope.row,scope.$index)"
+                               v-if="scope.row.statused === 32">确认状态</el-button>
+                    <el-button size="mini" @click="seedetail(scope.row,scope.$index)">查看详情</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="dialogFormVisible2" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="20%" class="demo-ruleForm">
+                <el-form-item label="状态类型" prop="type">
+                    <el-form-item>
+                        <el-select placeholder="" v-model="ruleForm.type" @change="changetype" filterable
+                                   style="width:80%">
+                            <el-option label="同意订单作废" value="1"></el-option>
+                            <!-- <el-option label="同意订单进入公共订单池" value="2"></el-option> -->
+                            <el-option label="驳回坏单申请" value="3"></el-option>
+                            <!-- <el-option label="重新分配给新的销售" value="4"></el-option> -->
+                        </el-select>
+                    </el-form-item>
+                </el-form-item>
+                <el-form-item label="销售姓名" prop="name" v-show="!nameshow">
+                    <el-form-item>
+                        <el-select placeholder="" v-model="ruleForm.name" filterable style="width:80%">
+                            <el-option v-for="item in names" :key="item.id" :label="item.username" :value="item.userId">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="save('ruleForm')">{{btnval}}</el-button>
+            </span>
+        </el-dialog>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/abnormal.js');
+    };
+</script>
+
+
+</html>

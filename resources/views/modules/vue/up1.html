@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-upload
+                   :action="url"
+                   list-type="picture-card"
+                   :on-preview="handlePictureCardPreview"
+                   :on-remove="handleRemove">
+            <i class="el-icon-plus"></i>
+        </el-upload>
+        <el-button size="small" type="success" @click="submitUpload">上传到服务器</el-button>
+        <el-dialog :visible.sync="dialogVisible">
+            <img width="100%" :src="dialogImageUrl" alt="">
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/axios.min.js"></script>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                dialogImageUrl: '',
+                dialogVisible: false,
+                fileList: [],
+                myHeaders: {
+                    token: token
+                },
+                url: "" + baseURL + "sys/seller/order/evidenceThumbSave",
+                data: {
+                    cdId: "2",
+                    groupId: "2",
+                    formDate: ""
+                },
+                formDate: '',
+            };
+        },
+        methods: {
+            submitUpload1() {
+                this.formDate = new FormData();
+                this.formDate.append('current', "CNY");
+                this.formDate.append('studId', "27");
+                this.formDate.append('amount', "27");
+                this.formDate.append('purchaseId', "68");
+                let config = {
+                    headers: {
+                        processData: false,
+                        contentType: false,
+                        mimeType: "multipart/form-data",
+                        token: token,
+                    }
+                }
+                axios.post(vm.url, this.formDate, config).then(res => {
+                    console.log(res)
+                }).catch(res => {
+                    console.log(res)
+                })
+            },
+            uploadFile1(file) {
+                console.log(file);
+                this.formDate = new FormData();
+                this.formDate.append('file', file.file);
+                console.log(this.formDate);
+            },
+            uploadFile(file) {
+                console.log(file);
+                this.formDate = new FormData();
+                this.formDate.append('file', file.file);
+            },
+            submitUpload() {
+                this.$refs.upload.submit();
+                this.formDate = new FormData();
+                this.$refs.upload.submit();
+                this.formDate.append('current', "CNY");
+                this.formDate.append('studId', "27");
+                this.formDate.append('amount', "27");
+                this.formDate.append('purchaseId', "68");
+                let config = {
+                    headers: {
+                        processData: false,
+                        contentType: false,
+                        mimeType: "multipart/form-data",
+                        token: token,
+                    }
+                }
+                axios.post(vm.url, this.formDate, config).then(res => {
+                    console.log(res)
+                }).catch(res => {
+                    console.log(res)
+                })
+            },
+            success() {},
+            beforeAvatarUpload(file) {
+                const isLt2M = file.size;
+                alert(isLt2M);
+            },
+            handleExceed(file) {
+                console.log(file)
+            },
+            change(file) {
+                console.log(file)
+            },
+            remove(file) {
+                console.log(file)
+            },
+            handlePictureCardPreview(file) {
+                console.log(file)
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+        }
+    })
+    class TbFedMembers {
+        static get HuaChen() {
+            return 'jelly';
+        }
+    }
+    alert(TbFedMembers.HuaChen);
+    Promise.reject(123).then(v => {
+        console.log(v);
+    }).catch(v => {
+        console.log(v);
+    });
+    var obj = new Object();
+    obj.d = 2;
+    a();
+
+    function a() {
+        alert(1);
+        obj.d = 22;
+    };
+    console.log(obj.d);
+    //d为全局变量。
+</script>
+</body>
+
+</html>
+
+</html>

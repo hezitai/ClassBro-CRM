@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>首页</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="modules/vue/css/index.css">
+</head>
+<style>
+    #orders {
+        cursor: pointer;
+        color: #409EFF;
+    }
+
+    .color1 {
+        background: #fef0f0;
+        cursor: not-allowed;
+    }
+
+    .color1:hover {
+        background: #fef0f0;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <el-table
+                  :data="tableDataEnd"
+                  ref="multipleTable"
+                  border
+                  cell-displayed="true"
+                  style="width: 100%;">
+            <el-table-column
+                             label="订单号">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.parentId !==null&&scope.row.spoType !==64'><img style="width:15px"
+                             src="modules/vue/images/ss.svg"></span>
+                    <span @click="openorder(scope.row,scope.$index)" id="orders">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="订单状态">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.statused===1'>未处理(无任何销售接单)</span>
+                    <span v-if='scope.row.statused===2'>待审核</span>
+                    <span v-if='scope.row.statused===4'>待确定</span>
+                    <span v-if='scope.row.statused===8'>待规划(等待教师/运营接单)</span>
+                    <span v-if='scope.row.statused===16'>规划中(订单第一次超时等待运营接单)</span>
+                    <span v-if='scope.row.statused===32'>规划中(订单第二次超时等待运营主管强制指派)</span>
+                    <span v-if='scope.row.statused===64'>规划中(运营接单待指派，正在处理)</span>
+                    <span v-if='scope.row.statused===128'>待排课</span>
+                    <span v-if='scope.row.statused===256'>已排课</span>
+                    <span v-if='scope.row.statused===512'>待结课</span>
+                    <span v-if='scope.row.statused===1024'>已结课</span>
+                    <span v-if='scope.row.statused===2048'>已强制结课</span>
+                    <span v-if='scope.row.statused===4096'>已取消</span>
+                    <span v-if='scope.row.statused===8192'>坏单申请中</span>
+                    <span v-if='scope.row.statused===16384'>坏单已确认结束</span>
+                    <span v-if='scope.row.statused===32768'>销售被更换</span>
+                    <span v-if='scope.row.statused===65536'>事故单申请中</span>
+                    <span v-if='scope.row.statused===131072'>事故单已处理</span>
+                    <span v-if='scope.row.statused===262144'>事故单更换教师</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="销售名称">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.sellerName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="锁单操作" align='center'>
+                <template slot-scope="scope">
+                    <!-- <span><i class="el-icon-lock"></i>锁定</span> -->
+                    <el-button size='mini'
+                               v-show='(usertype.hasSales == true || usertype.hasSalesGroupMaster == true || usertype.hasSalesManager == true) && scope.row.deleteFlag == false'
+                               @click="lock_order(scope.row,scope.$index)">
+                        <img src="images/lock.png"
+                             style="width:30px;height:30px" alt="">
+                    </el-button>
+                    <!-- el-icon-lock -->
+                    <!-- <span><i class="el-icon-unlock"></i>解锁</span> -->
+                    <el-button size='mini'
+                               v-show='(usertype.hasSales == true || usertype.hasSalesGroupMaster == true || usertype.hasSalesManager == true) && scope.row.deleteFlag == true'
+                               @click="unlock_order(scope.row,scope.$index)">
+                        <img src="images/unlock.png" style="width:30px;height:30px" alt=""></el-button>
+                    <!-- el-icon-unlock -->
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="200">
+
+                <template slot-scope="scope">
+                    <el-dropdown trigger="click" v-show='scope.row.spoType !=64'>
+                        <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                            下拉操作
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <!-- 原功能 -->
+                            <!-- <el-dropdown-item v-show='usertype.hasSales == true || usertype.hasSalesGroupMaster == true || usertype.hasSalesManager == true'
+                                              @click="lock_order(scope.row,scope.$index)">锁定订单</el-dropdown-item>
+                            <el-dropdown-item v-show='usertype.hasSales == true || usertype.hasSalesGroupMaster == true || usertype.hasSalesManager == true'
+                                              @click="unlock_order(scope.row,scope.$index)">解锁订单</el-dropdown-item> -->
+                            <!-- 销售经理--全部订单 -->
+                            <el-dropdown-item v-show='usertype.hasSalesGroupMaster == true || usertype.hasSalesManager == true'
+                                              @click.native="blank_out(scope.row,scope.$index)">作废订单</el-dropdown-item>
+                            <el-dropdown-item v-show='usertype.hasSalesManager == true'
+                                              @click.native="salesPresenterTime(scope.row,scope.$index)">赠送课时
+                            </el-dropdown-item>
+                            <!-- 销售经理--大班课列表 -->
+                            <!-- <el-dropdown-item>编辑班课</el-dropdown-item>
+                            <el-dropdown-item>结束班课</el-dropdown-item>
+                            <el-dropdown-item>拉人进班</el-dropdown-item>
+                            <el-dropdown-item>更换班主任</el-dropdown-item>
+                            <el-dropdown-item>激活班课</el-dropdown-item> -->
+                            <el-dropdown-item @click.native="imchat(scope.row,scope.$index)">聊天记录</el-dropdown-item>
+                            <!-- 销售专员--我的订单 -->
+                            <el-dropdown-item v-show='usertype.hasSales == true || usertype.hasSalesGroupMaster == true'
+                                              @click.native="badorder(scope.row,scope.$index)">坏单申请</el-dropdown-item>
+                            <!-- 销售专员--已完成订单 -->
+                            <el-dropdown-item v-show='(usertype.hasSales == true || usertype.hasSalesGroupMaster == true) && scope.row.statused < 128'
+                                              @click.native="apply_Seller(scope.row,scope.$index)">申请售后单(销售)
+                            </el-dropdown-item>
+                            <!-- 师资主管--大班课列表 -->
+                            <!-- <el-dropdown-item>申请更换讲师</el-dropdown-item>
+                            <el-dropdown-item>强制关闭班课</el-dropdown-item> -->
+                            <!-- 师资主管--未完成订单 -->
+                            <el-dropdown-item v-show='(usertype.hasOperManager == true) && (scope.row.statused===512&&scope.row.spoType!==64)'
+                                              @click.native="sure_end(scope.row,scope.$index)">确认结课</el-dropdown-item>
+                            <el-dropdown-item v-show='(usertype.hasOper == true || usertype.hasOperManager == true) && (scope.row.sooStatused===1)'
+                                              @click.native="cancel(scope.row,scope.$index)">取消委派</el-dropdown-item>
+                            <el-dropdown-item v-show='(usertype.hasOper == true || usertype.hasOperManager == true) || scope.row.sooStatused==0'
+                                              @click.native="give(scope.row,scope.$index)">委派订单</el-dropdown-item>
+                            <el-dropdown-item v-show='(usertype.hasOper == true || usertype.hasOperManager == true)'
+                                              @click.native="apply_Oper(scope.row,scope.$index)">申请售后单(师资)
+                            </el-dropdown-item>
+                            <el-dropdown-item v-show='(usertype.hasOperManager == true)'
+                                              @click.native='tiaozheng(scope.row,scope.$index)'>调整时薪和G币
+                            </el-dropdown-item>
+                            <!-- 师资主管--已完成订单 -->
+                            <!-- <el-dropdown-item>预付G币</el-dropdown-item>
+                            <el-dropdown-item>奖励G币</el-dropdown-item>
+                            <el-dropdown-item>调整时薪</el-dropdown-item>
+                            <el-dropdown-item>扣除讲师收入</el-dropdown-item>
+                            <el-dropdown-item>追付G币</el-dropdown-item> -->
+                            <!-- 师资专员 -->
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                    <el-dropdown trigger="click" v-show='scope.row.spoType ==64'>
+                            <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                                下拉操作
+                                <i class="el-icon-arrow-down el-icon--right"></i>
+                            </span>
+                            <el-dropdown-menu slot="dropdown">
+                                <!-- 聊天记录 -->
+                                <!-- 申请售后单 -->
+                                <!-- 销售经理--大班课列表 -->
+                                <!-- <el-dropdown-item>编辑班课</el-dropdown-item>
+                                <el-dropdown-item>拉人进班</el-dropdown-item> -->
+                                <!-- 师资主管--大班课列表 -->
+                                <!-- <el-dropdown-item>申请更换讲师</el-dropdown-item> -->
+                                <!-- 师资主管--未完成订单 -->
+                                <!-- 调整时薪和G币 -->
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination
+                       style="margin-top:15px"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[20]"
+                       :page-size="20"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+
+        <el-dialog
+                   title="提示"
+                   :visible.sync="tiaozhengDialog"
+                   width="50%"
+                   :before-close="tiaozhengDialogClose">
+            <div>
+                <el-form ref="tiaozhengruleform" :model="tiaozhengform" label-width="80px">
+                    <el-form-item label="调整时薪">
+                        <el-input v-model="tiaozhengruleform.money" type='number'></el-input>
+                    </el-form-item>
+                    <p style="color:red">当前讲师时薪为{{moneytime}}GB</p>
+                    <el-form-item>
+                        <el-button type='primary' @click='tiaozhengtime'>调整时薪</el-button>
+                    </el-form-item>
+                    <el-form-item label="">
+                        <el-radio-group v-model="tiaozhengruleform.type" @change='changeRaidoType'>
+                            <el-radio :label="0">预付G币</el-radio>
+                            <el-radio :label="1">奖励G币</el-radio>
+                            <el-radio :label="2">扣除G币</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label="G币">
+                        <el-input v-model="tiaozhengruleform.gb" type='number'></el-input>
+                    </el-form-item>
+                    <el-form-item label="理由" v-show='tiaozhengruleform.type == 2'>
+                        <el-input v-model="tiaozhengruleform.desc" type='textarea'></el-input>
+                    </el-form-item>
+                </el-form>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <!-- <el-button @click="tiaozhengDialogClose">取 消</el-button> -->
+                <el-button type="primary" @click="tiaozhengDialogSubmit">确 定</el-button>
+            </span>
+        </el-dialog>
+
+        <!-- <el-dialog :visible.sync="evaluate" width="40%">
+            <div class="text item">
+                课堂网络质量: {{evaluates.networkRate}}分
+            </div>
+            <div class="text item">
+                是否达到您的订单需求: {{evaluates.expectRate}}分
+            </div>
+            <div class="text item">
+                使用万能班长满意度: {{evaluates.platRate}}分
+            </div>
+            <div class="text item">
+                专业水平: {{evaluates.professRate}}分
+            </div>
+            <div class="text item">
+                上课态度: {{evaluates.attitudeRate}}分
+            </div>
+            <div class="text item">
+                辅导技巧: {{evaluates.skillRate}}分
+            </div>
+            <div class="text item">
+                意见及建议: {{evaluates.proposal}}分
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="exit">确 定</el-button>
+            </span>
+        </el-dialog> -->
+
+        <el-dialog :visible.sync="dialogFormVisible1" width="40%" @close='closeTeacDialog'>
+            <el-form :model="giveruleForm" :rules="giverules" ref="giveruleForm" label-width="140px"
+                     class="demo-ruleForm">
+                <el-form-item label="请选择分配讲师" prop="country">
+                    <el-form-item>
+                        <el-select placeholder="请选择分配讲师" filterable :filter-method="teacFilter"
+                                   v-model="giveruleForm.country" style="width: 200px;">
+                            <el-option v-for="item in selects" :key="item.id" :label="item.username" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form-item>
+                <el-form-item label="G币" prop="price" v-show="gg">
+                    <el-input v-model="giveruleForm.price"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm1('giveruleForm')">确 定
+                </el-button>
+            </span>
+        </el-dialog>
+        <!-- 确认结课 -->
+        <el-dialog :visible.sync="dialogFormVisible3" width="40%">
+            <el-form :model="jiekeruleForm" :rules="rules" ref="jiekeruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="操作" prop="doSomething">
+                    <el-select placeholder="请选择" v-model="jiekeruleForm.doSomething" style="width: 200px;"
+                               @change="sure_endhandleChange">
+                        <el-option label="同意" value="1"></el-option>
+                        <el-option label="不同意" value="0"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="理由" prop="description" v-show="sub4">
+                    <el-input v-model="jiekeruleForm.description"></el-input>
+                </el-form-item>
+                <el-form-item label="赠送G币" prop="sendGb" v-show="sub6">
+                    <el-input v-model="jiekeruleForm.sendGb"></el-input>
+                </el-form-item>
+                <el-form-item label="G币" prop="gb1" v-show="sub3">
+                    <el-input v-model="jiekeruleForm.gb1"></el-input>
+                </el-form-item>
+                <el-form-item label="OTG币" prop="otgb1" v-show="sub5">
+                    <el-input v-model="jiekeruleForm.otgb1"></el-input>
+                </el-form-item>
+                <el-form-item label="讲师姓名:" prop="">
+                    <span>{{teacherInformation.teacUserName}}</span>
+                </el-form-item>
+                <el-form-item label="讲师级别:" prop="">
+                    <span v-if='teacherInformation.tuGrade == 1'>银牌讲师</span>
+                    <span v-if='teacherInformation.tuGrade == 2'>金牌讲师</span>
+                    <span v-if='teacherInformation.tuGrade == 3'>王牌讲师</span>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm3('jiekeruleForm')">确认
+                </el-button>
+            </span>
+        </el-dialog>
+
+        <!-- 申请售后单 师资 -->
+        <el-dialog :visible.sync="opershigumodel" width="40%" :before-close='opershigumodelClose'
+                   v-loading='opershigumodelLoading'>
+            <el-form :model="operruleForm" :rules="operrules" ref="operruleForm" label-width="80px"
+                     class="demo-ruleForm">
+                <el-form-item label="事故类别" prop='shigutype'>
+                    <el-select v-model="operruleForm.shigutype" placeholder="请选择事故类别">
+                        <el-option key="2"
+                                   label="讲师问题"
+                                   value="2">
+                        </el-option>
+                        <el-option key="4"
+                                   label="售后问题"
+                                   value="4">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="申请理由" prop="descriptions">
+                    <el-input v-model="operruleForm.descriptions" type='textarea'></el-input>
+                </el-form-item>
+                <el-form-item label="上传文件">
+                    <el-button type="primary" id='selectfiles2'>选择文件</el-button>
+                    <div style="padding: 10px 0;" id="ossfile2"></div>
+                    <!-- <el-button type='primary'>上传文件</el-button> -->
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="opershigumodelLoading" @click="opershigumodelSubmit">确 定
+                </el-button>
+            </span>
+        </el-dialog>
+
+        <!-- 申请售后单 销售 -->
+        <el-dialog :visible.sync="shigumodel" width="40%" :before-close='shigumodelClose' v-loading='shigumodelLoading'>
+            <el-form :model="shigumodelruleForm" :rules="shigumodelrules" ref="shigumodelruleForm" label-width="80px"
+                     class="demo-ruleForm">
+                <el-form-item label="事故类别" prop='shigutype'>
+                    <el-select v-model="shigumodelruleForm.shigutype" placeholder="请选择事故类别">
+                        <el-option key="1"
+                                   label="金额问题"
+                                   value="1">
+                        </el-option>
+                        <el-option key="4"
+                                   label="售后问题"
+                                   value="4">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="申请理由" prop="descriptions">
+                    <el-input v-model="shigumodelruleForm.descriptions" type='textarea'></el-input>
+                </el-form-item>
+                <el-form-item label="上传文件">
+                    <el-button type="primary" id='selectfiles1'>选择文件</el-button>
+                    <div style="padding: 10px 0;" id="ossfile1"></div>
+                    <!-- <el-button type='primary'>上传文件</el-button> -->
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="shigumodelLoading" @click="shigumodelSubmit">确 定
+                </el-button>
+            </span>
+        </el-dialog>
+
+
+        <!-- 坏蛋申请 -->
+        <el-dialog :visible.sync="badmodel" width="40%">
+            <el-form :model="badmodelruleForm" :rules="badmodelrules" ref="badmodelruleForm" label-width="80px"
+                     class="demo-ruleForm">
+                <el-form-item label="反馈类型" prop="extype">
+                    <el-select v-model="badmodelruleForm.extype" placeholder="选择反馈类型">
+                        <el-option label="价格不符" value="1"></el-option>
+                        <el-option label="师资资源" value="2"></el-option>
+                        <el-option label="客户意向不足" value="3"></el-option>
+                        <el-option label="其他" value="4"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="理由" prop="description">
+                    <el-input v-model="badmodelruleForm.description"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="badmodelbtnstatus"
+                           @click="badordersubmitForm('badmodelruleForm')">{{badmodelbtnval2}}
+                </el-button>
+            </span>
+        </el-dialog>
+        <!-- 赠送课时 -->
+        <el-dialog :visible.sync="timemodel" width="40%" :before-close='timemodelClose'>
+            <el-form :model="PresenterTimeruleForm" :rules="PresenterTimerules" ref="PresenterTimeruleForm"
+                     label-width="80px" class="demo-ruleForm">
+                <el-form-item label="时长" prop="time">
+                    <el-input-number v-model="PresenterTimeruleForm.time" :step="1"></el-input-number>
+                </el-form-item>
+                <el-form-item label="理由" prop="description">
+                    <el-input v-model="PresenterTimeruleForm.description" type="textarea" :rows="3"></el-input>
+                </el-form-item>
+                <el-form-item label="类型" prop="type">
+                    <template>
+                        <el-radio v-model="PresenterTimeruleForm.type" label="0">后消耗</el-radio>
+                        <el-radio v-model="PresenterTimeruleForm.type" label="1">先消耗</el-radio>
+                        <el-radio v-model="PresenterTimeruleForm.type" label="2">抵扣欠款</el-radio>
+                    </template>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save('PresenterTimeruleForm')" v-bind:loading="timebtnstatus">
+                    {{timebtnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+
+
+        <el-dialog
+                   :visible.sync="pricemodel"
+                   width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="25%" class="demo-ruleForm">
+                <el-form-item label="总价" prop="totalPrice">
+                    <el-input v-model="ruleForm.totalPrice" style="width:75%" type="number"
+                              onkeyup="value=(parseInt((value=value.replace(/\D/g,''))==''||parseInt((value=value.replace(/\D/g,''))==0)?'1':value,10))">
+                    </el-input>
+                </el-form-item>
+                <el-form-item label="是否新增预付款" prop="delivery">
+                    <el-switch v-model="delivery" @change="change_delivery"></el-switch>
+                </el-form-item>
+                <el-form-item label="新增预付款" prop="prepayment" v-show="showprepayment">
+                    <el-input v-model="ruleForm.prepayment" style="width:75%" type="number"
+                              onkeyup="value=(parseInt((value=value.replace(/\D/g,''))==''||parseInt((value=value.replace(/\D/g,''))==0)?'1':value,10))">
+                    </el-input>
+                </el-form-item>
+                <el-upload
+                           v-show="showprepayment"
+                           class="upload-demo"
+                           ref="upload"
+                           :headers="myHeaders"
+                           :data="ruleForm"
+                           :multiple="true"
+                           :action="url"
+                           :on-preview="handlePreview"
+                           :on-remove="handleRemove"
+                           :on-change="change"
+                           :on-success="success"
+                           :on-error="onerror"
+                           :file-list="fileList"
+                           list-type="picture"
+                           :auto-upload="false">
+                    <el-button style="margin-left: 80px" size="mini" type="primary">选择图片</el-button>
+                    <el-button style="display:none;" @click="submitUpload"></el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+    </div>
+</body>
+<script src="modules/vue/js/jquery.js"></script>
+<!-- <script src="js/base.js"></script> -->
+<script type="text/javascript">
+    document.write('<script src="js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<!-- <script src="modules/vue/libs/"></script> -->
+<script src="modules/vue/libs/crypto.js"></script>
+<script src="modules/vue/libs/hmac.js"></script>
+<script src="modules/vue/libs/sha1.js"></script>
+<script src="modules/vue/libs/base64.js"></script>
+<script src="modules/vue/libs/plupload.full.min.js"></script>
+<script src="modules/vue/js/vue.js"></script>
+<script src="modules/vue/js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('js/superSearch.js');
+    }
+</script>
+
+</html>

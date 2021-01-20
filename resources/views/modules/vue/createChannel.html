@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .content {
+        width: 80%;
+        margin: 0 30px;
+    }
+
+    .underline {
+        width: 100%;
+        border-bottom: 1px solid #999;
+    }
+
+    .littleTitle {
+        font-weight: 600;
+        color: #409EFF;
+    }
+
+    .red {
+        color: red;
+    }
+
+    .progress {
+        margin-top: 2px;
+        width: 100%;
+        height: 14px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+    }
+
+    .progress-bar {
+        background-color: rgb(92, 184, 92);
+        background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.14902) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.14902) 50%, rgba(255, 255, 255, 0.14902) 75%, transparent 75%, transparent);
+        background-size: 40px 40px;
+        box-shadow: rgba(0, 0, 0, 0.14902) 0px -1px 0px 0px inset;
+        box-sizing: border-box;
+        color: rgb(255, 255, 255);
+        display: block;
+        float: left;
+        font-size: 12px;
+        height: 20px;
+        line-height: 20px;
+        text-align: center;
+        transition-delay: 0s;
+        transition-duration: 0.6s;
+        transition-property: width;
+        transition-timing-function: ease;
+        width: 100%;
+    }
+
+    .important .el-form-item__label::before {
+        content: '*';
+        color: #f56c6c;
+        margin-right: 4px;
+    }
+</style>
+
+<body>
+    <div id="app" v-loading='loadingPage'>
+        <el-tabs v-model="activeName" @tab-click="changeTabHandleClick">
+            <el-tab-pane label="基本信息" name="first" value='tabNum'></el-tab-pane>
+            <el-tab-pane label="高级信息" name="second" value='tabNum'></el-tab-pane>
+        </el-tabs>
+        <div class="content" v-show='showItem == true'>
+            <el-form ref="channelInfo" :model="channelInfo" :rules="channelInforules" label-width="140px">
+                <el-form-item label="渠道名称">
+                    <el-select v-model="channelInfo.channelName" placeholder="请选择姓名" @change='getInfo'>
+                        <el-option v-for="(item, index) in channelNameList" :label="item.sysTeacChannel.channelName"
+                                   :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="姓名">
+                    <el-input disabled v-model="channelInfo.name"></el-input>
+                </el-form-item>
+                <el-form-item label="性别">
+                    <el-select disabled v-model="channelInfo.male" placeholder="请选择性别">
+                        <el-option label="男" value="MALE"></el-option>
+                        <el-option label="女" value="FEMALE"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item disabled label="联系电话">
+                    <el-input disabled v-model="channelInfo.phone"></el-input>
+                </el-form-item>
+                <el-form-item label="身份证号" prop="idCard">
+                    <el-input v-model="channelInfo.idCard"></el-input>
+                </el-form-item>
+                <el-form-item label="是否线下已签署合同" v-show='channelType != 4'>
+                    <el-switch
+                               v-model="channelInfo.offlineChannel">
+                    </el-switch>
+                </el-form-item>
+                <el-form-item v-show='channelInfo.offlineChannel == true'>
+                    <p style='color:red;margin:0;'>* 如有多个合同，请将合同压缩打包后上传</p>
+                    <!-- <el-button size="small" type="primary" style="display:none;">上传合同</el-button> -->
+                    <el-button size="small" type="primary"  id="selectfiles">
+                        上传合同
+                    </el-button>
+                    <div id='ossfile'></div>
+                    
+                    <el-button id="postfiles" type="primary" style="display:none;">上传</el-button>
+                    <el-button style="display:none;" type="success" id="postfiles">
+                        上传文件
+                    </el-button>
+                </el-form-item>
+                <el-form-item label="线下已签署合同文件" v-show='channelFile !="" && viewChannelType == 4'>
+                    <a :href="channelFile">{{channelFile}}</a>
+                    <br>
+                    <span style="color:red">*如要更换合同，只需重新上传即可</span>
+                </el-form-item>
+            </el-form>
+            <el-button :disabled='havechannelStatus == false' type='primary' @click='nextBtn'>
+                下一步
+            </el-button>
+        </div>
+        <div v-show='showItem == false' class="content">
+            <div>
+                <el-form ref="channelInfo" :rules="channelInforules" :model="channelInfo" label-width="140px">
+                    <!--  v-show='channelStatus != 0' -->
+                    <el-form-item label="合同名称"  prop="channelCalled">
+                        <el-input  v-model="channelInfo.channelCalled"></el-input>
+                    </el-form-item>
+                    <el-form-item label="合同有效期限" prop="date">
+                        <el-date-picker
+                                        v-model="channelInfo.date.start"
+                                        type="date"
+                                        value-format='yyyy-MM-dd'
+                                        placeholder="选择日期">
+                        </el-date-picker>
+                        至
+                        <el-date-picker
+                                        v-model="channelInfo.date.end"
+                                        type="date"
+                                        value-format='yyyy-MM-dd'
+                                        placeholder="选择日期">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item label="合同期限" prop="year">
+                        <el-input v-model="channelInfo.year" style="width:100px;"></el-input> 月 &nbsp;<span
+                              style=color:red>*请填写中文数字(壹贰叁肆伍陆柒捌玖拾)</span>
+                    </el-form-item>
+                    <el-form-item label="指定区域" prop="area">
+                        <el-input v-model="channelInfo.area"></el-input>
+                    </el-form-item>
+
+                    <div class="underline"></div>
+                    <p class="littleTitle">合作费用</p>
+                    <el-form-item label="结算方式" class="important" v-show='noCheckList == false'>
+                        <el-checkbox-group v-model="channelInfo.checkList" @change="handleCheckAllChange">
+                            <el-checkbox v-for='(item,index) in checkListArray' :label="item.label" :key="item.key"
+                                         @change="handleCheck(item)">{{item.name}}</el-checkbox>
+                        </el-checkbox-group>
+                    </el-form-item>
+                    <el-form-item v-show='noCheckList == false'>
+                        <el-input v-bind:disabled="disabled1" v-model="channelInfo.meansPayments1" style="width:70px;">
+                        </el-input><span class="red">RMB每人</span>
+                        <el-input v-bind:disabled="disabled2" v-model="channelInfo.meansPayments2" style="width:70px;">
+                        </el-input><span class="red">RMB每人</span>
+                        <el-input v-bind:disabled="disabled3" v-model="channelInfo.meansPayments3" style="width:70px;">
+                        </el-input><span class="red">RMB每人</span>
+                        <el-input v-bind:disabled="disabled4" v-model="channelInfo.meansPayments4" style="width:70px;">
+                        </el-input><span class="red">%每人</span>
+                    </el-form-item>
+                    <el-form-item label='不结算'>
+                        <el-switch
+                                   v-model="noCheckList"
+                                   @change='changeNoCheckList'>
+                        </el-switch>
+                    </el-form-item>
+
+                    <el-form-item label="结算日" prop="monthData">
+                        <div>
+                            每月<el-input v-model="channelInfo.monthData" style="width:50px"></el-input>
+                            号统一对上一个自然月达到上述要求的讲师人数进行结算
+                        </div>
+                    </el-form-item>
+
+
+                    <div v-show='channelType != 4 && channelType != 0'>
+                        <div class="underline"></div>
+                        <p class="littleTitle">权利和义务</p>
+                        <el-form-item label='乙方的权利和义务' prop="yifangyaoqiu">
+                            <div>
+                                乙方向甲方提供的简历所有者必须是<el-input v-model="channelInfo.yifangyaoqiu" style="width:100px">
+                                </el-input>
+                                ，非指定区域内以甲乙双方友好协商为主
+                            </div>
+                        </el-form-item>
+                        <el-form-item label="额外要求（选填）">
+                            <el-input type='textarea' v-model="channelInfo.hezuoneirong"></el-input>
+                        </el-form-item>
+                        <!-- <div class="underline"></div>
+                        <p class="littleTitle">合作内容</p>
+                        <el-form-item label="合作内容">
+                            <el-input type='textarea' v-model="channelInfo.hezuoneirong"></el-input>
+                        </el-form-item> -->
+                    </div>
+
+
+                    <div v-show='channelType == 0'>
+                        <div class="underline"></div>
+                        <p class="littleTitle">合作内容</p>
+                        <!-- prop="hezuoneirong" -->
+                        <el-form-item label="合作内容">
+                            <el-input type='textarea' v-model="channelInfo.hezuoneirong"></el-input>
+                        </el-form-item>
+                        <div class="underline"></div>
+                        <p class="littleTitle">付款账户信息</p>
+                        <el-form-item label="开户行" prop="bankName">
+                            <el-input v-model="channelInfo.bankName"></el-input>
+                        </el-form-item>
+                        <el-form-item label="姓名" prop="accountName">
+                            <el-input v-model="channelInfo.accountName"></el-input>
+                        </el-form-item>
+                        <el-form-item label="卡号" prop="bankCardNum">
+                            <el-input v-model="channelInfo.bankCardNum"></el-input>
+                        </el-form-item>
+                    </div>
+                    <el-form-item>
+                        <el-button @click='beforeBtn'>上一步</el-button>
+                        <el-button type="success" @click='createChannel' v-show='channelStatus == 0'>发送合同</el-button>
+                        <el-button type="success" @click='setChannel' v-show='channelStatus == 1'>修改合同</el-button>
+                        <el-button type="success" @click='goChannel' v-show='channelStatus == 2'>续签合同</el-button>
+                        <el-button type="primary" v-show='channelType != 0' @click='viewChannel'>合同预览</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="libs/crypto.js"></script>
+<script src="libs/hmac.js"></script>
+<script src="libs/sha1.js"></script>
+<script src="libs/base64.js"></script>
+<script src="libs/plupload.full.min.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/createChannel.js');
+    }
+</script>
+
+</html>

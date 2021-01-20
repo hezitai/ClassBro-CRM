@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>销售业绩</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../../css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../plugins/jqgrid/ui.jqgrid-bootstrap.css">
+    <link rel="stylesheet" href="../../../plugins/ztree/css/metroStyle/metroStyle.css">
+    <link rel="stylesheet" href="../../../css/main.css">
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../../../plugins/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.css">
+
+    <script src="../../../libs/jquery.min.js"></script>
+    <script src="../../../plugins/layer/layer.js"></script>
+    <script src="../../../libs/bootstrap.min.js"></script>
+    <script src="../../../libs/vue.min.js"></script>
+    <script src="../js/index.js"></script>
+    <script src="../../../plugins/jqgrid/grid.locale-cn.js"></script>
+    <script src="../../../plugins/jqgrid/jquery.jqGrid.min.js"></script>
+    <script src="../../../plugins/ztree/jquery.ztree.all.min.js"></script>
+    <script src="../../../js/common.js"></script>
+    <script src="../../../js/base.js"></script>
+    <script src="../../../plugins/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
+
+</head>
+<style>
+    .buchangbtn {
+        width: 60px;
+        height: 30px;
+        border: none;
+        background: rgb(32, 144, 255);
+        color:#fff;
+        border-radius: 5px;
+    }
+    .buchangbtnCancel {
+        width: 60px;
+        height: 30px;
+        border: none;
+        background: rgb(161, 204, 248);
+        color:#fff;
+        border-radius: 5px;
+        cursor:  not-allowed; 
+    }
+</style>
+
+<body>
+    <div id="rrapp" v-cloak>
+        <div v-show="showList">
+            <div class="grid-btn" style="display: flex;">
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" @change="query" v-model="q.key" @keyup.enter="query"
+                           placeholder="请输入订单号、课程名称、销售名称、学生名称、课堂名称...">
+                </div>
+                <a class="btn btn-primary" @click="query"><i class="glyphicon glyphicon-search"></i>&nbsp;查询</a>
+                <label style="margin-top: 5px">业绩类型：</label>
+                <div style="width: 120px;">
+                    <select class="form-control" @change="query" id="perType" v-model="q.perType">
+                        <option></option>
+                        <option value="1">销售业绩</option>
+                        <option value="2">消耗业绩</option>
+                    </select>
+                </div>
+                <div class="col-sm-4" style="display: flex;">
+                    <input class="form-control mydatetime" id="timeFrom">
+                    <label style="margin-top: 5px">&nbsp;&nbsp;-&nbsp;&nbsp;</label>
+                    <input class="form-control mydatetime" id="timeTo">
+                </div>
+            </div>
+            <table id="jqGrid"></table>
+            <div id="jqGridPager"></div>
+            <el-dialog
+                       title="补偿业绩"
+                       :visible.sync="buchangyeji"
+                       width="30%"
+                       :before-close="buchangyejiHandleClose">
+                <div>
+                    <span>补偿金额</span>
+                    <el-input v-model="buchangjine" type='number' placeholder="请输入补偿金额"></el-input>
+                </div>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="buchangyejiHandleClose">取 消</el-button>
+                    <el-button type="primary" @click="buchangyejiSubmit">确 定</el-button>
+                </span>
+            </el-dialog>
+        </div>
+
+
+
+
+    </div>
+
+    <script src="allSalesPerformance.js"></script>
+    <!-- <script type="text/javascript">
+        window.onload = function () {
+            loadJsOrCss('allSalesPerformance.js');
+        }
+    </script> -->
+</body>
+
+</html>

@@ -1,0 +1,524 @@
+<!-- <!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body style="font-family: SimSun;">
+    <div id="#apps">
+        <p style="font-size:20pt; line-height:115%; margin:0pt 0pt 10pt; text-align:center">
+            <span style="font-size:20pt; font-weight:bold">{{info.channelName}}合作协议</span>
+        </p>
+        <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+            <span style="font-size:13pt; font-weight:bold">甲方（用人单位）</span>
+            <span style="font-size:13pt">：上海</span>
+            <span style="font-size:13pt">导毕教育科技有限公司</span></p>
+        <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+            <span style="font-size:13pt">地址：上海市杨浦区翔殷路1088</span>
+            <span style="font-size:13pt">号凯迪金融大厦20楼</span></p>
+        <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+            <span style="font-size:13pt">法定代表人：YU</span>
+            <span style="font-size:13pt"></span>
+            <span style="font-size:13pt">LIPENG</span></p>
+        <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+            <span style="font-size:13pt; font-weight:bold">乙方（渠道方）：[[${channelName}]]</span></p>
+        <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+            <span style="font-size:13pt">负责人：[[${name}]]</span>
+            <span style="font-size:13pt">联系方式：[[${phone}]]</span></p>
+        <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+            <span style=" font-size:13pt">身份证：[[${idCard}]]</span></p>
+        <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+            <span style="font-size:13pt; font-weight:bold">&#xa0;</span></p>
+        <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt">
+            <span style="font-size:13pt">甲乙双方本着互惠互利，优势互补的原则，在遵循相关法律法规的前提下，达成如下协议：</span></p>
+        <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+            <span style="font-size:13pt; font-weight:bold">第一条：</span>
+            <span style="font-size:13pt; font-weight:bold"></span>
+            <span style="font-size:13pt; font-weight:bold">合同期限：</span></p>
+        <ol type="1" style="margin:0pt; padding-left:10pt">
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:2.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt; font-weight:normal">合同有效期限：</span>
+                [(${startTime})]
+                <span style="font-size:13pt; font-weight:normal; text-decoration:underline"></span>
+                <span style="font-size:13pt; font-weight:normal">日起至</span>
+                [(${endTime})]
+                <span style="font-size:13pt; font-weight:normal">日止，为期</span>
+                <span style="font-size:13pt; font-weight:normal; text-decoration:underline"></span>
+                <span style="font-size:13pt; font-weight:normal; text-decoration:underline">[[${month}]] </span>
+                <span style="font-size:13pt; font-weight:normal">月。</span>
+            </li>
+        </ol>
+        <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+            <span style="font-size:13pt; font-weight:bold">第二条：合作内容和合作地点</span></p>
+        <ol type="1" style="margin:0pt; padding-left:10pt">
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">乙方以甲</span>
+                <span style="font-size:13pt">方提出的阶段性或临时性合作内容为准。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">甲方授权给乙方指定区域</span>
+                <span style="font-size:13pt">（[[${authorityZone}]]）</span>
+                <span style="font-size:13pt"></span>
+                <span style="font-size:13pt">进行兼职教师招聘以及宣传工作。</span></li>
+        </ol>
+        <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+            <span style="font-size:13pt; font-weight:bold">第三条：合作费用</span></p>
+        <ol type="1" style="margin:0pt; padding-left:10pt">
+            <li style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:8.25pt; text-align:justify; text-indent:0pt"
+                th:each="c : ${content}">
+                [(${c})]
+            </li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:8.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">已方向甲方推荐的兼职讲师无人数限制，只根据入职人数结算合作费用。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:8.25pt; text-indent:0pt">
+                <span style="font-size:13pt">每月</span>
+                <span style="font-size:13pt; text-decoration:underline">15</span>
+                <span style="font-size:13pt">号统一对达到上述要求的讲师人数进行结算。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:8.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">甲方拥有对兼职讲师入职标准和兼职讲师订单完成情况最终解释权。</span>
+            </li>
+        </ol>
+        <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+            <span style="font-size:13pt; font-weight:bold">第四条：甲方的权利与义务</span></p>
+        <ol type="1" style="margin:0pt; padding-left:10pt">
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">甲方有义务向乙方提供明确的合作内容和目标。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">合作期间，乙方如有违法违纪，违反保密条款，未完成或不服从安排合作内容的，甲方有权利随时解除合作合同，同时甲方保留向乙方追究损失的权利。</span>
+            </li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span
+                      style="font-size:13pt">甲方应及时详尽地向乙方提供与代理业务有关的文件和资料，向乙方的招聘和宣传人员提供有关的业务及操作流程培训，帮助乙方提高技术服务能力，拓展业务范围</span>
+                <span style="font-size:13pt">。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">甲方有权对乙方违反国家法律法规或者违反甲方代理管理规定进行扣除相应佣金，停止</span>
+                <span style="font-size:13pt">合作</span>
+                <span style="font-size:13pt">与</span>
+                <span style="font-size:13pt">代理</span>
+                <span style="font-size:13pt">资</span>
+                <span style="font-size:13pt">格等处理</span>
+                <span style="font-size:13pt">。</span></li>
+        </ol>
+        <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+            <span style="font-size:13pt; font-weight:bold">第五条：乙方的权利与义务</span></p>
+        <ol type="1" style="margin:0pt; padding-left:10pt">
+
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">乙方必须遵守甲方行为规范及规章制度，并有义务按时参与甲方设定的汇报日程。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">乙方每周周一向甲方发送收到的提交报名材料，需包含简历和成绩单。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">乙方向甲方提供的简历所有者必须是[[${authorityZone}]]大学在读的学生，非指定区域内以甲乙双方友好协商为主。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span
+                      style="font-size:13pt">乙方每月至少在乙方拥有的所有微信群里转发4次甲方的招聘文案，转发4次甲方的招聘链接，并需提供对应截图反馈。若未完成此项内容，甲方有权利终止乙方的合作与代理资格。</span>
+            </li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">乙方有义务向甲方提供合作总结， 乙方合作期间以甲方名义得的信息和资源最终归甲方所有。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span
+                      style="font-size:13pt">乙方在本协议约定的区域范围内自行开拓与发展渠道，积极推广甲方提供的兼职岗位，维护甲方的企业形象和服务品质，合作过程中如实向客户介绍甲方提供的兼职信息，并确保为合作渠道</span>
+                <span style="font-size:13pt">/个人</span>
+                <span style="font-size:13pt">提供良好的服务，不得以欺诈、胁迫等不正当手段损害客户及甲方声誉。</span>
+                <span style="font-size:13pt">   </span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">乙方有责任积极进行代理（招聘和宣传）活动。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">乙方与渠道</span>
+                <span style="font-size:13pt">/个人达成合作</span>
+                <span style="font-size:13pt">后，应及时向甲方通知，并认真做好服务与维护工作。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">乙方需要甲方人员协助培训或者从事其他相关工作的，甲方可根据协议内容给予帮助。</span>
+            </li>
+            [(${additionalProvisions})]
+        </ol>
+        <p style="font-size:11pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+            <span style="font-family:宋体; font-size:11pt">&#xa0;</span></p>
+        <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+            <span style="font-size:13pt; font-weight:bold">第六条：合同解除</span></p>
+        <ol type="1" style="margin:0pt; padding-left:10pt">
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">乙方在本协议履行期间可以在说明原因的情况下向甲方提出终止协议，但必须提前</span>
+                <span style="font-size:13pt">3</span>
+                <span style="font-size:13pt">天通知甲方。</span></li>
+            <li
+                style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                <span style="font-size:13pt">合作</span>
+                <span style="font-size:13pt">期间，甲方如发现乙方不符合合作要求或不适宜甲方安排工作等情况，可以向乙方提出终止合作，支付相应合作费用后，方可解除本协议。</span></li>
+        </ol>
+        <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt">
+            <span style="font-size:13pt">&#xa0;</span></p>
+        <img src="18e4ae09-ca4f-4ad3-8f48-c9efe6738150.001.png" width="184" height="166" alt="875317712726574303"
+             style="-aw-left-pos:33pt; -aw-rel-hpos:column; -aw-rel-vpos:paragraph; -aw-top-pos:3.05pt; -aw-wrap-type:none; margin-left:33pt; margin-top:3.05pt; position:absolute; z-index:-65535" />
+        <p style="font-size:10.5pt; line-height:150%; margin:0pt 0pt 10pt">
+            <span style="font-size:10.5pt; font-weight:bold">本合同一式两份，经甲乙双方签字或盖章生效，两份合同具有同等法律效力。（涂改或代签无效）</span></p>
+        <p style="font-size:10.5pt; line-height:150%; margin:0pt 0pt 10pt">
+            <span style="font-size:10.5pt; font-weight:bold">甲方：上海市</span>
+            <span style="font-size:10.5pt; font-weight:bold">导毕教育科技有限公司</span>
+            <span style="font-size:10.5pt; font-weight:bold"></span>
+            <span style="font-size:10.5pt; font-weight:bold">       乙</span>
+            <span style="font-size:10.5pt; font-weight:bold"></span>
+            <span style="font-size:10.5pt; font-weight:bold">方</span>
+            <span style="font-size:10.5pt; font-weight:bold">：   </span></p>
+        <p style="font-size:10.5pt; line-height:150%; margin:0pt 0pt 10pt">
+            <span style="font-size:10.5pt; font-weight:bold">地址：上海市杨浦区翔殷路1088号1幢20层</span></p>
+        <p style="font-size:10.5pt; line-height:150%; margin:0pt 0pt 10pt">
+            <span style="font-size:10.5pt; font-weight:bold">授权代表签字（盖章）：</span></p>
+        <p style="font-size:10.5pt; line-height:150%; margin:0pt 0pt 10pt">
+            <span style="font-size:10.5pt; font-weight:bold">日期：</span>
+            [(${nowTime})]
+            <span style="font-size:10.5pt; font-weight:bold">日期：</span>
+            <span style="font-size:10.5pt; font-weight:bold"></span>
+            <span style="font-size:10.5pt; font-weight:bold">年</span>
+            <span style="font-size:10.5pt; font-weight:bold"></span>
+            <span style="font-size:10.5pt; font-weight:bold">月</span>
+            <span style="font-size:10.5pt; font-weight:bold"></span>
+            <span style="font-size:10.5pt; font-weight:bold">日</span>
+            <span style="font-size:10.5pt; font-weight:bold"> </span></p>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="libs/crypto.js"></script>
+<script src="libs/hmac.js"></script>
+<script src="libs/sha1.js"></script>
+<script src="libs/base64.js"></script>
+<script src="libs/plupload.full.min.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/createChannel.js');
+    }
+</script>
+<script>
+    var vm = new Vue({
+        el: '#apps',
+        data() {
+            return {
+                info: {},
+            }
+        },
+        methods: {
+            init() {
+                var data = JSON.parse(window.localStorage.getItem('channelInfo'));
+                this.info = data;
+                console.log(data)
+            },
+        },
+        mounted() {
+            this.init()
+        }
+    });
+</script>
+
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<link rel="stylesheet" href="css/index.css">
+
+<body>
+    <div id="app">
+        <div>
+            <p style="font-size:20pt; line-height:115%; margin:0pt 0pt 10pt; text-align:center">
+                <span style="font-size:20pt; font-weight:bold">{{cinfo.contractName}}</span>
+            </p>
+            <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+                <span style="font-size:13pt; font-weight:bold">甲方（用人单位）</span>
+                <span style="font-size:13pt">：上海导毕教育科技有限公司</span>
+                <!-- <span style="font-size:13pt"></span></p> -->
+            <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+                <span style="font-size:13pt">地址：上海市杨浦区翔殷路1088号凯迪金融大厦20楼</span>
+                <!-- <span style="font-size:13pt"></span></p> -->
+            <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+                <span style="font-size:13pt">法定代表人：YU</span>
+                <span style="font-size:13pt"></span>
+                <span style="font-size:13pt">LIPENG</span></p>
+            <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+                <span style="font-size:13pt; font-weight:bold">乙方（渠道方）：{{ cinfo.channelName }}</span></p>
+            <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+                <span style="font-size:13pt">负责人：{{ cinfo.name }}</span>
+                <span style="font-size:13pt">联系方式：{{ cinfo.phone }}</span></p>
+            <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+                <span style=" font-size:13pt">身份证：{{ cinfo.idCard }}</span></p>
+            <p style="font-size:13pt; line-height:115%; margin:5pt 0pt 10pt">
+                <span style="font-size:13pt; font-weight:bold">&#xa0;</span></p>
+            <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt">
+                <span style="font-size:13pt">甲乙双方本着互惠互利，优势互补的原则，在遵循相关法律法规的前提下，达成如下协议：</span></p>
+            <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+                <span style="font-size:13pt; font-weight:bold">第一条：</span>
+                <span style="font-size:13pt; font-weight:bold"></span>
+                <span style="font-size:13pt; font-weight:bold">合同期限：</span></p>
+            <ol type="1" style="margin:0pt; padding-left:10pt">
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:2.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt; font-weight:normal">合同有效期限：</span>
+                    {{ cinfo.start | spliting }}
+                    <span style="font-size:13pt; font-weight:normal; text-decoration:underline"></span>
+                    <span style="font-size:13pt; font-weight:normal">日起至</span>
+                    {{ cinfo.end | spliting }}
+                    <span style="font-size:13pt; font-weight:normal">日止，为期</span>
+                    <span style="font-size:13pt; font-weight:normal; text-decoration:underline"></span>
+                    <span
+                          style="font-size:13pt; font-weight:normal; text-decoration:underline">{{ cinfo.indate }} </span>
+                    <span style="font-size:13pt; font-weight:normal">月。</span>
+                </li>
+            </ol>
+            <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+                <span style="font-size:13pt; font-weight:bold">第二条：合作内容和合作地点</span></p>
+            <ol type="1" style="margin:0pt; padding-left:10pt">
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">乙方以甲</span>
+                    <span style="font-size:13pt">方提出的阶段性或临时性合作内容为准。</span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">甲方授权给乙方指定区域</span>
+                    <span style="font-size:13pt">（{{ cinfo.authorityZone }}）</span>
+                    <span style="font-size:13pt"></span>
+                    <span style="font-size:13pt">进行兼职教师招聘以及宣传工作。</span></li>
+            </ol>
+            <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+                <span style="font-size:13pt; font-weight:bold">第三条：合作费用</span></p>
+            <ol type="1" style="margin:0pt; padding-left:10pt">
+                <li style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:8.25pt; text-align:justify; text-indent:0pt"
+                    v-show='aaa != "" && bbb != "" && ccc != "" && ddd != "" '>
+                    <!-- {{checkList}} -->
+                    <p v-show='aaa != ""'>{{aaa}}</p>
+                    <p v-show='bbb != ""'>{{bbb}}</p>
+                    <p v-show='ccc != ""'>{{ccc}}</p>
+                    <p v-show='ddd != ""'>{{ddd}}</p>
+                </li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:8.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">已方向甲方推荐的兼职讲师无人数限制，只根据入职人数结算合作费用。</span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:8.25pt; text-indent:0pt">
+                    <span style="font-size:13pt">每月</span>
+                    <span style="font-size:13pt; text-decoration:underline">{{cinfo.clearingFormTime}}</span>
+                    <span style="font-size:13pt">号统一对达到上述要求的讲师人数进行结算。</span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:8.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">甲方拥有对兼职讲师入职标准和兼职讲师订单完成情况最终解释权。</span>
+                </li>
+            </ol>
+            <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+                <span style="font-size:13pt; font-weight:bold">第四条：甲方的权利与义务</span></p>
+            <ol type="1" style="margin:0pt; padding-left:10pt">
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">甲方有义务向乙方提供明确的合作内容和目标。</span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span
+                          style="font-size:13pt">合作期间，乙方如有违法违纪，违反保密条款，未完成或不服从安排合作内容的，甲方有权利随时解除合作合同，同时甲方保留向乙方追究损失的权利。</span>
+                </li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span
+                          style="font-size:13pt">甲方应及时详尽地向乙方提供与代理业务有关的文件和资料，向乙方的招聘和宣传人员提供有关的业务及操作流程培训，帮助乙方提高技术服务能力，拓展业务范围</span>
+                    <span style="font-size:13pt">。</span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">甲方有权对乙方违反国家法律法规或者违反甲方代理管理规定进行扣除相应佣金，停止</span>
+                    <span style="font-size:13pt">合作</span>
+                    <span style="font-size:13pt">与</span>
+                    <span style="font-size:13pt">代理</span>
+                    <span style="font-size:13pt">资</span>
+                    <span style="font-size:13pt">格等处理</span>
+                    <span style="font-size:13pt">。</span></li>
+            </ol>
+            <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+                <span style="font-size:13pt; font-weight:bold">第五条：乙方的权利与义务</span></p>
+            <ol type="1" style="margin:0pt; padding-left:10pt">
+
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">乙方必须遵守甲方行为规范及规章制度，并有义务按时参与甲方设定的汇报日程。</span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">乙方每周周一向甲方发送收到的提交报名材料，需包含简历和成绩单。</span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span
+                          style="font-size:13pt">乙方向甲方提供的简历所有者必须是{{ cinfo.authorityZone }}大学在读的学生，非指定区域内以甲乙双方友好协商为主。</span>
+                </li>
+                <!-- <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span
+                          style="font-size:13pt">乙方每月至少在乙方拥有的所有微信群里转发4次甲方的招聘文案，转发4次甲方的招聘链接，并需提供对应截图反馈。若未完成此项内容，甲方有权利终止乙方的合作与代理资格。</span>
+                </li> -->
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">乙方有义务向甲方提供合作总结， 乙方合作期间以甲方名义得的信息和资源最终归甲方所有。</span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span
+                          style="font-size:13pt">乙方在本协议约定的区域范围内自行开拓与发展渠道，积极推广甲方提供的兼职岗位，维护甲方的企业形象和服务品质，合作过程中如实向客户介绍甲方提供的兼职信息，并确保为合作渠道</span>
+                    <span style="font-size:13pt">/个人</span>
+                    <span style="font-size:13pt">提供良好的服务，不得以欺诈、胁迫等不正当手段损害客户及甲方声誉。</span>
+                    <span style="font-size:13pt">   </span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">乙方有责任积极进行代理（招聘和宣传）活动。</span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">乙方与渠道</span>
+                    <span style="font-size:13pt">/个人达成合作</span>
+                    <span style="font-size:13pt">后，应及时向甲方通知，并认真做好服务与维护工作。</span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">乙方需要甲方人员协助培训或者从事其他相关工作的，甲方可根据协议内容给予帮助。</span>
+                </li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">{{ cinfo.additionalProvisions }}</span>
+                </li>
+                
+            </ol>
+            <p style="font-size:11pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+                <span style="font-family:宋体; font-size:11pt">&#xa0;</span></p>
+            <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt; text-align:justify">
+                <span style="font-size:13pt; font-weight:bold">第六条：合同解除</span></p>
+            <ol type="1" style="margin:0pt; padding-left:10pt">
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">乙方在本协议履行期间可以在说明原因的情况下向甲方提出终止协议，但必须提前</span>
+                    <span style="font-size:13pt">3</span>
+                    <span style="font-size:13pt">天通知甲方。</span></li>
+                <li
+                    style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt 15.75pt; padding-left:5.25pt; text-align:justify; text-indent:0pt">
+                    <span style="font-size:13pt">合作</span>
+                    <span style="font-size:13pt">期间，甲方如发现乙方不符合合作要求或不适宜甲方安排工作等情况，可以向乙方提出终止合作，支付相应合作费用后，方可解除本协议。</span>
+                </li>
+            </ol>
+            <p style="font-size:13pt; line-height:150%; margin:0pt 0pt 10pt">
+                <span style="font-size:13pt">&#xa0;</span></p>
+            <img src="images/zhang.png" width="184" height="166" alt="875317712726574303"
+                 style="-aw-left-pos:33pt; -aw-rel-hpos:column; -aw-rel-vpos:paragraph; -aw-top-pos:3.05pt; -aw-wrap-type:none; margin-left:33pt; margin-top:3.05pt; position:absolute; z-index:-65535" />
+            <p style="font-size:10.5pt; line-height:150%; margin:0pt 0pt 10pt">
+                <span style="font-size:10.5pt; font-weight:bold">本合同一式两份，经甲乙双方签字或盖章生效，两份合同具有同等法律效力。（涂改或代签无效）</span></p>
+            <p style="font-size:10.5pt; line-height:150%; margin:0pt 0pt 10pt">
+                <span style="font-size:10.5pt; font-weight:bold">甲方：上海市</span>
+                <span style="font-size:10.5pt; font-weight:bold">导毕教育科技有限公司</span>
+                <span style="font-size:10.5pt; font-weight:bold"></span>
+                <span style="font-size:10.5pt; font-weight:bold">       乙</span>
+                <span style="font-size:10.5pt; font-weight:bold"></span>
+                <span style="font-size:10.5pt; font-weight:bold">方</span>
+                <span style="font-size:10.5pt; font-weight:bold">：   </span></p>
+            <p style="font-size:10.5pt; line-height:150%; margin:0pt 0pt 10pt">
+                <span style="font-size:10.5pt; font-weight:bold">地址：上海市杨浦区翔殷路1088号1幢20层</span></p>
+            <p style="font-size:10.5pt; line-height:150%; margin:0pt 0pt 10pt">
+                <span style="font-size:10.5pt; font-weight:bold">授权代表签字（盖章）：</span></p>
+            <p style="font-size:10.5pt; line-height:150%; margin:0pt 0pt 10pt">
+                <span style="font-size:10.5pt; font-weight:bold">日期：</span>
+                {{ newDate }}
+                <span style="font-size:10.5pt; font-weight:bold">日期：</span>
+                <span style="font-size:10.5pt; font-weight:bold"></span>
+                <span style="font-size:10.5pt; font-weight:bold">年</span>
+                <span style="font-size:10.5pt; font-weight:bold"></span>
+                <span style="font-size:10.5pt; font-weight:bold">月</span>
+                <span style="font-size:10.5pt; font-weight:bold"></span>
+                <span style="font-size:10.5pt; font-weight:bold">日</span>
+                <span style="font-size:10.5pt; font-weight:bold"> </span></p>
+        </div>
+    </div>
+</body>
+
+</html>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="libs/crypto.js"></script>
+<script src="libs/hmac.js"></script>
+<script src="libs/sha1.js"></script>
+<script src="libs/base64.js"></script>
+<script src="libs/plupload.full.min.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                cinfo: {},
+                newDate: '',
+                checkList: '',
+                aaa: '',
+                bbb: '',
+                ccc: '',
+                ddd: '',
+            }
+        },
+        filters: {
+            spliting: function (val) {
+                return val.split(' ')[0]
+            }
+        },
+        methods: {
+            init() {
+                var data = JSON.parse(window.localStorage.getItem('channelInfo'));
+                this.cinfo = data;
+                console.log(data)
+                var myDate = new Date(); //获取系统当前时间
+                this.newDate = myDate.getFullYear() + '年' + (myDate.getMonth() + 1) * 1 + '月' + myDate
+                    .getDate() + '日';
+                // var aaa = '';
+                if (this.cinfo.checkList.indexOf(1) >= 0) {
+                    this.aaa = '以通过初试' + JSON.parse(this.cinfo.meansPayments)[0] + 'CNY每人';
+                }
+                if (this.cinfo.checkList.indexOf(2) >= 0) {
+                    this.bbb = '以通过复试' + JSON.parse(this.cinfo.meansPayments)[1] + 'CNY每人'
+                }
+                if (this.cinfo.checkList.indexOf(4) >= 0) {
+                    this.ccc = '以通过培训' + JSON.parse(this.cinfo.meansPayments)[2] + 'CNY每人'
+                }
+                if (this.cinfo.checkList.indexOf(8) >= 0) {
+                    this.ddd = '以入职讲师收入的百分比提成' + JSON.parse(this.cinfo.meansPayments)[3] + 'CNY每人'
+                }
+            },
+        },
+        mounted() {
+            this.init()
+        }
+    });
+</script>

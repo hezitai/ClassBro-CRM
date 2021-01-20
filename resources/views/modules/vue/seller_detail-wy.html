@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+    <style>
+        .grid-content:after {
+            display: block;
+            clear: both;
+            content: "";
+            visibility: hidden;
+            height: 0
+        }
+
+        .grid-content span {
+            float: left;
+        }
+
+        .grid-content span:last-child {
+            max-width: 75%;
+        }
+
+        .el-message-box__wrapper {
+            position: fixed;
+            top: -20px;
+            bottom: 0;
+            left: 0px !important;
+            right: 0;
+            text-align: center;
+        }
+
+        ul li {
+            list-style: none;
+            border-bottom: 1px solid #ddd;
+            /* height: 46px; */
+            line-height: 46px;
+            width: 100%;
+            display: block;
+        }
+
+        ul li a {
+            margin-right: 10px;
+        }
+
+        .button {
+            cursor: pointer;
+            color: #fff;
+            background-color: #409eff;
+            border-color: #409eff;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            margin-left: 10px;
+            text-align: center;
+            box-sizing: border-box;
+            outline: none;
+            margin-top: 6px;
+            transition: .1s;
+            border: 1px solid #dcdfe6;
+            float: right;
+        }
+
+        .view {
+            color: #409EFF;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width: 70%;
+            display: inline-block;
+            height: 30px;
+        }
+
+        i {
+            font-style: normal
+        }
+
+        #logs li {
+            font-size: 14px !important;
+            border-bottom: 1px solid #ddd;
+            height: auto !important;
+            line-height: 26px !important;
+        }
+
+        .logss li {
+            font-size: 14px !important;
+            border-bottom: 1px solid #ddd;
+            height: auto !important;
+            line-height: 26px !important;
+        }
+
+        .title {
+            font-weight: 600;
+            font-size: 18px;
+            margin: 5px 0 !important;
+            border-bottom: 1px solid #99a9bf;
+            padding-bottom: 8px;
+            height: 25px
+        }
+
+        .label {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+        .grid-content {
+            background: #fff;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .el-table__empty-block {
+            background: #fff;
+        }
+
+        .el-pager li {
+            width: 35.5px !important;
+        }
+    </style>
+</head>
+
+<body style="background: #e5e9f2;">
+    <div id="app">
+        <el-dialog :visible.sync="shareToTeacher" width="40%" :before-close="shareToTeacherDialogClose">
+            <div>
+                <el-input type='textarea' v-model='shareDesc' rows='3' placeholder='请给讲师留言'></el-input>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click='shareToTeacherDialogClose'>取 消</el-button>
+                <el-button type="primary" @click="shareSubmit">确 定</el-button>
+            </span>
+        </el-dialog>
+        <!-- CreateOutUrl Dialog -->
+        <el-dialog :visible.sync="createOutUrlDialog" width="40%" v-loading="createOutUrlDialogLoading"
+                   :before-close="createOutUrlDialogClose" top='2vh'>
+            <el-tabs v-model="createOutUrlActiveName" @tab-click="createOutUrlHandleClick"
+                     style="margin-bottom:10px;">
+                <el-tab-pane label="外链入口" name="first"></el-tab-pane>
+                <el-tab-pane label="系统内分享" name="second"></el-tab-pane>
+            </el-tabs>
+            <div v-show='createOutUrlActive1 == true'>
+                <div style="display: flex;justify-content:space-around;">
+                    <div style="width:200px;">
+                        <p style="background:#e8e8e8;text-align: center;margin: 0;padding: 14px 0;">方法一：通过微信扫码</p>
+                        <div>
+                            <img :src="erweimaPic" :alt="erweimaPic">
+                        </div>
+                        <div style="text-align:center;">
+                            <el-button size='mini' style="margin-top:10px;" @click='downErweimaPic(erweimaPic)'>下载
+                            </el-button>
+                        </div>
+                    </div>
+                    <div style="width:200px;">
+                        <p style="background:#e8e8e8;text-align: center;margin: 0;padding: 14px 0;">方法二：通过分享链接</p>
+                        <p>讲师入口链接（此链接电脑端和手机端都可以使用）</p>
+                        <div style="text-align: center;">
+                            <a style="word-wrap:break-word;color:#409EFF;cursor: pointer;"
+                               @click='openOutUrl(shareOutUrl)'>{{ shareOutUrl }}</a>
+                            <input id='input_url' v-model='shareOutUrl'
+                                   style='opacity: 0;position: absolute;z-index: 1'
+                                   type="text">
+                        </div>
+                        <div style="text-align:center;">
+                            <el-button style="margin-top:10px;" @click='copyShareOutUrl(shareOutUrl)' size='mini'>
+                                复制链接
+                            </el-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div v-show='createOutUrlActive1 == false'>
+                <span>选择讲师：</span>
+                <el-select v-model="level" style="width:120px;" placeholder="请选择" @change="changecreateOutUrlLevel">
+                    <el-option v-for="item in levels" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                </el-select>
+                <el-input style="width:180px;" v-model='searchKey' placeholder='请输入姓名或专业'></el-input>
+                <el-button type='primary' @click='createOutUrlSearchTeacher'>搜索</el-button>
+
+                <el-table :data="createOutUrlSearchResult" border style="width: 100%;margin-top:5px;"
+                          @selection-change="createOutUrlSearchSelectionChange">
+                    <el-table-column type="index" width="50" align='center'>
+                    </el-table-column>
+                    <el-table-column type="selection" width="50" align='center'>
+                    </el-table-column>
+                    <el-table-column label="姓名" align='center'>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.username }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="手机号" align='center'>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.mobile }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="级别" align='center'>
+                        <template slot-scope="scope">
+                            <span v-if='scope.row.rank == 0'>S级别</span>
+                            <span v-if='scope.row.rank == 1'>A级别</span>
+                            <span v-if='scope.row.rank == 2'>B级别</span>
+                            <span v-if='scope.row.rank == 3'>C级别</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="专业" align='center'>
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.professionalCoursesName }}</span>
+                        </template>
+                    </el-table-column>
+                </el-table>
+                <el-pagination layout="prev, pager, next" @size-change="createOutUrlHandleSizeChange"
+                               @current-change="createOutUrlHandleCurrentChange"
+                               :current-page="createOutUrlCurrentPage"
+                               :page-sizes="[10,15]" :page-size="createOutUrlLimit" :total="createOutUrlTotal">
+                </el-pagination>
+                <div style='text-align: right'>
+                    <el-button type="success" @click="shareTeacEvent">分 享</el-button>
+                </div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="createOutUrlDialogClose">关 闭</el-button>
+            </span>
+        </el-dialog>
+        <el-row :gutter="20" style="margin:0;">
+            <el-col :span="12" id="leftdiv">
+                <div class="grid-content bg-purple" style="max-height: 780px; overflow-y: auto;">
+                    <p class="title" style="    position: relative;"><span>订单信息</span><span
+                              style="text-align:center;position: absolute;right:5px; font-size: 16px;color:#409EFF;font-family: '微软雅黑';cursor: pointer;"
+                              @click='createOutUrl'>生成外链</span></p>
+                    <div class="grid-content bg-purple">
+                        <span class="label">订单号:</span>
+                        <span>{{wyorder.order_name}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">课程代码:</span>
+                        <span>{{wyorder.course_code}}</span>
+                    </div>
+                    <p style="border-top:1px dashed #409EFF"></p>
+                    <div class="grid-content bg-purple">
+                        <span class="label">课程总价:</span>
+                        <span>{{wyorder.coin}}&nbsp;{{wyorder.total_amount}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">已支付金额:</span>
+                        <span>{{wyorder.coin}}&nbsp;{{wyorder.deposit}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">课程尾款:</span>
+                        <span>{{wyorder.coin}}&nbsp;{{wyorder.balance}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">字数:</span>
+                        <span>{{wyorder.word_count}} 字</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">Deadline:</span>
+                        <span>{{wyorder.deadline}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">Deal Deadline:</span>
+                        <span>{{wyorder.real_deadline}}</span>
+                    </div>
+                    <p style="border-top:1px dashed #409EFF"></p>
+
+                    <div class="grid-content bg-purple">
+                        <span class="label">师资费用(Moon):</span>
+                        <span>{{wyorder.moon}}Moon</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">师资费用(G):</span>
+                        <span>{{wyorder.moon}}G</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">辅导需求:</span>
+                        <span>{{wyorder.client_message}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">订单备注:</span>
+                        <span>{{wyorder.remark}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">Reference Style:</span>
+                        <span>{{wyorder.reference_style}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">Reference Guide:</span>
+                        <span v-if='wyorder.reference_guide!=null'
+                              style="color:#408EF4;font-weight:600; cursor: pointer;"
+                              @click='downFilesss(wyorder.reference_guide.file_path)'>{{wyorder.reference_guide.real_name}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">学校名称:</span>
+                        <span>{{wyorder.university}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">学校网址:</span>
+                        <span>{{wyorder.university_url}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">学校系统账号:</span>
+                        <span>{{wyorder.blackboard_id}}</span>
+                    </div>
+                    <div class="grid-content bg-purple">
+                        <span class="label">学校系统密码:</span>
+                        <span>{{wyorder.password}}</span>
+                    </div>
+                </div>
+            </el-col>
+            <el-col :span="12">
+                <div class="grid-content bg-purple">
+                    <p class="title">课程流水</p>
+                    <ul id="logs" style="min-height:300px;max-height:300px;overflow-y:auto;">
+
+                    </ul>
+                </div>
+            </el-col>
+            <el-col :span="12">
+                <div class="grid-content bg-purple">
+                    <p class="title">课程流水 / Wyard</p>
+                    <ul class="logss" style="min-height:300px;max-height:300px;overflow-y:auto;">
+                        <li class='clears' v-for='item in wylog'>
+                            <i style='margin-right:10px;'>{{item.created_at}}</i><i>{{item.name}} {{item.username}}
+                                {{item.info}} </i>
+                        </li>
+                    </ul>
+                </div>
+            </el-col>
+        </el-row>
+        <div style="background:#fff;padding:10px;margin:8px 10px;">
+            <p class="title">课堂信息</p>
+            <el-table style="background: #e5e9f2;" :data="classroomdata" border style="width: 100%;margin-top:5px;"
+                      @selection-change="">
+                <el-table-column label="课堂名称" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.name }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="课堂说明" :show-overflow-tooltip="true">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.description }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="开始时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.startTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="结束时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.endTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="实际开始时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.reaStartTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="实际结束时间" width="160">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.reaEndTime }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="上课时长" width="80">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.schooltime }}分</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="赠送时长" width="80">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.presenterTime }}分</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="评分" width="80">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.rate }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="180">
+                    <template slot-scope="scope">
+                        <el-button size="mini" @click="revise(scope.row,scope.$index)">课堂记录</el-button>
+                        <el-button size="mini" @click="rview(scope.row,scope.$index)">回放</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <div style="background:#fff;padding:10px;margin:8px 10px;">
+            <div style="padding:20px;border:1px solid #ccc;">
+                <p class="title">课件信息</p>
+                <div>
+                    <div>
+                        <p>lecture_notes：</p>
+                        <div v-for="(item, key, index) in wyorder.upload.lecture_notes">
+                            <p :key="index" @click="down(item.file_path,item.real_name)"
+                               style="cursor :pointer;color:#408EF4;font-weight: 600;padding-left:10px;">
+                                {{ item.real_name }} <span
+                                      style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                            </p>
+                        </div>
+                        <p>original_work：</p>
+                        <div v-for="(item,key, index) in wyorder.upload.original_work">
+                            <p :key="index" @click="down(item.file_path,item.real_name)"
+                               style="cursor :pointer;color:#408EF4;font-weight: 600;padding-left:10px;">
+                                {{ item.real_name }} <span
+                                      style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                            </p>
+                        </div>
+                        <p>other_materials：</p>
+                        <div v-for="(item,key, index) in wyorder.upload.other_materials">
+                            <p :key="index" @click="down(item.file_path,item.real_name)"
+                               style="cursor :pointer;color:#408EF4;font-weight: 600;padding-left:10px;">
+                                {{ item.real_name }} <span
+                                      style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                            </p>
+                        </div>
+                        <p>personal_information：</p>
+                        <div v-for="(item,key, index) in wyorder.upload.personal_information">
+                            <p :key="index" @click="down(item.file_path,item.real_name)"
+                               style="cursor :pointer;color:#408EF4;font-weight: 600;padding-left:10px;">
+                                {{ item.real_name }} <span
+                                      style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                            </p>
+                        </div>
+                        <p>requirement：</p>
+                        <div v-for="(item,key, index) in wyorder.upload.requirement">
+                            <p :key="index" @click="down(item.file_path,item.real_name)"
+                               style="cursor :pointer;color:#408EF4;font-weight: 600;padding-left:10px;">
+                                {{ item.real_name }} <span
+                                      style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                            </p>
+                        </div>
+                        <p>samples：</p>
+                        <div v-for="(item,key, index) in wyorder.upload.samples">
+                            <p :key="index" @click="down(item.file_path,item.real_name)"
+                               style="cursor :pointer;color:#408EF4;font-weight: 600;padding-left:10px;">
+                                {{ item.real_name }} <span
+                                      style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                            </p>
+                        </div>
+                        <p>suggested_readings：</p>
+                        <div v-for="(item,key, index) in wyorder.upload.suggested_readings">
+                            <p :key="index" @click="down(item.file_path,item.real_name)"
+                               style="cursor :pointer;color:#408EF4;font-weight: 600;padding-left:10px;">
+                                {{ item.real_name }} <span
+                                      style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                            </p>
+                        </div>
+                        <p>unit_guide：</p>
+                        <div v-for="(item,key, index) in wyorder.upload.unit_guide">
+                            <p :key="index" @click="down(item.file_path,item.real_name)"
+                               style="cursor :pointer;color:#408EF4;font-weight: 600;padding-left:10px;">
+                                {{ item.real_name }} <span
+                                      style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding:20px;border:1px solid #ccc;margin-top: 20px;">
+                <p class="title">Dropbox</p>
+                <div>
+                    <div v-for="(item,index) in dropboxList">
+                        <p v-show='item.can_hide == true' :key="index"
+                           style="cursor :pointer;color:#408EF4;font-weight: 600;">
+                            <span @click="downDropbox(item.file_path,item.real_name)">
+                                {{ item.real_name }}
+                            </span>
+                            <span style="color:#333;font-weight: 400;padding-left: 5px">{{item.created_at}}</span>
+                            <span style="text-align:right;">
+                                <el-button @click='deleteDropboxBtn(item)' type='primary' size="small">
+                                    删除
+                                </el-button>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <el-dialog title="课堂记录" :visible.sync="dialogVisible" width="30%">
+            <div v-for="item in history" class="text item">
+                <div>{{item.suerrole}} {{ item.nickname }} {{ item.joinTime }} 进入了课堂</div>
+                <div>{{item.suerrole}} {{ item.nickname }} {{ item.leaveTime }} 离开了课堂</div>
+                <div>持续了 {{ item.duration }} 分钟</div>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+            </span>
+        </el-dialog>
+        <div style="background:#fff;padding:10px;margin:8px 10px;">
+
+        </div>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<!-- <script src="js/clipboard.min.js"></script> -->
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/seller_detail-wy.js');
+    }
+</script>
+
+</html>

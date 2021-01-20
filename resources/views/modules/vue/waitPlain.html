@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入" style="width:240px"></el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-select v-model="ruleForm.tudStatused" placeholder="请选择" @change="change_spoTypeArr">
+            <!-- <el-option  :key="0" :label="0" :value="全部">
+                </el-option> -->
+            <el-option v-for="item in tudStatuseds" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+        </el-select>
+        <el-select v-model="ruleForm.typeed" placeholder="请选择录入类型" @change="change_spoTypeedArr">
+            <!-- <el-option  :key="0" :label="0" :value="全部">
+                </el-option> -->
+            <el-option v-for="item in typeeds" :key="item.value" :label="item.label" :value="item.value">
+            </el-option>
+        </el-select>
+        <el-button type="primary" @click="creatTeacInfo"
+                   v-if="hasPermission('sys:shiziqudao:baomingliebiao:lurujiaoshixinxi')">录入教师信息</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <!-- <el-table-column label="手机号" :show-overflow-tooltip="true" width="120">
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="view_detail(scope.row,scope.$index)">{{ scope.row.mobile }}</span>
+                </template>
+            </el-table-column> -->
+            <el-table-column label="教师姓名" width="100" align='center'>
+                <template slot-scope="scope">
+                    <el-button v-show='scope.row.typeed === 2' style="cursor: default;" size='mini' type="danger" circle disabled
+                               title='他方录入'>渠</el-button>
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="view_detail(scope.row,scope.$index)">{{ scope.row.username }}</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column 
+      label="性别"
+      width="60">
+      <template slot-scope="scope">
+        <span v-if="scope.row.sex==='FEMALE'">女</span>
+        <span v-if="scope.row.sex==='MALE'">男</span>
+      </template>
+      </el-table-column> -->
+            <el-table-column :show-overflow-tooltip="true" label="学校" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.universityName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="学历" width="80" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.eduName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="专业" :show-overflow-tooltip="true" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.professionalCoursesName }}</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column
+        :show-overflow-tooltip="true"
+          label="国家">
+        <template slot-scope="scope">
+            <span>{{ scope.row.countryName }}</span>
+        </template>
+        </el-table-column> -->
+
+            <el-table-column label="初试人" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.interviewUser.username }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="复试人" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.reexamineInterviewUser.username }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="渠道方" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.channelName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="创建时间" :show-overflow-tooltip="true" align='center'>
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="状态" width="120" align='center'>
+                <template slot-scope="scope">
+                    <span v-if="scope.row.tudStatused===0">待预约</span>
+                    <span v-if="scope.row.tudStatused===1">待初试</span>
+                    <span v-if="scope.row.tudStatused===2">待复试</span>
+                    <span v-if="scope.row.tudStatused===3">初试被拒</span>
+                    <span v-if="scope.row.tudStatused===4">待培训1</span>
+                    <span v-if="scope.row.tudStatused===5">复试被拒</span>
+                    <span v-if="scope.row.tudStatused===6">培训1合格</span>
+                    <span v-if="scope.row.tudStatused===7">培训1被拒</span>
+                    <span v-if="scope.row.tudStatused===8">培训2合格</span>
+                    <span v-if="scope.row.tudStatused===9">培训2被拒</span>
+                    <span v-if="scope.row.tudStatused===10">工作中</span>
+                    <span v-if="scope.row.tudStatused===null">工作中</span>
+                </template>
+            </el-table-column>
+
+            <!-- <el-table-column label="简历/成绩单">
+                <template slot-scope="scope">
+                    <span>
+                        <el-button type="primary" size="mini" v-if="scope.row.report != ''" class="el-icon-download"
+                                   @click="downfile1(scope.row,scope.$index)">下载简历</el-button>
+                    </span>
+                </template>
+            </el-table-column> -->
+            <el-table-column label="操作" width="100px" align='center'>
+                <template slot-scope="scope">
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                            下拉操作
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item size="mini" @click.native="recommendTeacher(scope.row,scope.$index)"
+                                              v-if="scope.row.tudStatused == 0 &&(scope.row.report != '' || scope.row.resume != '') && hasPermission('sys:shiziqudao:baomingliebiao:yuyue')">
+                                预约</el-dropdown-item>
+                            <el-dropdown-item size="mini" disabled
+                                              v-if="(scope.row.tudStatused != 0||scope.row.report=='') && scope.row.resume == null ">
+                                预约
+                            </el-dropdown-item>
+                            <el-dropdown-item size="mini" @click.native="upfile1(scope.row,scope.$index)"
+                                              v-if="scope.row.report == ''&&hasPermission('sys:shiziqudao:baomingliebiao:shangchuanjianli')">
+                                上传简历和成绩单</el-dropdown-item>
+                            <!-- <el-dropdown-item size="mini" @click.native="upfile2(scope.row,scope.$index)" v-if="scope.row.resume == ''&&hasPermission('sys:shiziqudao:baomingliebiao:shangchuanchengjidan')">上传成绩单</el-dropdown-item> -->
+                            <el-dropdown-item size="mini" @click.native="upfile1(scope.row,scope.$index)"
+                                              v-if="scope.row.report != ''">更新简历和成绩单</el-dropdown-item>
+                            <!-- <el-dropdown-item size="mini" @click.native="upfile2(scope.row,scope.$index)" v-if="scope.row.resume != ''">更新成绩单</el-dropdown-item> -->
+                            <!-- <el-dropdown-item size="mini" @click.native="downfile1(scope.row,scope.$index)" v-if="scope.row.report != ''">下载简历</el-dropdown-item> -->
+                            <!-- <el-dropdown-item size="mini" @click.native="downfile2(scope.row,scope.$index)" v-if="scope.row.resume != ''">下载成绩单</el-dropdown-item> -->
+                            <!-- <el-dropdown-item size="mini" v-if="scope.row.report == ''"disabled>下载简历</el-dropdown-item> -->
+                            <!-- <el-dropdown-item size="mini" v-if="scope.row.resume == ''"disabled>下载成绩单</el-dropdown-item> -->
+                            <el-dropdown-item size="mini" @click.native="view_detail(scope.row,scope.$index)"
+                                              v-if="hasPermission('sys:shiziqudao:baomingliebiao:chakanjiaoshixinxi')">
+                                查看教师信息</el-dropdown-item>
+                            <el-dropdown-item size="mini" @click.native="downfile1(scope.row,scope.$index)"
+                                              :disabled="scope.row.resume == null && scope.row.report == null">
+                                下载简历</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+        <el-dialog :visible.sync="file1model" :close-on-click-modal="false" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders" :data="data" :multiple="true"
+                           :action="url" :on-preview="handlePreview"
+                           :on-remove="handleRemove" :on-success="success" :http-request="uploadFile"
+                           :on-error="onerror" :file-list="fileList"
+                           list-type="picture" :on-change="change" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择简历</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload">上传到服务器</el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save1('ruleForm')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="file1model1" :close-on-click-modal="false" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders" :data="data" :multiple="true"
+                           :action="url" :on-preview="handlePreview"
+                           :on-remove="handleRemove" :on-success="success" :http-request="uploadFile"
+                           :on-error="onerror" :file-list="fileList"
+                           list-type="picture" :on-change="change" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择成绩单</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload1">上传到服务器
+                    </el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save2('ruleForm')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/waitPlain.js');
+    }
+</script>
+
+</html>

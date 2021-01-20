@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<style>
+    .demo-table-expand {
+        font-size: 0;
+    }
+
+    .demo-table-expand label {
+        width: 90px;
+        color: #99a9bf;
+    }
+
+    .demo-table-expand .el-form-item {
+        margin-right: 0;
+        margin-bottom: 0;
+        width: 50%;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <div v-show="showList">
+            <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+            <el-button type="primary" @click="search">搜索</el-button>
+            <!-- <el-button type="primary" @click="add">分配运营</el-button> -->
+            <!-- <el-button type="primary" @click="openData">重置</el-button>
+            
+            <el-button type="primary" @click="handleDelete">删除</el-button> -->
+            <el-table
+                      :data="tableDataEnd"
+                      ref="multipleTable"
+                      border
+                      style="width: 100%;"
+                      @selection-change="handleSelectionChange">
+                <el-table-column
+                                 type="selection"
+                                 width="50">
+                </el-table-column>
+                <el-table-column type="expand">
+                    <template slot-scope="props">
+                        <el-form label-position="left" inline class="demo-table-expand">
+                            <el-form-item label="教师id">
+                                <span>{{ props.row.id }}</span>
+                            </el-form-item>
+                            <el-form-item label="运营姓名">
+                                <span>{{ props.row.operName }}</span>
+                            </el-form-item>
+                            <el-form-item label="教师姓名">
+                                <span>{{ props.row.username }}</span>
+                            </el-form-item>
+                            <el-form-item label="教师昵称">
+                                <span>{{ props.row.nickName }}</span>
+                            </el-form-item>
+                            <el-form-item label="教师资料">
+                                <span>{{ props.row.description }}</span>
+                            </el-form-item>
+                            <el-form-item label="教师学历">
+                                <span>{{ props.row.eduName }}</span>
+                            </el-form-item>
+                        </el-form>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                                 label="教师id"
+                                 prop="id">
+                </el-table-column>
+                <el-table-column
+                                 label="运营id"
+                                 prop="operaterId">
+                </el-table-column>
+                <el-table-column
+                                 label="教师姓名"
+                                 prop="username">
+                </el-table-column>
+                <el-table-column
+                                 label="教师昵称"
+                                 prop="nickName">
+                </el-table-column>
+                <el-table-column
+                                 label="教师性别"
+                                 prop="sex"
+                                 :formatter="formatSex">
+                </el-table-column>
+                <el-table-column
+                                 label="教师学历"
+                                 prop="eduName">
+                </el-table-column>
+            </el-table>
+            <!-- 添加的弹框 -->
+            <el-dialog
+                       :visible.sync="dialogFormVisible2"
+                       width="40%">
+                <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                    <el-form-item label="活动国家" prop="country">
+                        <el-form-item>
+                            <el-select placeholder="请选择" v-model="ruleForm.country" style="width: 120px;"
+                                       @change="handleChange">
+                                <el-option
+                                           v-for="item in selects"
+                                           :key="item.id"
+                                           :label="item.username"
+                                           :value="item.userId">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-form-item>
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="submitForm2('ruleForm')">确 定</el-button>
+                </span>
+            </el-dialog>
+            <el-pagination
+                           style="margin-top:15px"
+                           @size-change="handleSizeChange"
+                           @current-change="handleCurrentChange"
+                           :current-page="currentPage"
+                           :page-sizes="[6]"
+                           :page-size="6"
+                           layout="total, sizes, prev, pager, next, jumper"
+                           :total="total">
+            </el-pagination>
+        </div>
+        <div v-show="!showList">
+            111
+        </div>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<!-- import Vue before Element -->
+<script src="js/vue.js"></script>
+<!-- import JavaScript -->
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/pxteacherlist.js');
+    }
+
+</script>
+
+</html>

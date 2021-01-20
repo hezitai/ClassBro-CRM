@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <!-- import CSS -->
+</head>
+
+<body>
+  <ul id="ul"></ul>
+  <div id="ul1"></div>
+  <div id="ul12"></div>
+</body>
+  <script src="js/jquery.js"></script>
+  <script type="text/javascript">  
+  var m = [{key: 'x',key1: 'x',name4:"4;5"}, {key: 'y',key1: 'x',name4:"4;5"}, {key: 'z',key1: 'x',name4:"4;5"}];
+  var s = m[0].split(";");
+  console.log(s);
+    m.forEach(function (value, key) { 
+    var html = "<ul id='s'><li>"+value.key+"</li><li>"+value.key1+"</li></ul>"
+    $("#ul12").append(html);
+  });
+  m.forEach(function (value, key) { 
+    var a = value.name4.split(";");
+      console.log(a);
+  });
+
+  var users = [
+  {name: "张含韵", "email": "zhang@email.com"},
+  {name: "江一燕",   "email": "jiang@email.com"},
+  {name: "李小璐",  "email": "li@email.com"}
+];
+var emails = users.map(function (items) { return items.email; });
+
+console.log(emails.join(", "));
+
+users.map(item=>{
+  var html1 =  "<li>"+item.name+""+item.email+"</li>";
+  $("#ul").append(html1)
+});
+var times = [
+  "123","234","12321"
+];
+var lists = [
+  {name1:"1",name2:"2",name3:"3",name4:"4;5"},
+  {name1:"1",name2:"2",name3:"3",name4:"4;5"}
+]
+
+var list = [
+  {name1:"1",name2:"2",name3:"3",name4:"4;5"},
+  {name1:"1",name2:"2",name3:"3",name4:"4;5;8"}
+]
+list.map(items=>{
+  var html2 =  "<ul><li>"+items.name1+"</li><li>"+items.name2+"</li></ul>";
+  $("#ul1").append(html2);
+  var a = items.name4.split(";");
+  a.map(items=>{
+  var html3 =  "<span>"+items+"</span>";
+  $("#ul1").append(html3);
+});
+});
+  </script>
+</body>  
+</html>  
+</html>

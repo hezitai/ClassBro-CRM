@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+        <el-date-picker v-model="data" type="datetimerange" align="right" unlink-panels range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期" @change="choosedata" value-format="yyyy-MM-dd HH:mm:ss"
+                        :picker-options="pickerOptions2">
+        </el-date-picker>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-button type="primary" @click="down">导出</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column label="订单号" width="100">
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="sees(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="销售" width="100">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.sellerName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单类型" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.spoType===1'>定制辅导</span>
+                    <span v-if='scope.row.spoType===2'>考前突击</span>
+                    <span v-if='scope.row.spoType===4'>包课辅导</span>
+                    <span v-if='scope.row.spoType===8'>论文辅导</span>
+                    <span v-if='scope.row.spoType===32'>特殊订单</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单上传时间" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="讲师RMB" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.decimalTeacRMB }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="讲师G" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.decimalGB }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="讲师OTG" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.decimalOTGB }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="学校" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.universityName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="国家" width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.countryName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="金额" width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.decimalConsumeMoney }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="货币种类" width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.currency }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="充值时间" :show-overflow-tooltip="true" width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="讲师类型" width="80">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.teacherType===1'>兼职讲师</span>
+                    <span v-if='scope.row.teacherType===2'>全职讲师</span>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15]" :page-size="15" layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/statement.js');
+    }
+</script>
+
+</html>

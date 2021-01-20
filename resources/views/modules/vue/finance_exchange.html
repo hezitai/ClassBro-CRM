@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-button type="primary" @click="add">添加</el-button>
+        <el-table
+                  :data="tableDataEnd"
+                  ref="multipleTable"
+                  border
+                  style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column
+                             label="货币"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.tagerCurrency }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="汇率"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.exchange }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="修改时间"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.updateAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <el-button size="mini" v-if="hasPermission('sys:caiwubu:caiwujilu:xiugaihuilv')"
+                               @click="revise(scope.row,scope.$index)">修改汇率</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination
+                       style="margin-top:15px"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[6]"
+                       :page-size="6"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+        <!-- 添加的弹框 -->
+        <el-dialog
+                   :visible.sync="dialogFormVisible"
+                   width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="30%" class="demo-ruleForm">
+                <el-form-item label="选择货币种类" prop="currency">
+                    <el-form-item>
+                        <el-select placeholder="请选择货币种类" v-model="ruleForm.currency" style="width: 70%">
+                            <el-option label="CNY" value="CNY"></el-option>
+                            <el-option label="GBP" value="GBP"></el-option>
+                            <el-option label="AUD" value="AUD"></el-option>
+                            <el-option label="NZD" value="NZD"></el-option>
+                            <el-option label="USD" value="USD"></el-option>
+                            <el-option label="CAD" value="CAD"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form-item>
+                <el-form-item label="利率" prop="exchange">
+                    <el-input style="width: 70%" v-model="ruleForm.exchange"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitForm('ruleForm')">{{btnval}}</el-button>
+            </span>
+        </el-dialog>
+        <!-- 添加的弹框 -->
+        <el-dialog
+                   :visible.sync="dialogFormVisible1"
+                   width="40%">
+            <el-form :model="ruleForm" :rules="rules1" ref="ruleForm" label-width="20%" class="demo-ruleForm">
+                <el-form-item label="利率" prop="exchange" style="width:80%">
+                    <el-input v-model="ruleForm.exchange"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" @click="submitForm1('ruleForm')">{{btnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/finance_exchange.js');
+    }
+
+</script>
+
+</html>

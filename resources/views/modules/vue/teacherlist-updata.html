@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .color1 {
+        background: #fef0f0;
+        cursor: not-allowed;
+    }
+
+    .smile:first-child {
+        display: block !important
+    }
+
+    .smile {
+        display: none
+    }
+
+    .side:first-child {
+        display: block !important
+    }
+
+    .side {
+        display: none
+    }
+
+    .div {
+        display: inline-block;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <div>
+            <template>
+                <el-tabs v-model="activeName" @tab-click="handleClick">
+                    <el-tab-pane label="基本信息" name="first"></el-tab-pane>
+                    <el-tab-pane label="高级设置" name="second"></el-tab-pane>
+                    <el-tab-pane label="考核信息" name="seconds"></el-tab-pane>
+                    <el-tab-pane label="培训信息" name="four"></el-tab-pane>
+                </el-tabs>
+            </template>
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="180px" style="width:900px;"
+                     class="demo-ruleForm">
+                <div v-show="showa">
+                    <el-form-item label="头像">
+                        <img src="https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg"
+                             style="width:50px;height:50px;">
+                    </el-form-item>
+                    <el-form-item label="账号" prop="mobile">
+                        <el-select v-model="ruleForm.mobileCode" style="width:100px;">
+                            <!-- :label="'+' + item.code + ' ' + item.name" -->
+                            <el-option v-for="item in countrys" :key="item.id"
+                                       :value="item.code">
+                                <span style="display:inline-block;width:30px;text-align: right;">
+                                    {{'+' + item.code}}
+                                </span>
+                                <span style="display:inline-block;">
+                                    {{item.name}}
+                                </span>
+                            </el-option>
+                        </el-select>
+                        <el-input v-model="ruleForm.mobile" style="width:180px;" :disabled="true"></el-input>
+                    </el-form-item>
+                    <el-form-item label="姓名" prop="username">
+                        <el-input v-model="ruleForm.username"></el-input>
+                    </el-form-item>
+                    <el-form-item label="昵称" prop="nickName">
+                        <el-input v-model="ruleForm.nickName"></el-input>
+                    </el-form-item>
+                    <el-form-item label="性别" prop="sex">
+                        <el-select v-model="ruleForm.sex" placeholder="请选择性别">
+                            <el-option label="男" value="MALE"></el-option>
+                            <el-option label="女" value="FEMALE"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="生日">
+                        <el-col :span="11">
+                            <el-form-item prop="birthday">
+                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.birthday"
+                                                value-format="yyyy-MM-dd HH:mm:ss" style="width: 100%;">
+                                </el-date-picker>
+                            </el-form-item>
+                        </el-col>
+                    </el-form-item>
+                    <el-form-item label="微信号" prop="wxAccount">
+                        <el-input v-model="ruleForm.wxAccount"></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机号" prop="mobile">
+                        <el-input v-model="ruleForm.mobile"></el-input>
+                    </el-form-item>
+                    <el-form-item label="邮箱" prop="email">
+                        <el-input v-model="ruleForm.email"></el-input>
+                    </el-form-item>
+                    <el-form-item label="国家" prop="country">
+                        <el-select v-model="ruleForm.country" placeholder="请选择国家" @change="change_university">
+                            <el-option v-for="item in countrys" :key="item.id" :label="item.name" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="选择学校" prop="universityName">
+                        <el-select v-model="ruleForm.universityName" placeholder="请选择学校">
+                            <el-option v-for="item in universitys" :key="item.id" :label="item.name" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="专业" prop="professionalCourses">
+                        <el-select v-model="ruleForm.professionalCourses" multiple placeholder="请选择"
+                                   @change="change_professionalCourse">
+                            <el-option v-for="item in professionalCoursesNames" :key="item.id" :label="item.chineseName"
+                                       :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="学历" prop="eduName">
+                        <el-select v-model="ruleForm.eduName" placeholder="请选择学历">
+                            <el-option v-for="item in eduNames" :key="item.id" :label="item.name" :value="item.id">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="擅长学科" prop="specializeds">
+                        <el-input v-model="ruleForm.specializeds"></el-input>
+                    </el-form-item>
+                </div>
+                <div v-show="showb">
+                    <el-form-item label="是否纳税" prop="type">
+                        <el-checkbox v-model="isTax"></el-checkbox>
+                    </el-form-item>
+                    <el-form-item label="教师类别" prop="type">
+                        <el-select v-model="ruleForm.type" placeholder="请选择教师类别" @change="change_Typeed">
+                            <el-option label="全职" value="1"></el-option>
+                            <el-option label="兼职" value="2"></el-option>
+                            <el-option label="合作讲师" value="4"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="教师级别" prop="grade" v-show="teachers">
+                        <el-select v-model="ruleForm.grade" placeholder="请选择教师类别" id="gread" @change='changeGradeEvent'>
+                            <el-option label="银牌" value="1"></el-option>
+                            <el-option label="金牌" value="2"></el-option>
+                            <el-option label="王牌" value="3"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="时薪" prop="hourlyWage">
+                        <el-input v-model="ruleForm.hourlyWage" style="width:215px" :disabled="true"></el-input>
+                        <el-button>G/H</el-button>
+                    </el-form-item>
+                    <el-form-item label="授课经验" prop="teachingExperience">
+                        <el-input v-model="ruleForm.teachingExperience" style="width:215px"></el-input>
+                        <el-button>课时</el-button>
+                    </el-form-item>
+                    <el-form-item label="赠送时长" prop="presenterTimeLimit">
+                        <el-input v-model="ruleForm.presenterTimeLimit" style="width:215px"></el-input>
+                        <el-button>MIN</el-button>
+                    </el-form-item>
+                    <el-form-item label="最大抢单数" prop="maxLootNum">
+                        <el-input v-model="ruleForm.maxLootNum" style="width:215px"></el-input>
+                        <el-button>个</el-button>
+                    </el-form-item>
+                    <el-form-item style="margin-left:-85px" v-for="(domain, index) in ruleForm.domains"
+                                  :key="domain.key" :prop="'domains.' + index + '.content'">
+                        <div>
+                            <span style="margin-right:15px;">小报告标签</span>
+                            <el-input v-model="domain.snLabel" style="width:140px;" maxlength="6"></el-input>
+                            <span> {{domain.operName}}</span>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <span style="margin-right:15px;">小报告描述</span>
+                            <el-input v-model="domain.content" style="width:300px;" maxlength="500" type="textarea"
+                                      :rows="3"></el-input>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <span style="margin-right:15px;">小报告评价</span>
+                            <template>
+                                <el-radio v-model="domain.snType" label="0">好评</el-radio>
+                                <el-radio v-model="domain.snType" label="1">差评</el-radio>
+                            </template>
+                        </div>
+                        <el-button type="primary" size="small" @click.prevent="submit(domain)">修改</el-button>
+                        <el-button size="small" @click.prevent="removeDomain(domain)">删除</el-button>
+                    </el-form-item>
+                    <!-- <el-button @click="addDomain" style="margin-left:100px;margin-bottom:10px;">新增小报告</el-button> -->
+                </div>
+                <div v-show="showc">
+                    <el-form-item label="初试" prop="initialEvaluate" v-show="istrue">
+                        <el-input v-model="ruleForm.initialEvaluate" type="textarea" :rows="3"></el-input>
+                    </el-form-item>
+                    <el-form-item label="复试" prop="reexamineEvaluate" v-show="istrue">
+                        <el-input v-model="ruleForm.reexamineEvaluate" type="textarea" :rows="3"></el-input>
+                    </el-form-item>
+                </div>
+                <div v-show="showd">
+                    <el-form-item label="讲师状态" prop="rank">
+                        <el-select v-model="ruleForm.rank" style="width:310px;" placeholder="">
+                            <el-option label="级别S" value="0"></el-option>
+                            <el-option label="级别A" value="1"></el-option>
+                            <el-option label="级别B" value="2"></el-option>
+                            <el-option label="级别C" value="3"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="培训1评价" prop="rate1">
+                        <el-input v-model="ruleForm.rate1" type="textarea" :rows="3"></el-input>
+                    </el-form-item>
+                    <el-form-item label="培训2评价" prop="rate2">
+                        <el-input v-model="ruleForm.rate2" type="textarea" :rows="3"></el-input>
+                    </el-form-item>
+                </div>
+                <el-button type="primary" @click="update('ruleForm')" style="margin-left:60px;">修改</el-button>
+                <!-- <el-button type="primary" @click="back">返回</el-button> -->
+            </el-form>
+        </div>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/teacherlist-updata.js');
+    }
+</script>
+
+</html>

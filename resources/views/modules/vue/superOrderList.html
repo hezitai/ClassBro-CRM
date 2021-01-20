@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    #orders {
+        cursor: pointer;
+        color: #409EFF;
+    }
+
+    .color1 {
+        background: #fef0f0;
+        cursor: not-allowed;
+    }
+
+    .color1:hover {
+        background: #fef0f0;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入姓名" style="width:240px">
+        </el-input>
+        <!-- <el-select v-model="ruleForm.sooStatusedArr" placeholder="请选择订单状态" @change="change_sooStatusedArr">
+            <el-option label="全部" value="0;1;2;5;7;8"></el-option>
+            <el-option label="待委派" value="0"></el-option>
+            <el-option label="讲师未接单" value="1"></el-option>
+            <el-option label="待排课" value="128"></el-option>
+            <el-option label="已排课" value="256"></el-option>
+            <el-option label="申请结课中" value="512"></el-option>
+        </el-select> -->
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border :cell-class-name="rowClass"
+                  style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column label="订单号">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.spoType ==64'>
+                        <img style="width:15px" src="images/bigC.png">
+                    </span>
+                    <span v-if='scope.row.parentId !==null&&scope.row.spoType !==64'>
+                        <img style="width:15px" src="images/ss.svg">
+                    </span>
+                    <span @click="openorder(scope.row,scope.$index)" id="orders">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="订单备注">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.remark }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单状态" :show-overflow-tooltip="true" width="120">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.statused===1'>未处理(无任何销售接单)</span>
+                    <span v-if='scope.row.statused===2'>待审核</span>
+                    <span v-if='scope.row.statused===4'>待确定</span>
+                    <span v-if='scope.row.statused===8'>待规划(等待教师/运营接单)</span>
+                    <span v-if='scope.row.statused===16'>规划中(订单第一次超时等待运营接单)</span>
+                    <span v-if='scope.row.statused===32'>规划中(订单第二次超时等待运营主管强制指派)</span>
+                    <span v-if='scope.row.statused===64'>规划中(运营接单待指派，正在处理)</span>
+                    <span v-if='scope.row.statused===128'>待排课</span>
+                    <span v-if='scope.row.statused===256'>已排课</span>
+                    <span v-if='scope.row.statused===512'>待结课</span>
+                    <span v-if='scope.row.statused===1024'>已结课</span>
+                    <span v-if='scope.row.statused===2048'>已强制结课</span>
+                    <span v-if='scope.row.statused===4096'>已取消</span>
+                    <span v-if='scope.row.statused===8192'>坏单申请中</span>
+                    <span v-if='scope.row.statused===16384'>坏单已确认结束</span>
+                    <span v-if='scope.row.statused===32768'>销售被更换</span>
+                    <span v-if='scope.row.statused===65536'>事故单申请中</span>
+                    <span v-if='scope.row.statused===131072'>事故单已处理</span>
+                    <span v-if='scope.row.statused===262144'>事故单更换教师</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="销售名称" width="100">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.sellerName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" label="Official Deadline" width="160">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.studPurchaseOrder.examTime }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="110">
+                <template slot-scope="scope">
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                            下拉操作
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item v-if="(scope.row.id<8)&&(hasPermission('sys:seller:ordepool:Voidrder'))"
+                                              @click.native="blank_out(scope.row,scope.$index)">作废订单</el-dropdown-item>
+                            <el-dropdown-item v-if="(scope.row.id>=8)&&(hasPermission('sys:seller:ordepool:Voidrder'))"
+                                              disabled>作废订单</el-dropdown-item>
+                            <el-dropdown-item @click.native="lock_order(scope.row,scope.$index)"
+                                              v-if="(scope.row.statused<128&&scope.row.deleteFlag===false&&scope.row.spoType!==64)&&(hasPermission('sys:seller:allorder:suodingorder'))">
+                                锁定订单</el-dropdown-item>
+                            <el-dropdown-item disabled
+                                              v-if="(scope.row.statused<128&&scope.row.deleteFlag===true&&scope.row.spoType===64)&&(hasPermission('sys:seller:allorder:suodingorder'))">
+                                锁定订单</el-dropdown-item>
+                            <el-dropdown-item @click.native="unlock_order(scope.row,scope.$index)"
+                                              v-if="(scope.row.deleteFlag===true&&scope.row.spoType!==64)&&(hasPermission('sys:seller:allorder:jiesuorder'))">
+                                解锁订单</el-dropdown-item>
+                            <el-dropdown-item v-if="(scope.row.deleteFlag===false&&scope.row.spoType===64)&&(hasPermission('sys:seller:allorder:jiesuorder'))"
+                                              disabled>解锁订单</el-dropdown-item>
+                            <el-dropdown-item @click.native="salesPresenterTime(scope.row,scope.$index)"
+                                              v-if="(scope.row.spoType!==64)&&(hasPermission('sys:seller:allorder:zengsongtime'))">
+                                赠送课时</el-dropdown-item>
+                            <el-dropdown-item v-if="(scope.row.spoType===64)&&(hasPermission('sys:seller:allorder:zengsongtime'))"
+                                              disabled>赠送课时</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]" :page-size="limit" layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+        <el-dialog :visible.sync="timemodel" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="时长" prop="time">
+                    <el-input-number v-model="ruleForm.time" :step="1"></el-input-number>
+                </el-form-item>
+                <el-form-item label="理由" prop="description">
+                    <el-input v-model="ruleForm.description" type="textarea" :rows="3"></el-input>
+                </el-form-item>
+                <el-form-item label="类型" prop="type">
+                    <template>
+                        <el-radio v-model="ruleForm.type" label="0">后消耗</el-radio>
+                        <el-radio v-model="ruleForm.type" label="1">先消耗</el-radio>
+                        <el-radio v-model="ruleForm.type" label="2">抵扣欠款</el-radio>
+                    </template>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save('ruleForm')" v-bind:loading="timebtnstatus">{{timebtnval}}
+                </el-button>
+            </span>
+        </el-dialog>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script src="../../js/base.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/superOrderList.js');
+    }
+</script>
+
+</html>

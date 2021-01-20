@@ -1,0 +1,138 @@
+html { 
+    
+}
+@media screen and (min-width:1200px) {
+    html { 
+        
+    }
+}
+
+/*大于960px小于1199px屏幕尺寸应用以下样式*/
+@media screen and (min-width:960px) and (max-width:1199px) {
+    html { 
+        
+    }
+}
+
+/*大于768px小于959px屏幕尺寸应用以下样式*/
+@media screen and (min-width: 768px) and (max-width: 959px) {
+    html { 
+        
+    }
+}
+
+/*大于480px小于767px屏幕尺寸应用以下样式*/
+@media only screen and (min-width: 480px) and (max-width:767px) {
+    html { 
+        
+    }
+}
+
+/*小于479px屏幕尺寸应用以下样式*/
+@media only screen and (max-width: 479px) {
+    html { 
+        
+    }
+}
+.content-header {
+	position: relative;
+	padding: 0 0 3px 8px
+}
+
+.content-header>.breadcrumb {
+    position: relative;
+    top: 0;
+    right: 0;
+    float: none;
+    margin-top: 0px;
+    padding-left: 10px;
+    background: #ecf0f5;
+}
+
+.main-footer {
+    padding: 7px;
+    color: #444;
+    border-top: 1px solid #eee;
+}
+
+[v-cloak] {
+  display: none;
+}
+
+.grid-btn{
+	margin-bottom:12px;
+}
+.grid-btn .btn{
+	margin-right:10px;
+}
+.pointer{cursor: pointer;}
+
+.ml-10 { margin-left:0 !important; }
+@media (min-width: 768px) {
+	.ml-10 { margin-left:10px !important; }
+	.col-sm-10 {width: 70%;padding-left: 0px;}
+	.col-sm-2 {width: 24%;}
+}
+tbody > tr > th {font-weight: normal; }
+.panel .table { margin:0 0; }
+.panel .pagination { margin:0; }
+.panel-default>.panel-heading {background-color: #f5f5f5;}
+.row{
+	margin:0;
+	padding:2px 2px 0px 2px;
+}
+.col-xs-6{padding-left: 0px;padding-right: 0px;}
+.form-horizontal .form-group {margin-left:0px;margin-right:0px;}
+.form-horizontal{
+	width:550px;padding-top:20px;
+}
+
+.grid-btn {
+    margin-top: 10px;
+}
+
+.drag{
+    width:600px;height:450px;border:none;position: fixed !important;right:0;bottom:0;z-index: 999999;
+    background: #409cfe;
+    box-shadow: 0px 0px 2px 2px #aaa;
+    display: none;
+}
+.drags{
+    width:600px;height:400px;top:50px;position: absolute;border:none;
+}
+.clos{
+    height: 50px;
+    line-height: 50px;
+    position: absolute;
+    width: 60px;
+    top: 0;
+    right:0;
+    z-index: 9999;
+    display: block;
+    cursor: pointer;
+}
+.clos span{
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    display: block;
+    height: 50px;line-height: 50px;
+    position: absolute;width: 60px;
+    right: 0;
+    text-align: center;
+    z-index: 9999;
+}
+#newchat{
+    width: 64px;
+    height: 65px;
+    text-align: center;
+    color: #fff;
+    position: fixed;
+    right: 10px;
+    bottom:10px;
+    z-index: 9999;
+    cursor: pointer;
+    background: url("../im/chat1.png") no-repeat center center;
+    background-size: 100%;
+    display: none;
+}

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .clears:after {
+        display: block;
+        clear: both;
+        content: "";
+        visibility: hidden;
+        height: 0
+    }
+
+    .w50 {
+        width: 50%;
+        margin-bottom: 10px;
+    }
+
+    .fl {
+        float: left;
+    }
+
+    .fr {
+        float: right;
+    }
+
+    .el-form-item {
+        margin-bottom: 10px;
+    }
+
+    .result2 .el-form-item__label::before {
+        content: '*';
+        margin-right: 3px;
+        color: red;
+    }
+
+    .important .el-form-item__label::before {
+        content: '*';
+        margin-right: 3px;
+        color: red;
+    }
+
+    .progress {
+        margin-top: 2px;
+        width: 100%;
+        height: 14px;
+        margin-bottom: 10px;
+        overflow: hidden;
+        background-color: #f5f5f5;
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+    }
+
+    .progress-bar {
+        background-color: rgb(92, 184, 92);
+        background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.14902) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.14902) 50%, rgba(255, 255, 255, 0.14902) 75%, transparent 75%, transparent);
+        background-size: 40px 40px;
+        box-shadow: rgba(0, 0, 0, 0.14902) 0px -1px 0px 0px inset;
+        box-sizing: border-box;
+        color: rgb(255, 255, 255);
+        display: block;
+        float: left;
+        font-size: 12px;
+        height: 20px;
+        line-height: 20px;
+        text-align: center;
+        transition-delay: 0s;
+        transition-duration: 0.6s;
+        transition-property: width;
+        transition-timing-function: ease;
+        width: 100%;
+    }
+
+    .maskLoading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 9999999;
+        /* display: none; */
+    }
+
+    .maskLoading .imgText {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        width: 400px;
+        height: 180px;
+    }
+
+    .maskLoading .imgText p {
+        color: #fff;
+        text-align: center;
+    }
+
+    [v-cloak] {
+        display: none;
+    }
+
+    .blue {
+        color: #409EFF
+    }
+
+    .gary {
+        color: #ccc
+    }
+</style>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入" style="width:240px"></el-input>
+        <!-- <el-select v-model="ruleForm.spoTypeArr" placeholder="请选择" @change="change_spoTypeArr">
+      <el-option label="全部" value=""></el-option>
+      <el-option label="定制辅导" value="0"></el-option>
+      <el-option label="考前突击" value="1"></el-option>
+      <el-option label="包课辅导" value="2"></el-option>
+      <el-option label="论文辅导" value="4"></el-option>
+      <el-option label="特殊订单" value="32"></el-option>
+    </el-select>
+    <el-select v-model="ruleForm.sooTypeedArr" placeholder="请选择" @change="change_sooTypeedArr">
+      <el-option label="全部" value=""></el-option>
+      <el-option label="委派订单" value="1"></el-option>
+      <el-option label="自主抢单" value="2"></el-option>
+    </el-select> -->
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-select v-model="exceptionType" placeholder="请选择事故类别" @change="change_exceptionType">
+            <el-option label="全部" value=""></el-option>
+            <el-option label="金额问题" value="1"></el-option>
+            <el-option label="讲师问题" value="2"></el-option>
+            <el-option label="售后问题" value="4"></el-option>
+        </el-select>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column label="事故类别" width="100" align='center'>
+                <template slot-scope="scope">
+                    <span v-show='scope.row.exceptionType == 1'>金额问题</span>
+                    <span v-show='scope.row.exceptionType == 2'>讲师问题</span>
+                    <span v-show='scope.row.exceptionType == 4'>售后问题</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单号" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.parentId !==null&&scope.row.spoType !==64'>
+                        <img style="width:15px" src="images/ss.svg">
+                    </span>
+                    <span class="link" style="color:#409EFF;cursor: pointer;"
+                          @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="师资专员" width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.operUsername }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="讲师姓名" :show-overflow-tooltip="true" width="100">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.teacNickName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="申请时间" :show-overflow-tooltip="true" width="160">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.updateAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="feedback" :show-overflow-tooltip="true" align='center'>
+                <template slot-scope="scope">
+                    <span style="color:#409EFF;cursor: pointer;"
+                          v-show='scope.row.sysAfterSaleExceptionLog.handlingSuggestion != null'
+                          @click='checkFeedback(scope.row, scope.$index)'>查看</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column 
+            label="订单状态"
+            :show-overflow-tooltip="true"
+            width="100">
+            <template slot-scope="scope">
+                <span v-if='scope.row.statused>=8 && scope.row.statused<=64'>未接单</span>
+                <span v-if='scope.row.statused===128'>待排课</span>
+                <span v-if='scope.row.statused===256'>已排课</span>
+                <span v-if='scope.row.statused===512'>申请结课中</span>
+            </template>
+            </el-table-column> -->
+            <el-table-column label="申请理由" :show-overflow-tooltip="true" width="160">
+                <template slot-scope="scope">
+                    <span
+                          v-if='scope.row.sysAfterSaleException != null'>{{ scope.row.sysAfterSaleException.description }}</span>
+                    <span
+                          v-if='scope.row.sysAfterSaleException == null'>{{ scope.row.courseExtendtion.accident_reasons }}</span>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column label="可获G币" width="75">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.teacFixedPrice }}</span>
+                </template>
+            </el-table-column> -->
+            <el-table-column label="操作" width="400px" color="#000">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="returnValueToAccount(scope.row,scope.$index)"
+                               v-if="scope.row.spoType == -1">处理退卡</el-button>
+                    <el-button size="mini" disabled v-if="scope.row.spoType != -1">处理退卡</el-button>
+                    <el-button size="mini"
+                               v-if="((scope.row.spoType ==64&&scope.row.parentId !==null) || scope.row.spoType !==64)&&(hasPermission('sys:shouhou:weichulidingdan:qiangzhijieke'))&&(scope.row.spoType != -1)"
+                               @click="end(scope.row,scope.$index)">强制结课</el-button>
+                    <el-button size="mini" disabled
+                               v-if="((scope.row.spoType ==64&&scope.row.parentId ===null)&&(hasPermission('sys:shouhou:weichulidingdan:qiangzhijieke')))||(scope.row.spoType == -1)">
+                        强制结课</el-button>
+                    <el-button size="mini" @click="change_teacher(scope.row,scope.$index)"
+                               v-if="((scope.row.teacherId !==null && scope.row.spoType !==64)||(scope.row.spoType ===64&&scope.row.parentId ===null))&&(hasPermission('sys:shouhou:weichulidingdan:genghuanjiangshi'))&&(scope.row.spoType != -1)">
+                        更换讲师</el-button>
+                    <el-button size="mini" disabled
+                               v-if="(((scope.row.teacherId ===null && scope.row.spoType !==64)||(scope.row.spoType ==64&&scope.row.parentId !==null))&&(hasPermission('sys:shouhou:weichulidingdan:genghuanjiangshi')))||(scope.row.spoType == -1)">
+                        更换讲师</el-button>
+                    <el-button size="mini" @click="Application(scope.row,scope.$index)"
+                               v-if="hasPermission('sys:shouhou:weichulidingdan:bohuishigudan')">驳回事故单</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+
+
+        <el-dialog
+                   title="处理事故单"
+                   :visible.sync="disposeOrderDialog"
+                   width="50%"
+                   top='2vh'
+                   :before-close="disposeOrderDialogClose">
+            <div>
+                <el-form label-width="160px">
+                    <el-form-item label="责任人" class="important">
+                        <el-select v-model="disposePerson" multiple placeholder="请选择">
+                            <el-option v-for='(item, index) in selectOPtion' :key="item.key" :label="item.label "
+                                       :value="item.key"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="处理意见" class="important">
+                        <!-- <el-input v-model="desc" style='width:80%'></el-input><el-button style="margin-left: 10px;">删除</el-button><br />
+                        <el-button type='primary' style="margin-top: 10px;">新增意见</el-button> -->
+                        <!-- <div v-show='isFeedBack == false'>
+                            <el-input v-model="desc" type='textarea' style='width:70%'></el-input>
+                            <el-button type='warning' style="text-align: right;margin-left:5px;"
+                                       :disabled='descArr.length == 0' @click='delDesc(index)'>删除</el-button>
+                        </div> -->
+
+                        <div v-for='(item ,index) in descArr' style="margin:5px 0;">
+                            <el-input v-model="bindData[index]" type='textarea' style='width:70%'></el-input>
+                            <el-button type='warning' style="text-align: right;margin-left:5px;"
+                            size='mini':disabled='descArr.length < 1' @click='delDesc(index)'>删除</el-button>
+                        </div>
+
+                        <el-button type='primary' @click='addDesc' style="margin-top:10px;margin-left:0;">新增意见
+                        </el-button>
+                        <!-- <p v-for='(item ,index) in descArr'><span>{{index + 1}}:</span>{{item}} <el-button type='warning' style="text-align: right;" size='mini' @click='delDesc(index)'>删除</el-button></p> -->
+                    </el-form-item>
+
+                    <el-form-item label="文件"
+                                  style="border-bottom:1px dashed #ccc;padding-bottom:10px;">
+                        <el-button type='primary' id="selectfiles">上传文件</el-button>
+                        <div style="padding: 10px 0;" id="ossfile"></div>
+                        <div v-show='isFeedBack == true'>
+                            <p v-for='(item, index) in feedBackImg' style="line-height: 20px;">
+                                <a style="display:inline-block;width:80%;color:#409EFF;font-weight:600;overflow: hidden;
+                                    text-overflow:ellipsis;
+                                    white-space: nowrap;"
+                                   :href="item">{{item}}</a>
+                                <el-button size='mini'type='warning' @click='deleteImg(index)'>删 除</el-button>
+                            </p>
+
+                        </div>
+
+                    </el-form-item>
+                    <el-form-item label="处理结果" class="important">
+                        <el-radio v-model="result" label="1">订单结束</el-radio>
+                        <el-radio v-model="result" label="2">更换讲师</el-radio>
+                    </el-form-item>
+                    <div v-show='result == 2' class="result2">
+                        <el-form-item label="已完成的辅导内容">
+                            <el-input v-model="result2dec1" type='textarea'></el-input>
+                        </el-form-item>
+                        <el-form-item label="需完成的辅导内容">
+                            <el-input v-model="result2dec2" type='textarea'></el-input>
+                        </el-form-item>
+                        <el-form-item label="下一节课需求">
+                            <el-input v-model="result2dec3" type='textarea'></el-input>
+                        </el-form-item>
+                        <el-form-item label="对下一任老师说的话">
+                            <el-input v-model="result2dec4" type='textarea'></el-input>
+                        </el-form-item>
+                    </div>
+
+                </el-form>
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="disposeOrderDialogClose">取 消</el-button>
+                <el-button type="primary" @click="disposeOrderDialogSubmit">确 定</el-button>
+            </span>
+        </el-dialog>
+
+
+
+
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="dialogFormVisible4" width="40%" :before-close="dialogFormVisibleClose"
+                   v-loading='loadingAll == true'>
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="155px" class="demo-ruleForm">
+                <el-form-item label="责任人" prop="person_liable">
+                    <el-select placeholder="请选择责任人" v-model="ruleForm.person_liable" style="width: 200px;">
+                        <el-option label="无责任人" value="16"></el-option>
+                        <el-option label="销售" value="1"></el-option>
+                        <el-option label="学生" value="8"></el-option>
+                        <el-option label="师资" value="2"></el-option>
+                        <el-option label="老师" value="4"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="订单金额" style="margin-bottom:0">
+                    <span>{{totalPrice}} {{currency}}</span>
+                </el-form-item>
+                <!-- materialCost -->
+                <el-form-item label="材料费" style="margin-bottom:0" v-if='spoType == 1'>
+                    <span>{{materialCost}} {{currency}}</span>
+                </el-form-item>
+                <el-form-item label="已支付金额" style="margin-bottom:0">
+                    <span>{{prepayment}} {{currency}}</span>
+                </el-form-item>
+                <el-form-item label="订单余额" style="margin-bottom:0">
+                    <span>{{leftMoney}} {{currency}}</span>
+                </el-form-item>
+                <el-form-item label="调整订单余额" prop="blurLeftMoney" style="margin-bottom:0"
+                              v-if='studTermCardId == 0 || studTermCardId == null'>
+                    <el-input v-model="ruleForm.blurLeftMoney" type="number" style='width:150px'></el-input>
+                    {{currency}}
+                </el-form-item>
+                <el-form-item label="欠费金额" style="margin-bottom:0">
+                    <span>{{arrearageMoney}} {{currency}}</span>
+                </el-form-item>
+                <el-form-item label="已上课时" style="margin-bottom:0">
+                    <span>{{allSchooltime}} 分钟</span>
+                </el-form-item>
+                <!-- <el-form-item :label="label" prop="studMoney">
+                    <el-input v-model="ruleForm.studMoney" style='width:150px' type="number"></el-input> {{currency}}
+                </el-form-item> -->
+                <el-form-item>
+                    <el-checkbox v-model="ruleForm.hasSalesPerformance">纳入销售业绩考核</el-checkbox>
+                </el-form-item>
+                <!-- <el-form-item>
+                    <el-checkbox v-model="ruleForm.hasOperPerformance ">纳入师资业绩考核</el-checkbox>
+                </el-form-item> -->
+                <div v-if='studTermCardId != 0'>
+                    <el-form-item label="学期卡余额" style="margin-bottom:0">
+                        <span>{{extStudCardBagLastTime}} 小时</span>
+                    </el-form-item>
+                    <el-form-item label="调整学期卡余额" prop="extStudCardBagLastTimeChange">
+                        <el-input v-model="ruleForm.extStudCardBagLastTimeChange" style='width:150px' type="number">
+                        </el-input> 小时
+                    </el-form-item>
+                </div>
+                <div v-if="showdiv">
+                    <el-form-item label="讲师已获G币" style="margin-bottom:0">
+                        <span>{{teacGs}} 个</span>
+                    </el-form-item>
+                    <el-form-item label="讲师已获OTG币" style="margin-bottom:0" v-if="s2">
+                        <span>{{teacOtgs}} 个</span>
+                    </el-form-item>
+                    <el-form-item label="调整讲师G币" prop="GB">
+                        <el-input v-model="ruleForm.GB" type="number"></el-input>
+                    </el-form-item>
+                    <el-form-item label="调整讲师OTG币" prop="OTGB" v-if="s2">
+                        <el-input v-model="ruleForm.OTGB" type="number"></el-input>
+                    </el-form-item>
+                </div>
+                <el-form-item label="理由" prop="reason">
+                    <el-input v-model="ruleForm.reason" type="textarea"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-bind:loading="btnstatus" v-show="btn1" @click="submitForm4('ruleForm')">
+                    {{btnval}}</el-button>
+                <el-button type="primary" v-bind:loading="btnstatus" v-show="btn2" @click="submitForm3('ruleForm')">
+                    {{btnval}}</el-button>
+                <el-button @click="resetForm('ruleForm')" v-show="reset"></el-button>
+            </span>
+        </el-dialog>
+
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15]" :page-size="15" layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() +
+        '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="libs/crypto.js"></script>
+<script src="libs/hmac.js"></script>
+<script src="libs/sha1.js"></script>
+<script src="libs/base64.js"></script>
+<script src="libs/plupload.full.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="js/axios.min.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/customers.js');
+    }
+</script>
+
+
+</html>

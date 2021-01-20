@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入姓名" style="width:240px">
+        </el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-table
+                  :data="tableDataEnd"
+                  ref="multipleTable"
+                  border
+                  style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column
+                             label="姓名"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.callName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="微信号"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.wxAccount }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="学校名称"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.schoolName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="专业名称"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.professionalName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="课程名称"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.temCourseName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="下单时间"
+                             :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="150px">
+                <template slot-scope="scope">
+                    <el-button size="mini" v-bind:loading="btnstatus" v-if="scope.row.isMy===1"
+                               @click="dialogVisible(scope.row,scope.$index)">{{btnval}}</el-button>
+                    <el-button size="mini" v-bind:loading="btnstatus" v-if="scope.row.isMy===2"
+                               @click="apply(scope.row,scope.$index)">{{btnval1}}</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination
+                       style="margin-top:15px"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]"
+                       :page-size="limit"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/orderlist.js');
+    }
+</script>
+
+
+</html>

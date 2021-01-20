@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-upload
+                   class="upload-demo"
+                   ref="upload"
+                   action="123"
+                   :multiple="true"
+                   :file-list="fileList"
+                   :data="uploadDate"
+                   :before-upload="beforeUpload"
+                   :auto-upload="true">
+            <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+            <el-button style="margin-left: 10px;" size="small" type="success">上传到服务器</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </el-upload>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#app',
+        data() {
+            return {
+                fileList: [],
+                uploadDate: {}
+            }
+        },
+        mounted() {
+
+        },
+        methods: {
+            handleChange(file, fileList) {
+                this.fileList3 = fileList.slice(-3);
+            },
+            uploadSuccess(response, file, fileList) {
+                console.log('上传文件', response)
+            },
+            beforeUpload(response) {
+                var files = [];
+                var num = response;
+                files.push(response.name);
+                console.log(response)
+                var formData = new FormData();
+                // for(i=0;i<response.length;i++){  
+                //   formData.append("file["+i+"]", response[i].name);
+                // }
+                formData.append('file', response.name);
+                formData.append('name', "name");
+                formData.append('cdId', 1);
+                formData.append('groupId', 12);
+                $.ajax({
+                    headers: {
+                        "token": token
+                    },
+                    url: "" + baseURL + "sys/seller/courseware/save",
+                    type: 'POST',
+                    processData: false,
+                    contentType: false,
+                    data: formData,
+                    mimeType: "multipart/form-data",
+                    success: function (r) {
+
+                    }
+                });
+            },
+        }
+    });
+</script>
+</body>
+
+</html>
+
+</html>

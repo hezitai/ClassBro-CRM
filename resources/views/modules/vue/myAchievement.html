@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" placeholder="请输入" style="width:240px"></el-input>
+        <el-date-picker v-model="data" type="daterange" align="right" unlink-panels range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期" @change="choosedata" value-format="yyyy-MM-dd"
+                        :picker-options="pickerOptions2">
+        </el-date-picker>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <!-- <span>总消耗金额: </span>
+    <span>{{allmoney}}</span>
+    <span style="margin-left:15px">总订单数量: </span>
+    <span>{{allorderNumber}}</span> -->
+        <el-table v-show='showToYYT == true' :data="table" ref="multipleTable" border
+                  style="width: 100%;margin-top:5px;">
+            <el-table-column label="总消耗金额" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ allmoney | rounding}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="辅导消耗" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ allOrderMoney | rounding}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="代写消耗（文亚）" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ wyallorderNumber | rounding}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="总订单数量" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ allorderNumber | rounding}}</span>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column label="消耗金额" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.money * 1 + scope.row.wyardMoney * 1  | rounding}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="提成金额" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.operMoney * 1 + scope.row.operWyardMoney * 1 | rounding}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="师资名称" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.operName}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="兼职使用人数" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.partTimeNumber}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="订单数量" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.orderNumber}}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="100px">
+                <template slot-scope="scope">
+                    <el-button size="mini" @click="seedetail(scope.row,scope.$index)">查看详情</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- <el-pagination
+            style="margin-top:15px"
+             @size-change="handleSizeChange"
+             @current-change="handleCurrentChange"
+             :current-page="currentPage"
+             :page-sizes="[15,20]"
+             :page-size="limit"
+             layout="total, sizes, prev, pager, next, jumper"
+             :total="total">
+            </el-pagination> -->
+        <el-date-picker v-model="datas" style="margin:5px" type="daterange" range-separator="至" start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        @change="choosedataecharts" value-format="yyyy-MM-dd" :picker-options="pickerOptions2">
+        </el-date-picker>
+        <div id="main" style="width: 98%;height:400px;margin-top:20px;"></div>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/echarts.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/myAchievement.js');
+    }
+
+</script>
+
+</html>

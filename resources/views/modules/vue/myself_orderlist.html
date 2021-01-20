@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input> -->
+
+        <!-- <el-button type="primary" @click="openData">重置</el-button>
+            <el-button type="primary" @click="add">添加</el-button>
+            <el-button type="primary" @click="handleDelete">删除</el-button> -->
+        <el-date-picker
+                        v-model="data"
+                        type="daterange"
+                        align="right"
+                        unlink-panels
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        @change="choosedata"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        :picker-options="pickerOptions2">
+        </el-date-picker>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-button type="primary" v-bind:loading="btnstatus" @click="all">{{btnval}}</el-button>
+        <el-button id="performance"> </el-button>
+        <el-table
+                  :data="tableDataEnd"
+                  ref="multipleTable"
+                  border
+                  style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column
+                             label="订单号"
+                             width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="提成"
+                             width="100">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.commissionAmount }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="学生姓名"
+                             width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.studName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="课程名称"
+                             width="200">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.offCourseName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="实际消费总额"
+                             width="140">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.reaMonetary }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination
+                       style="margin-top:15px"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[15,20]"
+                       :page-size="limit"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/myself_orderlist.js');
+    }
+</script>
+
+</html>

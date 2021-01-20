@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="200px" style="width:800px;"
+                 class="demo-ruleForm">
+            <!-- <el-form-item label="课程ID" prop="username">
+        <el-input v-model="ruleForm.username"></el-input>
+      </el-form-item> -->
+            <el-form-item label="姓名" prop="username">
+                <el-input v-model="ruleForm.username"></el-input>
+            </el-form-item>
+            <el-form-item label="微信号" prop="wxAccount">
+                <el-input v-model="ruleForm.wxAccount"></el-input>
+            </el-form-item>
+            <el-form-item label="账号" prop="mobile">
+                <el-input v-model="ruleForm.mobile"></el-input>
+            </el-form-item>
+            <el-form-item label="密码" prop="password">
+                <el-input v-model="ruleForm.password"></el-input>
+            </el-form-item>
+            <el-form-item label="国家id" prop="countryId">
+                <el-select v-model="ruleForm.countryId" placeholder="请选择国家id">
+                    <el-option
+                               v-for="item in countrys"
+                               :key="item.id"
+                               :label="item.name"
+                               :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <!-- <el-form-item label="大学id" prop="universityId">
+        <el-input v-model="ruleForm.universityId"></el-input>
+      </el-form-item> -->
+            <el-form-item>
+                <el-button type="primary" @click="submitForm('ruleForm')">生成学生账号</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/creat.js');
+    }
+</script>
+
+</html>

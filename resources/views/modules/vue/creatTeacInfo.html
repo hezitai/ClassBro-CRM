@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .clearfix:after {
+        display: block;
+        clear: both;
+        content: "";
+        visibility: hidden;
+        height: 0
+    }
+
+    .fl {
+        float: left;
+    }
+
+    .red {
+        color: red;
+    }
+
+    .green {
+        color: green;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="140px" style="width:100%"
+                 class="demo-ruleForm">
+            <el-form-item label="手机号" prop="mobile">
+                <el-input
+                          @blur="result()"
+                          style="width:310px;"
+                          v-model="ruleForm.mobile"
+                          type="number"
+                          placeholder="请输入手机号">
+                </el-input>
+                <i class="el-icon-error" style="color:red" v-show="yes"></i>
+                <i class="el-icon-success" style="color:green" v-show="no"></i>
+                <el-button type="primary" @click="iftrue" id="tab">查询</el-button>
+                <i v-show="error" :class="color">{{error}}</i>
+            </el-form-item>
+            <!-- <el-form-item label="密码" prop="password">
+        <el-input v-model="ruleForm.password"></el-input>
+      </el-form-item> -->
+            <el-form-item label="姓名" prop="username">
+                <el-input v-model="ruleForm.username"></el-input>
+            </el-form-item>
+            <el-form-item label="昵称" prop="nickName">
+                <el-input v-model="ruleForm.nickName"></el-input>
+            </el-form-item>
+            <el-form-item label="渠道方" prop="channelId">
+                <el-select v-model="ruleForm.channelId" placeholder="请选择">
+                    <el-option
+                               v-for="item in toOperIds"
+                               :key="item.value"
+                               :label="item.channelName"
+                               :value="item.id">
+                    </el-option>
+            </el-form-item>
+            <el-form-item label="选择国家" prop="countryId">
+                <el-select v-model="ruleForm.countryId" placeholder="请选择国家" @change="change_country"
+                           style="width:310px;">
+                    <el-option
+                               v-for="item in countrys"
+                               :key="item.id"
+                               :label="item.name"
+                               :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="选择学校" prop="universityId">
+                <el-select v-model="ruleForm.universityId" filterable placeholder="请选择学校" @change="change_university"
+                           style="width:310px;">
+                    <el-option
+                               v-for="item in universitys"
+                               :key="item.id"
+                               :label="item.name"
+                               :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="专业" prop="professionalIds">
+                <el-select v-model="ruleForm.professionalIds" filterable multiple placeholder="请选择"
+                           style="width:310px;">
+                    <el-option
+                               v-for="item in professionalCoursesNames"
+                               :key="item.value"
+                               :label="item.chineseName"
+                               :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="学历" prop="eduBackgroundId">
+                <el-select v-model="ruleForm.eduBackgroundId" filterable placeholder="请选择" style="width:310px;">
+                    <el-option
+                               v-for="item in eduNames"
+                               :key="item.value"
+                               :label="item.name"
+                               :value="item.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="性别" prop="sex">
+                <el-select v-model="ruleForm.sex" placeholder="请选择性别" style="width:310px;">
+                    <el-option label="男" value="MALE"></el-option>
+                    <el-option label="女" value="FEMALE"></el-option>
+                </el-select>
+            </el-form-item>
+            <!-- <el-form-item label="擅长学科" prop="specializedName">
+          <el-input v-model="ruleForm.specializedName"></el-input>
+        </el-form-item>
+      <el-form-item label="性别" prop="sex">
+        <el-select v-model="ruleForm.sex" placeholder="请选择性别" style="width:310px;">
+          <el-option label="男" value="MALE"></el-option>
+          <el-option label="女" value="FEMALE"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="生日">
+        <el-col :span="11">
+          <el-form-item prop="birthday">
+            <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.birthday" value-format="yyyy-MM-dd HH:mm:ss" style="width: 310px;"></el-date-picker>
+          </el-form-item>
+        </el-col>
+      </el-form-item>
+      <el-form-item label="微信号" prop="wxAccount">
+        <el-input v-model="ruleForm.wxAccount"></el-input>
+      </el-form-item>
+      <el-form-item label="邮箱" prop="email">
+        <el-input v-model="ruleForm.email"></el-input>
+      </el-form-item> -->
+            <el-form-item>
+                <el-button type="primary" @click="submitForm('ruleForm')" v-bind:loading="btnstatus">{{btnval}}
+                </el-button>
+                <el-button @click="back()">返回</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/creatTeacInfo.js');
+    }
+
+</script>
+
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<style>
+    .el-checkbox+.el-checkbox {
+        margin-left: 0px;
+    }
+
+    .payOrderItem {
+        display: inline-block;
+        height: 40px;
+        line-height: 40px;
+        padding: 0 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin: 5px 5px;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <!-- <div style="margin-bottom:5px;"> -->
+        <el-input style="width:217px;" placeholder='请输入搜索关键字' v-model='searchKey' @blur='searchingEvent'></el-input>
+        <el-button type='primary' @click='searchingEvent'>搜索</el-button>
+        <!-- </div> -->
+
+
+        <el-select v-model="ruleForm.statusedArr" placeholder="选择账单类型" @change="changes">
+            <el-option label="全部账单" value=""></el-option>
+            <el-option label="未处理账单" value="1"></el-option>
+            <el-option label="已处理账单" value="2,4"></el-option>
+        </el-select>
+        <el-button type="primary" @click="allpay('ruleForm')"
+                   v-if="hasPermission('sys:seller:daichulibill:piliangzhifu')">批量支付</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column @change="handleSelectionChange" type="selection" width="50">
+            </el-table-column>
+            <el-table-column label="订单号" width="280">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.sopType ==64'>
+                        <img style="width:15px" src="images/bigC.png">
+                    </span>
+                    <span v-if='scope.row.parentId !==null&&scope.row.sopType !==64'>
+                        <img style="width:15px" src="images/ss.svg">
+                    </span>
+                    <span style="color:#409EFF;cursor: pointer;"
+                          @click="seedetail(scope.row,scope.$index)">{{ scope.row.orderNo }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="姓名" :show-overflow-tooltip="true" width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.nickName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="账单实付金额" :show-overflow-tooltip="true" width="80">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.oopExpenses }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="账单名称" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.type ===1'>课程预付</span>
+                    <span v-if='scope.row.type ===2'>欠费账单</span>
+                    <span v-if='scope.row.type ===4'>课程尾款</span>
+                    <span v-if='scope.row.type ===8'>课程追付</span>
+                    <span v-if='scope.row.type ===16'>补款账单</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="账单类型" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.billType ===1'>系统生成</span>
+                    <span v-if='scope.row.billType ===2'>销售创建</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="账单金额" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.badMoney }} {{ scope.row.current }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="账单状态" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span v-if='scope.row.statused ===1'>待处理</span>
+                    <span v-if='scope.row.statused ===2'>学生已处理</span>
+                    <span v-if='scope.row.statused ===4'>销售已处理</span>
+                    <span v-if='scope.row.statused ===8'>已结束</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="创建时间" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="拒绝理由" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.exceptionMsg }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="110">
+                <template slot-scope="scope">
+                    <el-dropdown trigger="click">
+                        <span class="el-dropdown-link" style="cursor: pointer;color: #409EFF;">
+                            下拉操作
+                            <i class="el-icon-arrow-down el-icon--right"></i>
+                        </span>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item v-if="hasPermission('sys:seller:bill:lijizhifu')"
+                                              @click.native="apply(scope.row,scope.$index)">立即支付</el-dropdown-item>
+                            <el-dropdown-item v-if="hasPermission('sys:seller:bill:chakanbill')"
+                                              @click.native="seebill(scope.row,scope.$index)">查看账单</el-dropdown-item>
+                            <el-dropdown-item @click.native="del(scope.row,scope.$index)"
+                                              v-if="scope.row.billType === 2 && scope.row.statused === 1">删除
+                            </el-dropdown-item>
+                            <el-dropdown-item disabled v-if="scope.row.billType !== 2 || scope.row.statused !== 1">删除
+                            </el-dropdown-item>
+                            <el-dropdown-item @click.native="suredel(scope.row,scope.$index)">强制删除</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="mm" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+                <el-form-item label="姓名" prop="studname">
+                    <el-input v-model="ruleForm.studname" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="账单总金额" prop="amount1" v-show="s1">
+                    <el-input v-model="ruleForm.amount1" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="还需充值" prop="amount" v-show="s2">
+                    <el-input v-model="ruleForm.amount" type="number" v-bind:value="oninput()"></el-input>
+                </el-form-item>
+                <el-form-item label="确认充值" v-show="s2">
+                    <el-input v-model="ruleForm.reamount" type="number" placeholder="请确保确认充值金额和还需充值金额保持一致"></el-input>
+                </el-form-item>
+                <div style="color:red;cursor: pointer;margin-left:75px" @click="payMethod">《充值须知》</div>
+                <span style="color:red;margin-left:75px"> {{red}} </span>
+                <el-form-item label="转账备注">
+                    <el-input type="textarea" :rows="4" v-model="ruleForm.remark"></el-input>
+                </el-form-item>
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders" :data="data" :multiple="true"
+                           accept="image/png, image/jpeg" :action="url" :on-preview="handlePreview"
+                           :on-remove="handleRemove"
+                           :on-success="success" :http-request="uploadFile" :on-error="onerror" :file-list="fileList"
+                           list-type="picture" :on-change="change" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload">上传到服务器</el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save('ruleForm')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="mm1" width="40%">
+            <el-form :model="ruleForm1" :rules="rules1" ref="ruleForm1" label-width="120px" class="demo-ruleForm">
+                <el-form-item label="姓名" prop="studname">
+                    <el-input v-model="ruleForm1.studname" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="定金" prop="amount1">
+                    <el-input v-model="ruleForm1.amount1" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="金额" prop="amount">
+                    <el-input v-model="ruleForm1.amount" type="number"
+                              onkeyup="this.value=this.value.replace(/[^\d.]/g,'').replace(/^(\-)*(\d+)\.(\d\d).*$/,'$1$2.$3')">
+                    </el-input>
+                </el-form-item>
+                <template>
+                    <el-radio v-show="radshow" v-model="radio" label="1">订单扣款</el-radio>
+                    <el-radio v-model="radio" label="2">余额扣款</el-radio>
+                </template>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save1('ruleForm1')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+        <el-dialog :visible.sync="mm2" :close-on-click-modal="false" width="40%">
+            <div style="font-size:16px;">1、请确认转账截图和充值金额一致。</div>
+            <div style="font-size:16px;">2、如收到多笔转账且金额相同，请务必上传不同的转账截图。</div>
+            <div style="font-size:16px;">3、请上传真实的转账截图。</div>
+            <div style="font-size:16px;">4、如有疑问，请联系部门负责人后再进行操作。</div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save2('ruleForm1')">我知道了</el-button>
+            </span>
+        </el-dialog>
+        <!-- 支付类型 -->
+        <el-dialog :visible.sync="paytypemodel" width="40%">
+            <el-form :model="ruleForm1" :rules="rules1" ref="ruleForm1" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="账单名称:" prop="studname">
+                    <span v-if='ruleForm.type ===1'>课程预付</span>
+                    <span v-if='ruleForm.type ===2'>欠费账单</span>
+                    <span v-if='ruleForm.type ===4'>课程尾款</span>
+                    <span v-if='ruleForm.type ===8'>课程追付</span>
+                    <span v-if='ruleForm.type ===16'>补款账单</span>
+                </el-form-item>
+                <el-form-item label="姓名:" prop="studname">
+                    <div>{{ruleForm1.studname}}</div>
+                </el-form-item>
+                <el-form-item label="订单金额:">
+                    <div>{{ruleForm1.ordermoney}} {{ruleForm1.current}}</div>
+                </el-form-item>
+                <el-form-item label="支付金额:" prop="amount">
+                    <el-input-number v-model="ruleForm1.amount" :min="min" :max="max" v-bind:disabled="disab">
+                    </el-input-number>
+                    <span style="margin-left:6px">{{ruleForm1.current}}</span>
+                </el-form-item>
+                <el-form-item label="定金:" prop="amount1" v-show="dj">
+                    <div>最少充值
+                        <span style="color:red;font-weight:600"> {{ruleForm1.amount1}}</span> {{ruleForm1.current}}
+                    </div>
+                </el-form-item>
+                <el-form-item label="支付方式:" prop="paytype">
+                    <el-select v-model="ruleForm1.paytype" placeholder="请选择支付方式">
+                        <el-option label="订单支付" value="0"></el-option>
+                        <el-option label="余额支付" value="1"></el-option>
+                        <el-option label="转账支付" value="2"></el-option>
+                        <el-option label="学期卡支付" value="3"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="typebtn('ruleForm1')" v-bind:loading="btnstatus">确定</el-button>
+            </span>
+        </el-dialog>
+        <!-- 添加的弹框 -->
+        <el-dialog :visible.sync="allpaymodel" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+                <el-form-item label="姓名:">
+                    <div>{{ nickNames }}</div>
+                </el-form-item>
+                <el-form-item label="金额:">
+                    <div>{{ amounts }} {{ currents }}</div>
+                </el-form-item>
+                <el-form-item label="转账备注:">
+                    <el-input type="textarea" :rows="4" v-model="ruleForm.remark"></el-input>
+                </el-form-item>
+                <el-upload class="upload-demo" ref="upload" :data="data" :multiple="true" accept="image/png, image/jpeg"
+                           :action="url" :on-remove="allhandleRemove" :http-request="alluploadFile"
+                           :file-list="allfileList"
+                           list-type="picture" :on-change="allchange" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="allsubmitUpload">上传到服务器
+                    </el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="allsave('ruleForm')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage" :page-sizes="[15,20]" :page-size="limit"
+                       layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
+
+        <!-- 多币种支付 -->
+        <el-dialog :visible.sync="rightAwayPay" width="60%" v-loading="rightAwayPayLoading"
+                   :before-close="rightAwayPayHandleClose" top='2vh'>
+            <el-form :model="payDialogInfo" :rules="rules1" ref="payDialogInfo" label-width="100px"
+                     class="demo-getCourseData">
+                <el-form-item label="账单名称:" prop="studname">
+                    <span v-if='payDialogInfo.type ===1'>课程预付</span>
+                    <span v-if='payDialogInfo.type ===2'>欠费账单</span>
+                    <span v-if='payDialogInfo.type ===4'>课程尾款</span>
+                    <span v-if='payDialogInfo.type ===8'>课程追付</span>
+                    <span v-if='payDialogInfo.type ===16'>补款账单</span>
+                </el-form-item>
+                <el-form-item label="姓名:" prop="studname">
+                    <div>{{payDialogInfo.nickName}}</div>
+                </el-form-item>
+                <el-form-item label="账单金额:">
+                    <div>{{payDialogInfo.badMoney}} {{payDialogInfo.current}}</div>
+                </el-form-item>
+                <el-form-item label="从订单支付:">
+                    <!-- <el-checkbox></el-checkbox> -->
+                    <el-switch @change='payToOrderEvent' v-model="switchValue">
+                    </el-switch>
+                </el-form-item>
+                <div v-show='switchValue == false'>
+                    <div>
+                        <el-form-item label='支付方式'>
+                            <el-checkbox-group v-model='chiocePaymentMethodArray'>
+                                <el-checkbox style="display:block"
+                                             v-for='(item, index) in paymentMethod'
+                                             @change='changePaymentEvent(item)'
+                                             :key='item.id'
+                                             :label='item'>
+                                    <span v-if='item.hasCard == true'>
+                                        学期卡(剩余{{item.lastTime}}课时 = {{item.money}} {{item.current}}
+                                        ({{item.exchangeMoney}}{{payDialogInfo.current}}) )
+                                    </span>
+                                    <span v-if='item.hasCard == false'>
+                                        {{item.current}} 账户余额：{{item.money}}
+                                        {{item.current}}
+                                        ({{item.exchangeMoney}}
+                                        {{payDialogInfo.current}})
+                                    </span>
+                                </el-checkbox>
+                            </el-checkbox-group>
+                        </el-form-item>
+                    </div>
+                    <div v-show='chiocePaymentMethodArray.length > 1'>
+                        <el-form-item label='支付顺序'>
+                            <div class="payOrderItem" v-for='(item, index) in chiocePaymentMethodArray'>
+                                <span v-if='item.hasCard == true'>
+                                    学期卡抵扣
+                                </span>
+                                <span v-if='item.hasCard == false'>
+                                    {{item.current}} 账户
+                                </span>
+                            </div>
+                        </el-form-item>
+                    </div>
+                    <div v-show='stillNeedPay > 0'>
+                        <p style="color:red;font-size:12px;" v-show='warningPaymentMoney'>
+                            支付方式账户余额不足，需转账充值
+                            <span>
+                                {{stillNeedPay}} {{payDialogInfo.current}}
+                                <span v-show='stillNeedPaymentMoney != 0'>
+                                    换汇后约 {{stillNeedPaymentMoney}} {{nomarlCurrency}}
+                                </span>
+                            </span>
+                        </p>
+                        <p style="color:#409EFF;font-size:12px;" v-show='!warningPaymentMoney'>
+                            <span>
+                                转账充值{{stillNeedPay}} {{payDialogInfo.current}}
+                                <span>
+                                    换汇后约 {{stillNeedPaymentMoney}} {{nomarlCurrency}}
+                                </span>
+                            </span>
+                        </p>
+                        <el-form-item label="转账充值金额:" prop="amount">
+                            <el-input type='number' style='width:100px;' @blur='changeResiduePayMoneyEvent'
+                                      v-model="residuePayMoney">
+                            </el-input>
+                            <el-select v-model="nomarlCurrency" placeholder="币种" style="width:100px;"
+                                       @change='changeCurrency'>
+                                <el-option v-for="item in currencyList" :key="item.id" :label="item.tagerCurrency"
+                                           :value="item.tagerCurrency" :disabled='item.deleteFlag == true'>
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+                        <p style="color:red;font-size:12px;">请确认剩余支付金额与上传图片金额一致！</p>
+                        <div>
+                            <el-upload class="upload-demo" ref="upload" :headers="myHeaders2" :data="data2"
+                                       :multiple="true"
+                                       accept="image/png, image/jpeg" :action="url2" :on-preview="handlePreview2"
+                                       :on-remove="handleRemove2" :on-success="success2" :http-request="uploadFile2"
+                                       :on-error="onerror2" :file-list="fileList2" list-type="picture"
+                                       :on-change="change2"
+                                       :auto-upload="false">
+                                <el-button slot="trigger" size="small" type="primary" style="margin-left:30px;">上传图片
+                                </el-button>
+                                <el-button size="small" style="display:none" type="success" @click="submitUpload">上传到服务器
+                                </el-button>
+                            </el-upload>
+                            <p style="padding: 0 30px;">
+                                <span style='margin-bottom: 10px;display: inline-block;'>备注：</span>
+                                <el-input style="display:inline-block" type="textarea" placeholder="请输入备注"
+                                          v-model="rightAwayPayType2Doc">
+                                </el-input>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="padding-left: 20px;" v-show='switchValue == true'>
+                    <el-table :data="payToOrderArray" style="width: 100%">
+                        <el-table-column label="订单号（剩余金额）" align='left'>
+                            <template slot-scope="scope">
+                                {{scope.row.orderNo}} <span style="color:#409EFF;font-weight:600;">（{{scope.row.studPurchaseOrder.leftMoney}} {{scope.row.studPurchaseOrder.currency}}）</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" width="120" align='center'>
+                            <template slot-scope="scope">
+                                <el-button size='mini' type="primary" :disabled='(scope.row.studPurchaseOrder.currency != payDialogInfo.current) || (payDialogInfo.badMoney*1 > scope.row.studPurchaseOrder.leftMoney*1)' @click="rightAwayPayType22Submit(scope.row)"
+                                           v-bind:loading="b1" title>支付
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </div>
+
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" v-show='switchValue == false' @click="rightAwayPayType2Submit"
+                           v-bind:loading="b1">确定支付
+                </el-button>
+            </span>
+        </el-dialog>
+
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="js/axios.min.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/bad_ordered.js');
+    }
+</script>
+
+</html>

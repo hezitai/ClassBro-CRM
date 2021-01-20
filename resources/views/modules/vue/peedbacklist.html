@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<style>
+    .demo-table-expand {
+        font-size: 0;
+    }
+
+    .demo-table-expand label {
+        width: 90px;
+        color: #99a9bf;
+    }
+
+    .demo-table-expand .el-form-item {
+        margin-right: 0;
+        margin-bottom: 0;
+        width: 50%;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" placeholder="请输入姓名" style="width:240px"></el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <!-- <el-button type="primary" @click="openData">重置</el-button>
+            <el-button type="primary" @click="add">添加</el-button>
+            <el-button type="primary" @click="handleDelete">删除</el-button> -->
+        <el-select v-model="ruleForm.countryId" placeholder="选择反馈类型" @change="handleChange">
+            <el-option label="学生反馈" value="1"></el-option>
+            <el-option label="教师反馈" value="2"></el-option>
+        </el-select>
+        <el-table
+                  :data="tableDataEnd"
+                  ref="multipleTable"
+                  border
+                  style="width: 100%;"
+                  @selection-change="handleSelectionChange">
+            <el-table-column
+                             type="selection"
+                             width="50">
+            </el-table-column>
+            <el-table-column type="expand">
+                <template slot-scope="props">
+                    <el-form label-position="left" inline class="demo-table-expand">
+                        <el-form-item label="用户id">
+                            <span>{{ props.row.id }}</span>
+                        </el-form-item>
+                        <el-form-item label="userId">
+                            <span>{{ props.row.userId }}</span>
+                        </el-form-item>
+                        <el-form-item label="用户姓名">
+                            <span>{{ props.row.name }}</span>
+                        </el-form-item>
+                        <el-form-item label="反馈详情">
+                            <span>{{ props.row.contents }}</span>
+                        </el-form-item>
+                    </el-form>
+                </template>
+            </el-table-column>
+            <el-table-column
+                             label="用户id"
+                             prop="id">
+            </el-table-column>
+            <el-table-column
+                             label="userId"
+                             prop="userId">
+            </el-table-column>
+            <el-table-column
+                             label="用户姓名"
+                             prop="name">
+            </el-table-column>
+            <el-table-column
+                             label="userId"
+                             prop="userId">
+            </el-table-column>
+            <el-table-column
+                             label="反馈详情"
+                             prop="contents">
+            </el-table-column>
+        </el-table>
+
+        <el-pagination
+                       style="margin-top:15px"
+                       @size-change="handleSizeChange"
+                       @current-change="handleCurrentChange"
+                       :current-page="currentPage"
+                       :page-sizes="[6]"
+                       :page-size="6"
+                       layout="total, sizes, prev, pager, next, jumper"
+                       :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        loadJsOrCss('pagejs/peedbacklist.js');
+    }
+</script>
+
+</html>

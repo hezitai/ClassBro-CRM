@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <div id="app">
+        <el-input v-model="tableDataName" @keyup.enter.native="search" placeholder="请输入姓名" style="width:240px">
+        </el-input>
+        <el-button type="primary" @click="search">搜索</el-button>
+        <el-button type="primary" @click="searchs">学生充值</el-button>
+        <el-table :data="tableDataEnd" ref="multipleTable" border style="width: 100%;margin-top:5px;"
+                  @selection-change="handleSelectionChange">
+            <!-- <el-table-column
+            type="selection"
+            width="50">
+          </el-table-column> -->
+            <el-table-column label="时间" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.createAt }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="学生名称" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.nickName }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="转账金额" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.money }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="货币" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <span>{{ scope.row.current }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="状态" :show-overflow-tooltip="true">
+                <template slot-scope="scope">
+                    <el-tag v-if='scope.row.statused===0'>待审核</el-tag>
+                    <el-tag type="success" v-if='scope.row.statused===1'>已通过</el-tag>
+                    <el-tag type="warning" v-if='scope.row.statused===2'>已拒绝</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column label="凭证">
+                <template slot-scope="scope">
+                    <a v-for="thumbPaths in scope.row.thumbPaths" @click="view(thumbPaths)">
+                        <img :src="thumbPaths" style="width:50px;height:50px;margin-right:10px;border:1px solid #ddd">
+                    </a>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scope">
+                    <!--  v-if="hasPermission('sys:seller:Studentecharge:buchongzhuanzhangtupian')" -->
+                    <el-button size="mini" @click="updateimg(scope.row,scope.$index)">补充转账图片</el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 充值 -->
+        <el-dialog :visible.sync="mm" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="手机号" prop="name">
+                    <el-input v-model="ruleForm.name" style="width:120px"></el-input>
+                    <el-button type="primary" @click="searchname">查询</el-button>
+                    <i v-show="error" style="color:red">{{error}}</i>
+                </el-form-item>
+                <el-form-item label="姓名" prop="studname">
+                    <el-input v-model="ruleForm.studname" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="金额" prop="amount" v-show="person">
+                    <el-input v-model="ruleForm.amount" type="number"></el-input>
+                </el-form-item>
+                <el-form-item label="转账备注">
+                    <el-input type="textarea" :rows="4" v-model="ruleForm.remark"></el-input>
+                </el-form-item>
+                <el-form-item label="货币类型" prop="current" v-show="person">
+                    <el-form-item>
+                        <el-select v-model="ruleForm.current" style="width: 200px;">
+                            <el-option v-for="item in countrys" :key="item.value" :label="item.currency"
+                                       :value="item.currency">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form-item>
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders" :data="data" :multiple="true"
+                           accept="image/png, image/jpeg" :action="url" :on-preview="handlePreview"
+                           :on-remove="handleRemove"
+                           :on-success="success" :http-request="uploadFile" :on-error="onerror" :file-list="fileList"
+                           list-type="picture" :on-change="change" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload">上传到服务器</el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save('ruleForm')" v-bind:loading="b1">{{b2}}</el-button>
+            </span>
+        </el-dialog>
+        <!-- 补充 -->
+        <el-dialog :visible.sync="updatamodel" width="40%">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="80px" class="demo-ruleForm">
+                <el-form-item label="手机号" prop="name">
+                    <el-input v-model="ruleForm.name" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="姓名" prop="studname">
+                    <el-input v-model="ruleForm.studname" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="转账备注">
+                    <el-input type="textarea" :rows="4" v-model="ruleForm.remark"></el-input>
+                </el-form-item>
+                <el-upload class="upload-demo" ref="upload" :headers="myHeaders1" :data="datas1" :multiple="true"
+                           accept="image/png, image/jpeg" :action="url" :on-preview="handlePreview1"
+                           :on-remove="handleRemove1"
+                           :on-success="success1" :http-request="uploadFile1" :on-error="onerror1"
+                           :file-list="fileList1"
+                           list-type="picture" :on-change="change1" :auto-upload="false">
+                    <el-button slot="trigger" size="small" type="primary" style="margin-left:80px;">选择图片</el-button>
+                    <el-button size="small" style="display:none" type="success" @click="submitUpload1">上传到服务器
+                    </el-button>
+                </el-upload>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="save1('ruleForm')" v-bind:loading="b11">{{b21}}</el-button>
+            </span>
+        </el-dialog>
+        <el-pagination style="margin-top:15px" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+                       :current-page="currentPage" :page-sizes="[15]" :page-size="15"
+                       layout="total, sizes, prev, pager, next, jumper" :total="total">
+        </el-pagination>
+    </div>
+</body>
+<script src="js/jquery.js"></script>
+<script type="text/javascript">
+    document.write('<script src="../../js/base.js?tmp=' + new Date().getTime() + '" type="text/javascript" charset="utf-8"><\/script>');
+</script>
+<script src="js/axios.min.js"></script>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script type="text/javascript">
+    window.onload = function(){
+        loadJsOrCss('pagejs/charge_money.js')
+    }
+</script>
+
+</html>
